@@ -1,5 +1,6 @@
 import {useEffect,useState} from 'react';
 import {defaultTokens,defaultMotionTokens,ActionBar,ActionButton,tokensToDTCG,TOKEN_VERSION,type SocialTokens,type SocialVariant,type PreviewState,type IconMotion,type IconMotionTokens} from '../lib/index.js';
+import {useInitialFragment} from './useInitialFragment.js';
 import {MotionLab} from './MotionLab.js';
 import {LiveActions} from './LiveActions.js';
 import {Inspector,type EditableToken} from './Inspector.js';
@@ -7,6 +8,7 @@ import {Documentation,StateCatalog} from './Documentation.js';
 import {variantInfo,variants,states,stateNames,words,type Locale} from './content.js';
 function download(name:string,data:string){const url=URL.createObjectURL(new Blob([data],{type:'application/json'})),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 export default function App(){
+ useInitialFragment();
  const [locale,setLocale]=useState<Locale>('en'),[tokens,setTokens]=useState<SocialTokens>({...defaultTokens}),[isolate,setIsolate]=useState(false),[variable,setVariable]=useState<EditableToken>('gap'),[variant,setVariant]=useState<SocialVariant>('spring'),[preview,setPreview]=useState<PreviewState>('idle'),[reduced,setReduced]=useState(false),[targets,setTargets]=useState(false),[fail,setFail]=useState(false),[delay,setDelay]=useState(900),[iconMotion,setIconMotion]=useState<IconMotion>('cartoon'),[motionTokens,setMotionTokens]=useState<IconMotionTokens>({...defaultMotionTokens});
  const t=words[locale],activeTokens=isolate?{...defaultTokens,[variable]:tokens[variable]}:tokens;
  useEffect(()=>{document.documentElement.lang=locale;},[locale]);

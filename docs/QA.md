@@ -18,7 +18,7 @@ Evidence: application GitHub `f6d53ebf082f9f6f0734c74f7e77f8644b7fb9de`, corresp
 - [Temporal JSON, heart phases and bilingual catalog screenshots](https://github.com/domizo/social-interaction-lab/actions/runs/38056363811/artifacts/11671121654), retained 14 days
 - Artifact SHA-256: `86e57bc83e85aeb48bd1760ffa2eaad23a2a1914aabe66e8fa8ee30c8598cbdd`
 
-This record and the narrow capture/deep-link cleanup follow the measured application source. Every subsequent exact repository commit reruns the full Quality workflow. Hosted sign-in, Safari, physical devices and assistive-technology limits below still apply.
+This record and the narrow capture/deep-link cleanup follow the measured application source. A later fresh-page regression exposed initial fragment scrolling before React mounted; the app now performs the initial jump after layout fonts settle, cancels stale/unmounted work, and yields to user input. Three lifecycle regressions bring the unit suite to 102. Every subsequent exact repository commit reruns the full Quality workflow. Hosted sign-in, Safari, physical devices and assistive-technology limits below still apply.
 
 ## 0.2.0 glyph-motion verification / アイコンの動作検証
 
