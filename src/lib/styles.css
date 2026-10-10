@@ -7,13 +7,17 @@
 .sil-soft{border-radius:999px;background:#faf1f2;padding-inline:16px}.sil-soft:hover,.sil-soft[data-preview=hover]{background:#f6e3e6}
 .sil-solid{border-radius:5px;background:#25272a;color:#fff;padding-inline:14px}.sil-solid:hover,.sil-solid[data-preview=hover]{background:#44474d}.sil-solid[data-selected=true],.sil-solid[data-action=like][data-preview=selected]{background:var(--sil-accent,#b93240);color:white;border-color:currentColor}
 .sil-spring{border-radius:18px 18px 18px 8px;border-color:#e2e4e8;transition-timing-function:cubic-bezier(.34,1.56,.64,1)}.sil-spring:hover,.sil-spring[data-preview=hover]{transform:translateY(-1px);background:#fff7f7;border-color:#e7bac0}.sil-spring:active,.sil-spring[data-preview=pressed]{transform:none}
-.sil-action[data-pending=true],.sil-action[data-preview=pending]{cursor:progress}.sil-action[data-pending=true] .sil-icon,.sil-action[data-preview=pending] .sil-icon{opacity:.4}.sil-pending-dot{position:absolute;inset:-3px;border:2px solid transparent;border-top-color:currentColor;border-radius:50%;animation:sil-spin 750ms linear infinite}.sil-action[data-preview=pending] .sil-icon-wrap:after{content:'';position:absolute;inset:-3px;border:2px dotted currentColor;border-radius:50%}
+.sil-action[data-pending=true],.sil-action[data-preview=pending]{cursor:progress}.sil-action[data-pending=true] .sil-icon,.sil-action[data-preview=pending] .sil-icon{opacity:.65}.sil-pending-mark{position:absolute;right:-8px;bottom:-7px;background:inherit;border-radius:3px;font:700 12px/8px sans-serif;letter-spacing:0;padding:1px 2px;color:currentColor}.sil-action[data-preview=pending] .sil-icon-wrap:after{content:'···';position:absolute;right:-8px;bottom:-7px;font:bold 12px/8px sans-serif}
 .sil-action[data-error=true],.sil-action[data-preview=error]{border-color:#a32935}.sil-error-mark{position:absolute;right:-5px;top:-6px;background:#a32935;color:white;font:bold 10px/14px sans-serif;width:14px;border-radius:50%;text-align:center}.sil-action:disabled{opacity:.5;cursor:not-allowed}.sil-action[aria-disabled=true]:active .sil-content{transform:none}
-@keyframes sil-spin{to{transform:rotate(360deg)}}
-@media(prefers-reduced-motion:reduce){.sil-action,.sil-action:hover,.sil-action:active{transition:none;transform:none!important}.sil-pending-dot{animation:none;border-style:dotted;border-color:currentColor}}
-[data-reduced-motion=true] .sil-action{transition:none!important;transform:none!important}[data-reduced-motion=true] .sil-pending-dot{animation:none;border-style:dotted;border-color:currentColor}
+
+@media(prefers-reduced-motion:reduce){.sil-action,.sil-action:hover,.sil-action:active{transition:none;transform:none!important}}
+[data-reduced-motion=true] .sil-action{transition:none!important;transform:none!important}
 
 .sil-action[data-action=like][data-preview=selected] .sil-icon{fill:currentColor}
 
 .sil-content{display:inline-flex;align-items:center;justify-content:center;gap:inherit;transition:transform var(--sil-duration,180ms) cubic-bezier(.2,.8,.2,1)}.sil-spring .sil-content{transition-timing-function:cubic-bezier(.34,1.56,.64,1)}
 @media(prefers-reduced-motion:reduce){.sil-content{transition:none!important;transform:none!important}}[data-reduced-motion=true] .sil-content{transition:none!important;transform:none!important}
+
+.sil-icon [data-glyph-part]{transform-box:fill-box;transform-origin:center}.sil-icon path{transform-box:fill-box;transform-origin:center}
+
+.sil-action[data-reduced-motion=true],.sil-action[data-reduced-motion=true]:hover,.sil-action[data-reduced-motion=true] .sil-content{transition:none!important;transform:none!important}

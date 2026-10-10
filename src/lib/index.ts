@@ -5,3 +5,6 @@ export {useAsyncAction,simulateRequest} from './useAsyncAction.js';
 export type {AsyncActionState,AsyncStatus} from './useAsyncAction.js';
 export {defaultTokens,tokenBounds,normalizeTokens,tokenStyle,tokensToDTCG,TOKEN_VERSION} from './tokens.js';
 export type {SocialTokens,SocialVariant,SocialAction,PreviewState} from './tokens.js';
+
+export {iconMotions,defaultMotionTokens,normalizeMotionTokens,glyphMotionPlan} from './iconMotion.js';
+export type {IconMotion,IconMotionTokens,GlyphPlan} from './iconMotion.js';

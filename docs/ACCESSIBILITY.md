@@ -10,7 +10,7 @@
 - Native dialog supplies modal focus containment with explicit first/last Tab wrapping; close/save calls close before restoring trigger focus
 - Cancellation aborts requests and invalidates stale results. Text remains after an error for retry
 - Saved comment/quote text is retained in mounted session state and inspectable; reload clears it
-- Reduced-motion media query removes animation/transforms. Manual preview switch matches this behavior
+- OS reduced-motion preference and the standalone reducedMotion prop cancel SVG animations and suppress CSS transforms. Pending keeps static dots and accessible status; selected state remains visible without motion
 - Edited accent colors are experimental; a specimen-surface contrast warning is not a complete accessibility audit
 
 キーボード、名前、状態、フォーカス、中止と再試行に対応します。ただし実際の支援技術での確認、利用先の背景色・表示密度・言語による検証は別途必要です。アクセシビリティ完全準拠を主張するものではありません。

@@ -1,5 +1,6 @@
 import type { CSSProperties } from 'react';
-export const TOKEN_VERSION = '0.1.0';
+import {normalizeMotionTokens,type IconMotionTokens} from './iconMotion.js';
+export const TOKEN_VERSION = '0.2.0';
 export type SocialVariant = 'minimal' | 'soft' | 'solid' | 'spring';
 export type SocialAction = 'like' | 'comment' | 'share' | 'quote';
 export type PreviewState = 'idle' | 'hover' | 'focus' | 'pressed' | 'selected' | 'pending' | 'error';
@@ -15,7 +16,7 @@ export function normalizeTokens(input: Partial<SocialTokens> = {}): SocialTokens
 export function tokenStyle(input: Partial<SocialTokens> = {}): CSSProperties {
   const t=normalizeTokens(input); return {'--sil-icon':`${t.iconSize}px`,'--sil-stroke':t.strokeWidth,'--sil-gap':`${t.gap}px`,'--sil-duration':`${t.duration}ms`,'--sil-amplitude':t.amplitude/100,'--sil-accent':t.accent,'--sil-target':`${t.hitTarget}px`} as CSSProperties;
 }
-export function tokensToDTCG(input: Partial<SocialTokens> = {}) {
-  const t=normalizeTokens(input); const dimension=(value:number)=>({$type:'dimension',$value:{value,unit:'px'}});
-  return {$description:'Social Interaction Lab. DTCG 2025.10 format; not a W3C Recommendation. Package version '+TOKEN_VERSION, iconSize:dimension(t.iconSize),strokeWidth:dimension(t.strokeWidth),gap:dimension(t.gap),hitTarget:dimension(t.hitTarget),duration:{$type:'duration',$value:{value:t.duration,unit:'ms'}},amplitude:{$type:'number',$value:t.amplitude/100},accent:{$type:'color',$value:{colorSpace:'srgb',components:[1,3,5].map(i=>parseInt(t.accent.slice(i,i+2),16)/255),alpha:1,hex:t.accent}}};
+export function tokensToDTCG(input: Partial<SocialTokens> = {}, motionInput:Partial<IconMotionTokens>={}) {
+  const t=normalizeTokens(input),m=normalizeMotionTokens(motionInput); const dimension=(value:number)=>({$type:'dimension',$value:{value,unit:'px'}});
+  return {iconMotion:{duration:{$type:'duration',$value:{value:m.duration,unit:'ms'}},intensity:{$type:'number',$value:m.intensity},stagger:{$type:'duration',$value:{value:m.stagger,unit:'ms'}}},$description:'Social Interaction Lab. DTCG 2025.10 format; not a W3C Recommendation. Package version '+TOKEN_VERSION, iconSize:dimension(t.iconSize),strokeWidth:dimension(t.strokeWidth),gap:dimension(t.gap),hitTarget:dimension(t.hitTarget),duration:{$type:'duration',$value:{value:t.duration,unit:'ms'}},amplitude:{$type:'number',$value:t.amplitude/100},accent:{$type:'color',$value:{colorSpace:'srgb',components:[1,3,5].map(i=>parseInt(t.accent.slice(i,i+2),16)/255),alpha:1,hex:t.accent}}};
 }

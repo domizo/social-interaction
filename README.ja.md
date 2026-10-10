@@ -16,14 +16,14 @@ npm run verify:consumer
 npm run verify:archive
 ```
 
-build はサイト `dist/`、ESM ライブラリ `package/`、インストール可能な `public/downloads/social-interaction-lab-react-0.1.0.tgz` を生成します。verify:archive は Git HEAD に記録されたファイルだけで新規インストール・ビルド・テストを行います。
+build はサイト `dist/`、ESM ライブラリ `package/`、インストール可能な `public/downloads/social-interaction-lab-react-0.2.0.tgz` を生成します。verify:archive は Git HEAD に記録されたファイルだけで新規インストール・ビルド・テストを行います。
 
 SNS への投稿、アカウント連携、API キー、アクセス解析はありません。応答はすべてローカルのシミュレーションです。保存したコメント・引用は現在の画面セッション内のみ保持され、再読み込みで消えます。
 
 ## 別のアプリに組み込む
 
 ```sh
-npm install ./social-interaction-lab-react-0.1.0.tgz
+npm install ./social-interaction-lab-react-0.2.0.tgz
 ```
 
 ```tsx
@@ -35,6 +35,18 @@ import '@social-interaction-lab/react/styles.css';
 ```
 
 React 18.2 / 19 対応、ESM のみです。CSS は明示的に読み込みます。LikeButton は制御コンポーネントです。CommentButton・QuoteButton はダイアログ、ShareButton はメニューを開くことを支援技術に伝えます。利用側で実際のポップアップ、フォーカス移動・復帰、キーボード操作、aria-expanded / aria-controls を実装してください。動く実装例はソースの src/app/LiveActions.tsx にあります。
+
+## アイコン自体を動かす
+
+見た目の variant とは別に、`iconMotion="pulse"` / `"spring"` / `"trace"` / `"gesture"` を選べます。「動き」セクションで4操作 × 4表現を比較し、時間・強さ・パーツの時間差を調整。一括再生や処理中プレビューができ、選んだ動きは実際のローカル操作にも反映されます。
+
+```tsx
+<LikeButton label="いいね" selected={liked} iconMotion="gesture"
+  motionTokens={{ duration: 560, intensity: 1, stagger: 60 }}
+  onClick={() => setLiked(value => !value)} />
+```
+
+ハートの弾み、吹き出しの膨らみ、共有矢印の発射、引用符の時間差などを SVG 自体で表現します。開始時の動きは成功を意味しません。処理中はゆっくり反復し、静止した点と状態説明も残ります。OS 設定と `reducedMotion` に対応。詳しくは[動きの API・意図・制約](docs/MOTION.md)を参照してください。
 
 ## 状態と非同期処理
 

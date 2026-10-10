@@ -1,6 +1,6 @@
 # Social Interaction Lab
 
-Four original expressions of Like, Comment, Share, and Quote, built from shared accessible React + TypeScript primitives. Includes a bilingual EN/JA Vite playground and a real installable library.
+Four original visual styles and four glyph-motion treatments for Like, Comment, Share, and Quote, built from shared accessible React + TypeScript primitives. Includes a bilingual EN/JA Vite playground and a real installable library.
 
 [日本語](README.ja.md)
 
@@ -20,10 +20,10 @@ npm run build
 
 ## Install the library
 
-Download `social-interaction-lab-react-0.1.0.tgz` from the playground or build it with `npm run build:package`. In your separate React project:
+Download `social-interaction-lab-react-0.2.0.tgz` from the playground or build it with `npm run build:package`. In your separate React project:
 
 ```sh
-npm install ./social-interaction-lab-react-0.1.0.tgz
+npm install ./social-interaction-lab-react-0.2.0.tgz
 ```
 
 React 18.2 or 19 is a peer dependency. The library is ESM-only; styles are explicitly imported and are not automatically injected.
@@ -50,6 +50,18 @@ export function PostActions() {
 
 The popup callbacks above are integration placeholders for your application. LikeButton is controlled. CommentButton and QuoteButton announce a dialog; ShareButton announces a menu. You must supply matching accessible popups, keyboard navigation, focus handling, and aria-expanded/aria-controls. The full working popup implementations are in `src/app/LiveActions.tsx` in the source project. The exported primitives do not create popups themselves.
 
+### Animate the icons
+
+Choose `iconMotion="pulse"`, `"spring"`, `"trace"`, or `"gesture"` independently of the visual style. The Motion section compares all 16 combinations, replays them together, and adjusts glyph duration, intensity, and part stagger. Select a treatment to use it in the real local interactions.
+
+```tsx
+<LikeButton label="Like" selected={liked} iconMotion="spring"
+  motionTokens={{ duration: 560, intensity: 1, stagger: 60 }}
+  onClick={() => setLiked(value => !value)} />
+```
+
+Activation feedback is not a success message. Pending uses a slower repeating glyph with static dots and accessible status. OS/manual reduced motion preserves state without movement. See [motion API and design tradeoffs](docs/MOTION.md).
+
 ### Async ownership
 
 ```tsx
@@ -70,7 +82,7 @@ Import `useAsyncAction` from the same package. One hook instance owns one action
 - Four variants: `minimal`, `soft`, `solid`, `spring`; see [design hypotheses](docs/DESIGN.md)
 - Icon size and CSS-pixel stroke are independent through non-scaling strokes
 - 44 px minimum hit targets are a product choice; WCAG 2.2 AA 2.5.8 is 24 × 24 CSS px with exceptions
-- Reduced-motion support is in CSS; the playground also has a manual simulation toggle
+- OS reduced motion and the standalone `reducedMotion` prop suppress both SVG motion and CSS transforms
 - Arbitrary accent changes may reduce contrast; the inspector warns and exports remain experimental
 - [API](docs/API.md), [accessibility](docs/ACCESSIBILITY.md), [contribution checklist](CONTRIBUTING.md), [changelog](CHANGELOG.md)
 

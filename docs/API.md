@@ -19,6 +19,12 @@ LikeButton, CommentButton, QuoteButton, ShareButton share a native button implem
 
 Comment/Quote set aria-haspopup=dialog; Share sets aria-haspopup=menu. Provide actual popups and appropriate aria-expanded / aria-controls in your integration. Components do not implement popup lifecycle for you.
 
+## Glyph motion / アイコンの動き
+
+iconMotion: none | pulse | spring | trace | gesture (default spring). motionTokens: duration 0–1600 ms, intensity 0–2, stagger 0–160 ms. motionTrigger: changing string/number replays without activating the action. reducedMotion: suppresses SVG and CSS motion; OS reduction always wins. See [complete API and lifecycle](MOTION.md).
+
+見た目の variant と動きは独立しています。再生は状態やリクエストを変更しません。処理中は反復と静止した点で表示し、成功とは区別します。
+
 ## Tokens / トークン
 
 iconSize 16–28 px, strokeWidth 1–3 CSS px, gap 4–28 px, duration 0–400 ms, amplitude 0–8 percent, hitTarget 44–64 px, accent six-digit hex. Nonfinite numbers and invalid hex fall back to defaults; finite out-of-range numbers clamp. DTCG amplitude exports as a fraction (4% → 0.04). Hit target and visible icon dimensions are separate. Spring uses a bounded cubic-bezier easing, not a physical spring simulation.
