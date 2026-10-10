@@ -1,0 +1,20 @@
+import {describe,it,expect,vi,afterEach} from 'vitest';
+import {renderHook,act} from '@testing-library/react';
+import {useAsyncAction,simulateRequest} from '../src/lib/index.js';
+function deferred<T>(){let resolve!:(v:T)=>void,reject!:(v:Error)=>void;const promise=new Promise<T>((a,b)=>{resolve=a;reject=b;});return {promise,resolve,reject};}
+afterEach(()=>vi.useRealTimers());
+describe('async operation ownership',()=>{
+ it('commits success',async()=>{const {result}=renderHook(()=>useAsyncAction<number>());await act(async()=>{expect(await result.current.run(async()=>42)).toBe(42);});expect(result.current.status).toBe('success');expect(result.current.value).toBe(42);});
+ it('deduplicates repeated activation before React renders',async()=>{const d=deferred<number>(),op=vi.fn(()=>d.promise),{result}=renderHook(()=>useAsyncAction<number>());let first:Promise<number|undefined>;act(()=>{first=result.current.run(op);void result.current.run(op);});expect(op).toHaveBeenCalledTimes(1);await act(async()=>{d.resolve(1);await first!;});});
+ it('cancellation aborts and prevents stale results even from an ignoring adapter',async()=>{const old=deferred<number>(),fresh=deferred<number>(),{result}=renderHook(()=>useAsyncAction<number>());let signal:AbortSignal|undefined;act(()=>{void result.current.run(s=>{signal=s;return old.promise;});result.current.cancel();void result.current.run(()=>fresh.promise);});expect(signal?.aborted).toBe(true);await act(async()=>{old.resolve(11);await old.promise;});expect(result.current.status).toBe('pending');expect(result.current.value).toBeUndefined();await act(async()=>{fresh.resolve(22);await fresh.promise;});expect(result.current.value).toBe(22);});
+ it('late rejection cannot overwrite a new success',async()=>{const old=deferred<number>(),{result}=renderHook(()=>useAsyncAction<number>());act(()=>{void result.current.run(()=>old.promise);result.current.cancel();});await act(async()=>{await result.current.run(async()=>3);old.reject(new Error('old'));await Promise.resolve();});expect(result.current.status).toBe('success');expect(result.current.value).toBe(3);});
+ it('unmount aborts work and resolves to no result',async()=>{const d=deferred<number>(),{result,unmount}=renderHook(()=>useAsyncAction<number>());let p:Promise<number|undefined>;act(()=>{p=result.current.run(()=>d.promise);});unmount();d.resolve(8);expect(await p!).toBeUndefined();});
+ it('allows explicit retry after errors',async()=>{const {result}=renderHook(()=>useAsyncAction<number>());await act(async()=>{await result.current.run(async()=>{throw Error('offline');});});expect(result.current.status).toBe('error');await act(async()=>{await result.current.run(async()=>9);});expect(result.current.status).toBe('success');expect(result.current.error).toBeNull();});
+ it('reset invalidates pending work and clears retained result',async()=>{const d=deferred<number>(),{result}=renderHook(()=>useAsyncAction<number>());act(()=>{void result.current.run(()=>d.promise);result.current.reset();});await act(async()=>{d.resolve(8);await d.promise;});expect(result.current.status).toBe('idle');expect(result.current.value).toBeUndefined();});
+});
+describe('local simulator',()=>{
+ it.each([NaN,Infinity,-1,2147483648])('rejects invalid timer delay %s',async delay=>{await expect(simulateRequest('x',{signal:new AbortController().signal,delay})).rejects.toBeInstanceOf(RangeError);});
+ it('honors zero delay',async()=>{vi.useFakeTimers();const p=simulateRequest('zero',{signal:new AbortController().signal,delay:0});await vi.runAllTimersAsync();expect(await p).toBe('zero');});
+ it('rejects on abort without waiting for timeout',async()=>{const c=new AbortController(),p=simulateRequest('x',{signal:c.signal,delay:1000});const check=expect(p).rejects.toHaveProperty('name','AbortError');c.abort();await check;});
+ it('rejects already aborted signals',async()=>{const c=new AbortController();c.abort();await expect(simulateRequest('x',{signal:c.signal})).rejects.toHaveProperty('name','AbortError');});
+});

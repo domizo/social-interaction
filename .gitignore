@@ -1,0 +1,8 @@
+node_modules/
+dist/
+/package/
+*.tsbuildinfo
+/public/downloads/
+/qa/
+/test-results/
+/playwright-report/

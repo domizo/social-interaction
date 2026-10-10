@@ -1,0 +1,13 @@
+import {mkdtemp,writeFile,readFile,rm} from 'node:fs/promises';
+import {tmpdir} from 'node:os';import {join,resolve} from 'node:path';import {execFileSync} from 'node:child_process';
+const root=process.cwd(),dir=await mkdtemp(join(tmpdir(),'social-consumer-'));
+try{
+ await writeFile(join(dir,'package.json'),JSON.stringify({name:'external-social-consumer',private:true,type:'module'}));
+ execFileSync('npm',['install',resolve('public/downloads/social-interaction-lab-react-0.1.0.tgz'),'react@19','@types/react@19','typescript@5.9','--ignore-scripts','--cache','/tmp/social-lab-npm-cache'],{cwd:dir,stdio:'inherit'});
+ await writeFile(join(dir,'tsconfig.json'),JSON.stringify({compilerOptions:{strict:true,skipLibCheck:false,module:'NodeNext',moduleResolution:'NodeNext',target:'ES2022',jsx:'react-jsx',noEmit:true},include:['consumer.tsx']}));
+ await writeFile(join(dir,'consumer.tsx'),`import {LikeButton,CommentButton,QuoteButton,ShareButton,ActionBar,useAsyncAction,defaultTokens,tokensToDTCG,type SocialTokens} from '@social-interaction-lab/react';\nconst t:SocialTokens={...defaultTokens,gap:8};\nexport function Consumer(){const request=useAsyncAction<boolean>();return <ActionBar tokens={t}><LikeButton label="Like" selected={false} pending={request.status==='pending'} onClick={()=>void request.run(async()=>true)}/><CommentButton label="Comment"/><ShareButton label="Share" aria-expanded={false}/><QuoteButton label="Quote"/></ActionBar>;}\nexport const exported=tokensToDTCG(t);`);
+ execFileSync(process.execPath,[join(dir,'node_modules/typescript/bin/tsc'),'-p',join(dir,'tsconfig.json')],{cwd:dir,stdio:'inherit'});
+ execFileSync(process.execPath,['--input-type=module','-e',`import {LikeButton,defaultTokens,tokensToDTCG} from '@social-interaction-lab/react'; if(!LikeButton||defaultTokens.hitTarget!==44||!tokensToDTCG().duration)throw Error('bad exports'); console.log('Node ESM runtime import passed')`],{cwd:dir,stdio:'inherit'});
+ const css=await readFile(join(dir,'node_modules/@social-interaction-lab/react/dist/styles.css'),'utf8');if(!css.includes('prefers-reduced-motion'))throw Error('Missing CSS');
+ console.log('PASS: fresh external npm install, strict NodeNext/no skipLibCheck, runtime ESM, stylesheet.');
+}finally{await rm(dir,{recursive:true,force:true});}
