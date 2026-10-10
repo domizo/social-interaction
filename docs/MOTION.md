@@ -43,4 +43,4 @@ Reactivation, trigger changes, settings changes, reduced-motion changes, cancell
 
 ## Verification / 動作確認
 
-Unit tests cover plans and lifecycle ownership. Playwright samples real SVG computed transforms/line offsets over elapsed time for all 16 combinations on desktop and mobile, alongside currentTime progression, target geometry, replay, pending, cancellation and reduced motion. Frame screenshots provide visual review only; a still image alone does not prove animation. See [QA](QA.md) for the latest actual run and limits.
+Unit tests cover plans and lifecycle ownership. Playwright samples real SVG computed transforms/line offsets over elapsed time for all 16 combinations on desktop and mobile, alongside currentTime progression, target geometry, replay, pending, cancellation and reduced motion. Frame screenshots provide visual review only; a still image alone does not prove animation. See [QA](https://github.com/domizo/social-interaction-lab/blob/main/docs/QA.md) for the latest actual run and limits.

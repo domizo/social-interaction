@@ -2,6 +2,32 @@
 
 Date: 2026-10-10. Source checks, real-browser checks and hosted access are reported separately.
 
+## 0.2.0 glyph-motion verification / アイコンの動作検証
+
+Flow: open the Motion section → activate each action in each treatment → observe real SVG geometry or line/fill styling change over time → cancel/replay/reduce motion without changing the hit target or request result.
+
+- 62 unit tests passed in the first complete motion release gate; a subsequent text-contrast regression brings the source suite to 63
+- All 22 real Chromium cases passed on desktop 1536×1024 and mobile 390×844, including the existing 12 interaction regressions
+- All 16 motion/action combinations were sampled in each viewport. Actual SVG `g`/`path` targets changed computed transforms, stroke offsets or fill/opacity, and animation currentTime progressed between observations. Recorded intervals were 116–217 ms. This is temporal evidence, not an inference from still screenshots
+- Browser checks also verified fixed ≥44 px targets, pending glyph loops, independent status, cancellation, rapid trace replay ownership, stop/zero duration, standalone reducedMotion CSS, OS reduction, selected specimens and Japanese treatment selection
+- Reviewed EN/JA desktop/mobile layouts plus three recorded motion frames per viewport. No clipping or horizontal overflow in tested widths. New helper text was subsequently darkened to ≥4.5:1 on white, the controls and code surfaces, with source and computed-color regressions
+- Fresh strict external consumers passed with React 18 and React 19, including motion types, runtime ESM, keyframe plans and DTCG output
+- Native Sites deployment succeeded with owner-only access unchanged. The hosted sign-in flow was not exercised; see limits below
+
+### Motion evidence / 根拠
+
+- Application-motion source: GitHub `1d064dc515fa368880d70030878dabf0e014458d`; Site `389a696ee9f27ea3f43ca9091688d9b67babbbef`
+- [Successful 22-case browser CI](https://github.com/domizo/social-interaction-lab/actions/runs/38053137595)
+- [Temporal JSON, motion frames and EN/JA screenshots](https://github.com/domizo/social-interaction-lab/actions/runs/38053137595/artifacts/11670911049), retained for 14 days. Open the Playwright report for the two glyph-animation-progress.json attachments
+- Artifact SHA-256: `e75a77f750f6b5bd41afb6a1a8c265108d8050d9883c3705e21ccd720360763d`
+- This record, a packaged documentation-link correction and the narrow helper-text palette cleanup follow that run. The repository Quality workflow repeats all checks for each final commit
+
+Browser plugin not available in this environment. The local browser launch was sandbox-blocked; real Playwright execution used the standard GitHub CI runner. No local restriction or production consent was bypassed.
+
+## Original 0.1.0 baseline / 初回版
+
+The following evidence belongs to the original release; the motion gate above supersedes its test counts. Persistent overview crops below show that original baseline.
+
 ## Passed / 通過
 
 - Strict TypeScript checks include the application, reusable library, unit tests and Playwright configuration

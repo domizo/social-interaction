@@ -28,7 +28,7 @@ test('zero duration and stop keep still glyphs and selectable variants',async({p
 });
 
 test('standalone reduced prop suppresses CSS movement and selected specimens stay filled',async({page})=>{
- await page.locator('input[name="preview"][value="selected"]').check();const selected=page.locator('.specimen [data-action="like"]').first();await expect(selected).toHaveAttribute('aria-pressed','false');expect(await selected.locator('svg').evaluate(el=>getComputedStyle(el).fill)).not.toBe('none');
+ await page.locator('input[name="preview"][value="selected"]').check();expect(await page.locator('.motion-lab>.section-title p').evaluate(el=>getComputedStyle(el).color)).toBe('rgb(100, 113, 129)');const selected=page.locator('.specimen [data-action="like"]').first();await expect(selected).toHaveAttribute('aria-pressed','false');expect(await selected.locator('svg').evaluate(el=>getComputedStyle(el).fill)).not.toBe('none');
  await page.getByRole('checkbox',{name:'Reduce glyph motion',exact:true}).check();const button=page.locator('[data-motion-row="spring"] [data-action="like"]');
  await expect(button).toHaveAttribute('data-reduced-motion','true');await button.evaluate(el=>{for(let p=el.parentElement;p;p=p.parentElement)p.removeAttribute('data-reduced-motion');el.setAttribute('data-preview','pressed');});await button.hover();
  expect(await button.evaluate(el=>getComputedStyle(el).transform)).toBe('none');expect(await button.locator('.sil-content').evaluate(el=>getComputedStyle(el).transform)).toBe('none');
