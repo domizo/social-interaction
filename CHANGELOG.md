@@ -1,5 +1,15 @@
 # Changelog / 変更履歴
 
+## 0.3.0 — 2026-10-10
+
+- Add `cartoon`: action-specific anticipation, squash, overshoot, heart quiver with an expanding/fading outline, and bubble pop / カートゥーン表現、震えるハートと広がって消える輪郭、吹き出しの出現
+- Expand to 12 icons with Repost, Bookmark, Note, Star, Send, Sparkles, Bell, and Reaction, plus named components and shared EN/JA catalog metadata / 8アイコン・名前付き部品・両言語メタデータを追加
+- Add controlled Bookmark/Note/Star/Bell toggles alongside Like; keep the remaining seven actions as commands / 5トグルと7コマンドの意味を明確化
+- Add a 12-card catalog and a fifth motion-comparison row; keep previews separate from live composers/menu and external services / 12枚のカタログ・5行目の比較、プレビューと実操作を分離
+- Cancel decorative SVG effects with their replay; preserve fixed hit targets, bounded controls, and OS/manual reduced motion / 装飾も再生単位で中止し、操作領域・範囲・動きの抑制を維持
+- Suppress cartoon secondary bursts while pending; retain slower glyph repetition, static dots, and accessible status / 処理中は追加バーストを抑え、ゆっくりした反復と静止した状態表示を維持
+- Document the new API and review requirements; completed checks and limits belong in `docs/QA.md` / 新 API と確認項目を文書化、実施結果は QA に記録
+
 ## 0.2.0 — 2026-10-10
 
 - Four selectable glyph-motion treatments × four actions: pulse, spring, trace, gesture / 4操作 × 4種類のアイコンアニメーション

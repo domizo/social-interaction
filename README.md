@@ -1,6 +1,6 @@
 # Social Interaction Lab
 
-Four original visual styles and four glyph-motion treatments for Like, Comment, Share, and Quote, built from shared accessible React + TypeScript primitives. Includes a bilingual EN/JA Vite playground and a real installable library.
+Four original visual styles and five glyph-motion treatments for 12 social-action icons, built from shared accessible React + TypeScript primitives. Cartoon motion adds anime-inspired anticipation, squash, overshoot, and decorative effects. Includes a bilingual EN/JA Vite playground and a real installable library.
 
 [日本語](README.ja.md)
 
@@ -16,14 +16,14 @@ npm test
 npm run build
 ```
 
-`npm run build` emits the playground in `dist/`, ESM library in `package/`, and a downloadable tarball in `public/downloads/`. There are no accounts, API keys, analytics, social-network connections, or posting. Every request in the playground is local simulation. Saved text lasts for the mounted session only; reload clears it.
+`npm run build` emits the playground in `dist/`, ESM library in `package/`, and a downloadable tarball in `public/downloads/`. There are no accounts, API keys, analytics, social-network or AI connections, or posting. Every request in the playground is local simulation. Saved text lasts for the mounted session only; reload clears it.
 
 ## Install the library
 
-Download `social-interaction-lab-react-0.2.0.tgz` from the playground or build it with `npm run build:package`. In your separate React project:
+Download `social-interaction-lab-react-0.3.0.tgz` from the playground or build it with `npm run build:package`. In your separate React project:
 
 ```sh
-npm install ./social-interaction-lab-react-0.2.0.tgz
+npm install ./social-interaction-lab-react-0.3.0.tgz
 ```
 
 React 18.2 or 19 is a peer dependency. The library is ESM-only; styles are explicitly imported and are not automatically injected.
@@ -48,19 +48,30 @@ export function PostActions() {
 }
 ```
 
-The popup callbacks above are integration placeholders for your application. LikeButton is controlled. CommentButton and QuoteButton announce a dialog; ShareButton announces a menu. You must supply matching accessible popups, keyboard navigation, focus handling, and aria-expanded/aria-controls. The full working popup implementations are in `src/app/LiveActions.tsx` in the source project. The exported primitives do not create popups themselves.
+The popup callbacks above are integration placeholders for your application. LikeButton is controlled, as are the other toggle components listed below. CommentButton and QuoteButton announce a dialog; ShareButton announces a menu. You must supply matching accessible popups, keyboard navigation, focus handling, and aria-expanded/aria-controls. The full working popup implementations are in `src/app/LiveActions.tsx` in the source project. The exported primitives do not create popups themselves.
+
+### Explore the action catalog
+
+- Controlled toggles: `LikeButton`, `BookmarkButton`, `NoteButton`, `StarButton`, `BellButton`
+- Commands: `CommentButton`, `ShareButton`, `QuoteButton`, `RepostButton`, `SendButton`, `SparklesButton`, `ReactionButton`
+- `ActionButton` accepts all 12 `SocialAction` values; `ActionIcon` exposes the same decorative SVG catalog
+- Exported `socialActions`, `toggleActions`, `isToggleAction`, and EN/JA `actionLabels` keep catalog integrations consistent
+
+Toggle `selected` values map to `aria-pressed`; keep the accessible label stable. `NoteButton` is a sticky-note alternative for saving, labelled “Keep note” / “メモを保存” in the playground, not a text editor. Sparkles is a local visual action, not an AI service. Repost, Send, and the other catalog actions do not publish or transmit anything.
 
 ### Animate the icons
 
-Choose `iconMotion="pulse"`, `"spring"`, `"trace"`, or `"gesture"` independently of the visual style. The Motion section compares all 16 combinations, replays them together, and adjusts glyph duration, intensity, and part stagger. Select a treatment to use it in the real local interactions.
+Choose `iconMotion="pulse"`, `"spring"`, `"trace"`, `"gesture"`, or `"cartoon"` independently of the visual style; `"none"` disables glyph motion. The Motion section compares the original four actions × five treatments, replays them together, and adjusts glyph duration, intensity, and part stagger. A separate 12-card catalog previews the selected treatment across every icon; those previews do not open popups or invoke a service. Select a treatment to use it in the original live local interactions.
 
 ```tsx
-<LikeButton label="Like" selected={liked} iconMotion="spring"
+<LikeButton label="Like" selected={liked} iconMotion="cartoon"
   motionTokens={{ duration: 560, intensity: 1, stagger: 60 }}
   onClick={() => setLiked(value => !value)} />
 ```
 
-Activation feedback is not a success message. Pending uses a slower repeating glyph with static dots and accessible status. OS/manual reduced motion preserves state without movement. See [motion API and design tradeoffs](docs/MOTION.md).
+Cartoon gives the heart a quiver and an expanding, fading outline, pops the comment bubble into view, and uses action-specific gestures across the catalog. These expressive treatments are hypotheses to test in context, not universal rules for beauty.
+
+Glyph duration is bounded to 0–1600 ms, intensity to 0–2, and part stagger to 0–160 ms. Activation feedback is not a success message. Pending uses a slower repeating glyph with static dots and accessible status; cartoon secondary bursts stay off during pending. OS/manual reduced motion preserves state without movement. Effects are decorative, cancellation-owned, and never enlarge the hit target. See [motion API and design tradeoffs](docs/MOTION.md).
 
 ### Async ownership
 

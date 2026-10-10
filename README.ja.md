@@ -1,6 +1,6 @@
 # Social Interaction Lab
 
-いいね・コメント・共有・引用を、4つのオリジナルな表現で比較する React + TypeScript ライブラリと EN/JA 対応の Vite プレイグラウンドです。
+12種類のソーシャル操作アイコンを、4つの見た目と5つの動きで比較する React + TypeScript ライブラリと EN/JA 対応の Vite プレイグラウンドです。cartoon はアニメやカートゥーンを参考に、予備動作・つぶれと伸び・行き過ぎと収束・装飾エフェクトを加えます。
 
 ## 起動と検証
 
@@ -16,14 +16,14 @@ npm run verify:consumer
 npm run verify:archive
 ```
 
-build はサイト `dist/`、ESM ライブラリ `package/`、インストール可能な `public/downloads/social-interaction-lab-react-0.2.0.tgz` を生成します。verify:archive は Git HEAD に記録されたファイルだけで新規インストール・ビルド・テストを行います。
+build はサイト `dist/`、ESM ライブラリ `package/`、インストール可能な `public/downloads/social-interaction-lab-react-0.3.0.tgz` を生成します。verify:archive は Git HEAD に記録されたファイルだけで新規インストール・ビルド・テストを行います。
 
-SNS への投稿、アカウント連携、API キー、アクセス解析はありません。応答はすべてローカルのシミュレーションです。保存したコメント・引用は現在の画面セッション内のみ保持され、再読み込みで消えます。
+SNS への投稿、SNS・AI サービスとの連携、アカウント連携、API キー、アクセス解析はありません。応答はすべてローカルのシミュレーションです。保存したコメント・引用は現在の画面セッション内のみ保持され、再読み込みで消えます。
 
 ## 別のアプリに組み込む
 
 ```sh
-npm install ./social-interaction-lab-react-0.2.0.tgz
+npm install ./social-interaction-lab-react-0.3.0.tgz
 ```
 
 ```tsx
@@ -36,17 +36,28 @@ import '@social-interaction-lab/react/styles.css';
 
 React 18.2 / 19 対応、ESM のみです。CSS は明示的に読み込みます。LikeButton は制御コンポーネントです。CommentButton・QuoteButton はダイアログ、ShareButton はメニューを開くことを支援技術に伝えます。利用側で実際のポップアップ、フォーカス移動・復帰、キーボード操作、aria-expanded / aria-controls を実装してください。動く実装例はソースの src/app/LiveActions.tsx にあります。
 
+## 操作カタログ
+
+- 選択状態を持つ制御トグル: `LikeButton`（いいね）、`BookmarkButton`（ブックマーク）、`NoteButton`（メモを保存）、`StarButton`（スター）、`BellButton`（ベル）
+- コマンド: `CommentButton`（コメント）、`ShareButton`（共有）、`QuoteButton`（引用）、`RepostButton`（リポスト）、`SendButton`（送信）、`SparklesButton`（きらめき）、`ReactionButton`（リアクション）
+- `ActionButton` と装飾用 SVG の `ActionIcon` で、同じ12種類の `SocialAction` を使えます
+- `socialActions` / `toggleActions` / `isToggleAction` と EN/JA の `actionLabels` を公開し、カタログの実装に再利用できます
+
+トグルの `selected` は `aria-pressed` に対応し、選択前後でアクセシブル名を変えません。`NoteButton` は付箋の形をした保存操作の別案です。プレイグラウンドでのラベルは「メモを保存」/ “Keep note” で、文章を入力するエディタではありません。Sparkles に AI 機能はなく、リポストや送信を含むすべての操作はローカルのシミュレーションです。
+
 ## アイコン自体を動かす
 
-見た目の variant とは別に、`iconMotion="pulse"` / `"spring"` / `"trace"` / `"gesture"` を選べます。「動き」セクションで4操作 × 4表現を比較し、時間・強さ・パーツの時間差を調整。一括再生や処理中プレビューができ、選んだ動きは実際のローカル操作にも反映されます。
+見た目の variant とは別に、`iconMotion="pulse"` / `"spring"` / `"trace"` / `"gesture"` / `"cartoon"` を選べます。`"none"` ならアイコンの動きを止めます。「動き」セクションで従来の4操作 × 5表現を比較し、時間・強さ・パーツの時間差を調整。別の12枚のカタログで、選んだ動きを全アイコンに適用して確認できます。カタログのプレビューはポップアップや外部サービスを起動しません。一括再生や処理中プレビューができ、選んだ動きは従来のローカル操作にも反映されます。
 
 ```tsx
-<LikeButton label="いいね" selected={liked} iconMotion="gesture"
+<LikeButton label="いいね" selected={liked} iconMotion="cartoon"
   motionTokens={{ duration: 560, intensity: 1, stagger: 60 }}
   onClick={() => setLiked(value => !value)} />
 ```
 
-ハートの弾み、吹き出しの膨らみ、共有矢印の発射、引用符の時間差などを SVG 自体で表現します。開始時の動きは成功を意味しません。処理中はゆっくり反復し、静止した点と状態説明も残ります。OS 設定と `reducedMotion` に対応。詳しくは[動きの API・意図・制約](docs/MOTION.md)を参照してください。
+cartoon では、ハートの小刻みな震えと拡大しながら消える輪郭、吹き出しのポップな出現など、各操作に合わせた動きを SVG 自体で表現します。心地よさの説明は文脈の中で検証する仮説です。
+
+アイコンの時間は 0–1600 ms、強さは 0–2、パーツの時間差は 0–160 ms。開始時の動きは成功を意味しません。処理中はゆっくり反復し、静止した点と状態説明を残し、cartoon の追加バーストは表示しません。OS 設定と `reducedMotion` に対応し、動きがなくても状態を伝えます。装飾エフェクトも再生単位で中止され、操作領域の大きさは変わりません。詳しくは[動きの API・意図・制約](docs/MOTION.md)を参照してください。
 
 ## 状態と非同期処理
 

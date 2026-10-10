@@ -1,8 +1,8 @@
 import type { CSSProperties } from 'react';
 import {normalizeMotionTokens,type IconMotionTokens} from './iconMotion.js';
-export const TOKEN_VERSION = '0.2.0';
+export const TOKEN_VERSION = '0.3.0';
 export type SocialVariant = 'minimal' | 'soft' | 'solid' | 'spring';
-export type SocialAction = 'like' | 'comment' | 'share' | 'quote';
+export type SocialAction = 'like' | 'comment' | 'share' | 'quote' | 'repost' | 'bookmark' | 'note' | 'star' | 'send' | 'sparkles' | 'bell' | 'reaction';
 export type PreviewState = 'idle' | 'hover' | 'focus' | 'pressed' | 'selected' | 'pending' | 'error';
 export interface SocialTokens { iconSize: number; strokeWidth: number; gap: number; duration: number; amplitude: number; accent: string; hitTarget: number }
 export const defaultTokens: Readonly<SocialTokens> = Object.freeze({iconSize:20,strokeWidth:1.6,gap:16,duration:180,amplitude:4,accent:'#b93240',hitTarget:44});
