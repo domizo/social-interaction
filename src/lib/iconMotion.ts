@@ -1,6 +1,7 @@
 import {useEffect,useRef,useState,type RefObject} from 'react';
 import type {SocialAction} from './tokens.js';
 import {repostSegment,commentMorph} from './cartoonGeometry.js';
+import {startMorphPlayback} from './morphPlayback.js';
 export type IconMotion='none'|'pulse'|'spring'|'trace'|'gesture'|'cartoon';
 export interface IconMotionTokens {duration:number;intensity:number;stagger:number}
 export const iconMotions=['pulse','spring','trace','gesture','cartoon'] as const;
@@ -62,8 +63,7 @@ export function useIconMotion(ref:RefObject<SVGSVGElement|null>,options:MotionOp
   if(!svg||options.disabled||options.reducedMotion||osReduced||options.iconMotion==='none'||(!options.pending&&!replay)||!t.duration||!t.intensity)return;
   // Query directly too, so a reduced-motion browser never gets an initial animation before the subscription effect settles.
   if(typeof window!=='undefined'&&window.matchMedia?.('(prefers-reduced-motion: reduce)').matches)return;
-  // Unsupported path interpolation keeps these glyphs static, rather than playing a misleading partial effect.
-  if(options.iconMotion==='cartoon'&&['repost','comment'].includes(options.action)&&typeof CSS!=='undefined'&&typeof CSS.supports==='function'&&!CSS.supports('d','path("M0 0 L1 1")'))return;
+  if(options.iconMotion==='cartoon'&&(options.action==='comment'||options.action==='repost'))return startMorphPlayback(svg,options.action,t,options.pending);
   const plan=glyphMotionPlan(options.action,options.iconMotion,{...t,intensity:options.pending?t.intensity*.55:t.intensity}).filter(step=>!options.pending||step.part!=='echo');
   const animations:Animation[]=[];let active=true;
   for(const step of plan){const nodes=step.part==='trace'?Array.from(svg.querySelectorAll<SVGPathElement>('.sil-glyph path')):Array.from(svg.querySelectorAll<SVGElement>(`[data-glyph-part="${step.part}"]`));

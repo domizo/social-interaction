@@ -1,5 +1,11 @@
 # Changelog / 変更履歴
 
+## 0.3.3 — 2026-10-10
+
+- Remove the CSS `d` compatibility bailout that disabled Cartoon Repost/Comment on unsupported engines / CSS の対応判定で2操作が止まる問題を修正
+- Render the agreed geometry through SVG attributes on animation frames; preserve timing, lifecycle ownership and all other treatments / 形を保ち、毎フレーム SVG 属性を更新
+- Test production builds in Chromium, WebKit and Firefox, including CSS support forced off, ordinary clicks, Play all, live Comment, natural completion and reduced motion / 3エンジンで通常操作・一括再生・完了・抑制を検証
+
 ## 0.3.2 — 2026-10-10
 
 - Correct Cartoon Repost to deform fixed-length sliding path segments, with tangent heads, rather than move rigid bent arrows / 矢印本体が経路の角で曲がり、直線で伸びる表現に修正

@@ -1,14 +1,14 @@
 import {test,expect,type Locator} from '@playwright/test';
 const shapeState=(button:Locator)=>button.locator('svg').evaluate(svg=>{
- const read=(part:string)=>{const el=svg.querySelector<SVGPathElement>(`[data-glyph-part="${part}"]`)!;const d=getComputedStyle(el).getPropertyValue('d'),values=(d.match(/-?\d*\.?\d+(?:e[-+]?\d+)?/gi)||[]).map(Number),points=Array.from({length:values.length/2},(_,i)=>({x:values[i*2],y:values[i*2+1]}));return {d,points,length:el.getTotalLength(),transform:getComputedStyle(el).transform};};
+ const read=(part:string)=>{const el=svg.querySelector<SVGPathElement>(`[data-glyph-part="${part}"]`)!;const d=el.getAttribute('d')!,values=(d.match(/-?\d*\.?\d+(?:e[-+]?\d+)?/gi)||[]).map(Number),points=Array.from({length:values.length/2},(_,i)=>({x:values[i*2],y:values[i*2+1]}));return {d,points,length:el.getTotalLength(),transform:getComputedStyle(el).transform};};
  return {time:Number(svg.getAnimations({subtree:true})[0]?.currentTime??-1),top:read('repost-body-top'),bottom:read('repost-body-bottom'),head:read('repost-head-top'),parent:getComputedStyle(svg.querySelector('.sil-glyph')!).transform};
 });
 const commentState=(button:Locator)=>button.locator('[data-glyph-part=comment-body]').evaluate(el=>{
- const style=getComputedStyle(el),d=style.getPropertyValue('d'),v=(d.match(/-?\d*\.?\d+(?:e[-+]?\d+)?/gi)||[]).map(Number),points=Array.from({length:v.length/2},(_,i)=>({x:v[i*2],y:v[i*2+1]}));
+ const style=getComputedStyle(el),d=el.getAttribute('d')!,v=(d.match(/-?\d*\.?\d+(?:e[-+]?\d+)?/gi)||[]).map(Number),points=Array.from({length:v.length/2},(_,i)=>({x:v[i*2],y:v[i*2+1]}));
  const cx=(points[16].x+points[48].x)/2,cy=(points[0].y+points[32].y)/2,r=(points[16].x-points[48].x)/2;
  return {d,points,cx,cy,r,tailRatio:Math.hypot(points[40].x-cx,points[40].y-cy)/r,circleError:Math.max(...points.map(p=>Math.abs(Math.hypot(p.x-cx,p.y-cy)/r-1))),opacity:Number(style.opacity),dasharray:style.strokeDasharray,dashoffset:style.strokeDashoffset,transform:style.transform};
 });
-const seek=async(button:Locator,phase:number)=>button.locator('svg').evaluate((svg,p)=>{for(const a of svg.getAnimations({subtree:true})){a.pause();(a.effect as KeyframeEffect).updateTiming({easing:'linear'});a.currentTime=1600*p;}},phase);
+const seek=async(button:Locator,phase:number)=>button.locator('svg').evaluate((svg,p)=>{for(const a of svg.getAnimations({subtree:true})){if(p===1){a.finish();continue;}a.pause();(a.effect as KeyframeEffect).updateTiming({easing:'linear'});a.currentTime=1600*p;}return new Promise<void>(resolve=>requestAnimationFrame(()=>requestAnimationFrame(()=>resolve())));},phase);
 test.beforeEach(async({page})=>{await page.goto('/#icon-catalog');await page.getByRole('slider',{name:'Glyph duration',exact:true}).press('End');});
 test('Cartoon Repost deforms constant-length bodies along the route with tangent heads',async({page},info)=>{
  test.setTimeout(90000);const b=page.locator('[data-catalog-action="repost"] button'),box=await b.boundingBox();await b.click();const elapsed=[];

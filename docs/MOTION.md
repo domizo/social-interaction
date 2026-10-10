@@ -1,6 +1,6 @@
 # Glyph motion / アイコンの動き
 
-Version 0.3.2 corrects the shape deformation of Cartoon Repost and Comment while preserving the other plans. Version 0.3.0 expands the catalog to 12 SVG icons and five treatments, adding `cartoon` alongside `pulse`, `spring`, `trace`, and `gesture`. `none` remains the opt-out. Motion changes the glyph, a glyph part, or its drawn path; it never resizes the button hit target. These are design hypotheses to compare in context, not universal rules about what feels beautiful.
+Version 0.3.3 makes Cartoon path playback independent of CSS `d` animation support. Version 0.3.2 corrects the shape deformation of Cartoon Repost and Comment while preserving the other plans. Version 0.3.0 expands the catalog to 12 SVG icons and five treatments, adding `cartoon` alongside `pulse`, `spring`, `trace`, and `gesture`. `none` remains the opt-out. Motion changes the glyph, a glyph part, or its drawn path; it never resizes the button hit target. These are design hypotheses to compare in context, not universal rules about what feels beautiful.
 
 | Treatment | Like | Comment | Share | Quote | Intended feel and tradeoff |
 |---|---|---|---|---|---|
@@ -41,9 +41,11 @@ Cartoon Repost uses two 10-unit-long sliding windows on an invisible rounded-rec
 
 Cartoon Comment starts as a closed circle of radius `1.5`, near the lower-left. The circle grows upward/rightward with its bounding-box corner at `(3,21)`, lightly overshoots, and develops the bubble tail only during the final 28% of geometric progress. All 64 sampled points form a circle before that late tail deformation. There is no stroke-dash drawing, outline echo, or separate tail visible in the early circle. The final closed bubble is also the static/reduced-motion shape. Intensity scales the growth overshoot.
 
-Cartoon uses compatible `d` path keyframes for these two actions, with no group translation/rotation/scale. All other treatments, including the explicit `trace` treatment, keep their previous plans and glyph geometry. `ActionIcon` accepts optional `motion` when rendering the corresponding Cartoon resting geometry; `ActionButton` supplies it automatically. Browsers that do not support CSS `d: path(...)` animation retain the static icon. Safari and physical-device behavior have not been verified.
+The inspectable plans retain compatible `d` keyframes. Passing those plans directly to `element.animate()` still requires CSS-path support; portable attribute playback is owned by `ActionButton`. Runtime playback for these two actions uses a cancel-owned `requestAnimationFrame` renderer that writes SVG `d` attributes. A standard Web Animations clock supplies easing, duration and pending iterations; an existing clock alone is not evidence of visible motion. There is no group translation/rotation/scale. All other treatments, including the explicit `trace` treatment, keep their previous plans and glyph geometry. `ActionIcon` accepts optional `motion` when rendering the corresponding Cartoon resting geometry; `ActionButton` supplies it automatically. CSS `d: path(...)` support is no longer required or queried. Natural completion, replay, settings changes and unmount restore only attributes still owned by that playback, without overwriting a newly rendered glyph. Browsers without Web Animations remain static. Cross-engine checks target Chromium, WebKit and Firefox; real Safari/physical-device behavior is a separate verification limit.
 
 リポストの本体は一定長の経路断片です。直線区間ではまっすぐになり、角をまたぐ間だけ曲がります。矢印の先端は経路の接線方向を向き、2本は半周ずれて一周します。コメントは左下の小さな閉じた円から育ち、最後の段階でしっぽが現れて吹き出しになります。線を描く処理や輪郭の残像は使いません。明示的な Trace スタイルと他の動きは従来どおりです。
+
+0.3.3 は CSS の `d` アニメーションへの依存を外し、毎フレーム SVG 属性を更新します。再生・一括再生・通常のクリックを、実際の経過時間・描画形状・画像の変化で検証します。中止や表示切り替えでは、その再生が所有する属性だけを戻します。
 
 Compatible command lists follow the [SVG path interpolation rules](https://www.w3.org/TR/SVG/paths.html#TheDProperty).
 
