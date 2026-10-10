@@ -1,4 +1,4 @@
-import {commentMorph,repostSegment} from './cartoonGeometry.js';
+import {commentTransition,repostTransition} from './canonicalMorph.js';
 import type {IconMotionTokens} from './iconMotion.js';
 /** Match CSS ease-in-out without depending on an element animation timeline. */
 export function morphEase(time:number):number {
@@ -17,11 +17,9 @@ export function startMorphPlayback(svg:SVGSVGElement,action:'comment'|'repost',t
  const duration=pending?Math.max(1100,tokens.duration*1.8):tokens.duration;
  const started=performance.now();let lastFrame=started;
  const render=(progress:number)=>{
-  const p=Math.min(1,Math.max(0,progress)),a=tokens.intensity*(pending?.55:1),phase=p+.06*a*Math.sin(2*Math.PI*p);
-  const comment=action==='comment'?commentMorph(p,a):null,top=action==='repost'?repostSegment(phase):null,bottom=action==='repost'?repostSegment(phase,true):null;
-  for(const item of snapshots){const part=item.node.getAttribute('data-glyph-part')!,shape=part.endsWith('bottom')?bottom:top,d=comment?comment.d:part.includes('-head-')?shape!.head:shape!.body;
+  const p=Math.min(1,Math.max(0,progress)),a=tokens.intensity*(pending?.55:1);
+  for(const item of snapshots){const d=action==='comment'?commentTransition(p,a).d:repostTransition(p,a,item.node.getAttribute('data-glyph-part')==='repost-bottom').d;
    item.node.setAttribute('d',d);item.lastD=d;
-   if(comment){item.node.style.setProperty('opacity',String(Math.min(1,.2+8*p)));item.lastOpacity=item.node.style.getPropertyValue('opacity');}
   }
  };
  const restore=()=>{for(const item of snapshots){

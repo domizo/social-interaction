@@ -1,5 +1,12 @@
 # Changelog / 変更履歴
 
+## 0.3.4 — 2026-10-10
+
+- Share the exact standard Repost/Comment glyphs across all treatments at rest, start, completion, cancellation and reduced motion / 全スタイルで同じ基本アイコンを使用
+- Add continuous entry/settle bridges around the existing deforming-arrow circuit and circle-to-tail motion / 動作中だけ変形し、元の形へ滑らかに戻る
+- Preserve the two compound Repost paths and one Comment path, including Trace staggering / Trace のパス構成と時間差を維持
+- Check cross-style geometry/pixel identity and near-end contour convergence in Chromium, WebKit and Firefox / 静止時の一致と終了直前の形状収束を3エンジンで検証
+
 ## 0.3.3 — 2026-10-10
 
 - Remove the CSS `d` compatibility bailout that disabled Cartoon Repost/Comment on unsupported engines / CSS の対応判定で2操作が止まる問題を修正

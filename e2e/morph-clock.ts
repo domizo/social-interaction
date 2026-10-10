@@ -6,7 +6,7 @@ export async function installMorphClock(page:Page){await page.addInitScript(()=>
  (window as unknown as {__morphClock:unknown}).__morphClock={freeze:()=>{start=fixed??real();fixed=start;},seek:(progress:number)=>{
   // Invert CSS ease-in-out's y coordinate, then evaluate its x coordinate.
   let lo=0,hi=1;for(let i=0;i<40;i++){const s=(lo+hi)/2;if(3*s*s-2*s*s*s<progress)lo=s;else hi=s;}const s=(lo+hi)/2;
-  fixed=start+1600*(progress===0?0:progress===1?1:3*.42*(1-s)*(1-s)*s+3*.58*(1-s)*s*s+s*s*s);
+  fixed=start+(progress===1?1601:1600*(progress===0?0:3*.42*(1-s)*(1-s)*s+3*.58*(1-s)*s*s+s*s*s));
  },release:()=>{fixed=null;}};
 });}
 export const freezeMorph=(page:Page)=>page.evaluate(()=>(window as unknown as {__morphClock:{freeze:()=>void}}).__morphClock.freeze());

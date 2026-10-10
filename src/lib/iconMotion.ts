@@ -1,6 +1,6 @@
 import {useEffect,useRef,useState,type RefObject} from 'react';
 import type {SocialAction} from './tokens.js';
-import {repostSegment,commentMorph} from './cartoonGeometry.js';
+import {repostTransition,commentTransition} from './canonicalMorph.js';
 import {startMorphPlayback} from './morphPlayback.js';
 export type IconMotion='none'|'pulse'|'spring'|'trace'|'gesture'|'cartoon';
 export interface IconMotionTokens {duration:number;intensity:number;stagger:number}
@@ -25,10 +25,10 @@ export function glyphMotionPlan(action:SocialAction,motion:IconMotion,input:Part
   let main:GlyphPlan[];
   switch(action){
    case 'like':main=single([neutral,{transform:`rotate(${-9*a}deg) scale(${1-.1*a})`,offset:.12},{transform:`rotate(${9*a}deg)`,offset:.22},{transform:`rotate(${-7*a}deg)`,offset:.32},{transform:`rotate(${5*a}deg) scale(${1+.2*a})`,offset:.45},{transform:`rotate(${-3*a}deg)`,offset:.58},neutral]);break;
-   case 'comment':return [part('comment-body',Array.from({length:65},(_,i)=>({d:`path("${commentMorph(i/64,a).d}")`,opacity:Math.min(1,.2+i/8),offset:i/64})))];
+   case 'comment':return [part('comment-body',Array.from({length:65},(_,i)=>({d:`path("${commentTransition(i/64,a).sampledD}")`,offset:i/64})))];
    case 'share':main=single([neutral,{transform:`translateY(${2*a}px) scaleY(${1-.18*a})`,offset:.2},{transform:`translateY(${-6*a}px) scaleY(${1+.1*a})`,offset:.48},neutral],'arrow');break;
    case 'quote':main=['quote-left','quote-right'].map((name,i)=>part(name,[neutral,{transform:`scale(${1-.2*a}) translateY(${2*a}px)`,offset:.18},{transform:`translate(${(i?1:-1)*2*a}px,${-3*a}px) scale(${1+.15*a})`,offset:.5},neutral],i*t.stagger));break;
-   case 'repost':return [false,true].flatMap(opposite=>['body','head'].map(piece=>part(`repost-${piece}-${opposite?'bottom':'top'}`,Array.from({length:97},(_,i)=>{const p=i/96,phase=p+.06*a*Math.sin(2*Math.PI*p),shape=repostSegment(phase,opposite);return {d:`path("${piece==='body'?shape.body:shape.head}")`,offset:p};}))));
+   case 'repost':return [false,true].map(opposite=>part(`repost-${opposite?'bottom':'top'}`,Array.from({length:97},(_,i)=>({d:`path("${repostTransition(i/96,a,opposite).sampledD}")`,offset:i/96}))));
    case 'bookmark':case 'note':main=[part('glyph',[neutral,{transform:`translateY(${-5*a}px) scaleY(${1-.12*a})`,offset:.2},{transform:`translateY(${2*a}px) scaleY(${1-.18*a}) scaleX(${1+.12*a})`,offset:.48},neutral]),part('fold',[neutral,{transform:`scaleY(${1-.7*a/2}) rotate(${-15*a}deg)`,offset:.3},neutral],t.stagger)];break;
    case 'star':main=single([neutral,{transform:`rotate(${-20*a}deg) scale(${1-.3*a})`,offset:.2},{transform:`rotate(${10*a}deg) scale(${1+.22*a})`,offset:.5},neutral]);break;
    case 'send':main=[part('plane',[neutral,{transform:`rotate(${-12*a}deg) scale(${1-.2*a})`,offset:.2},{transform:`translate(${7*a}px,${-7*a}px) scale(.85)`,opacity:0,offset:.48},{transform:`translate(${-4*a}px,${4*a}px) scale(.85)`,opacity:0,offset:.52},neutral]),part('crease',[neutral,{transform:`scaleX(${1-.6*a/2})`,offset:.22},neutral])];break;

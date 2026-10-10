@@ -16,14 +16,14 @@ npm run verify:consumer
 npm run verify:archive
 ```
 
-build はサイト `dist/`、ESM ライブラリ `package/`、インストール可能な `public/downloads/social-interaction-lab-react-0.3.3.tgz` を生成します。verify:archive は Git HEAD に記録されたファイルだけで新規インストール・ビルド・テストを行います。
+build はサイト `dist/`、ESM ライブラリ `package/`、インストール可能な `public/downloads/social-interaction-lab-react-0.3.4.tgz` を生成します。verify:archive は Git HEAD に記録されたファイルだけで新規インストール・ビルド・テストを行います。
 
 SNS への投稿、SNS・AI サービスとの連携、アカウント連携、API キー、アクセス解析はありません。応答はすべてローカルのシミュレーションです。保存したコメント・引用は現在の画面セッション内のみ保持され、再読み込みで消えます。
 
 ## 別のアプリに組み込む
 
 ```sh
-npm install ./social-interaction-lab-react-0.3.3.tgz
+npm install ./social-interaction-lab-react-0.3.4.tgz
 ```
 
 ```tsx
