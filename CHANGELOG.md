@@ -1,5 +1,13 @@
 # Changelog / 変更履歴
 
+## 0.3.5 — 2026-10-10
+
+- Keep Cartoon Repost on its original `x=4…20`, `y=6…18` rectangle: perimeter 56, body length 16, original 3-back/3-side arrowheads, and half-perimeter separation / 元の長方形・矢印の長さ・矢じり・半周の間隔を維持
+- Remove Repost entry/exit bridges and the artificial rounded route; 16-unit bodies span corners on the 12-unit vertical sides / 開始・終了の接続変形と角丸経路を除き、短い縦辺では角をまたぐ
+- Start Comment activation immediately as a tiny lower-left circle and grow continuously into the canonical bubble, with its tail developing throughout / 操作直後の小さな円から基本の吹き出しへ、しっぽも含めて連続的に成長
+- Keep Comment bounds anchored at `(3,21)`; remove compression, holds, rebounds, and a separate late morph / 左下の基準点を固定し、圧縮・停止・跳ね返り・最後だけの変形を除去
+- Use intensity for Repost pace accent and Comment initial size; retain canonical idle/end/cancel/reduced geometry and the existing portable SVG-attribute playback/watchdog / 強さは進行速度の抑揚・初期サイズに適用。基本の静止形状と移植可能な再生処理は維持
+
 ## 0.3.4 — 2026-10-10
 
 - Share the exact standard Repost/Comment glyphs across all treatments at rest, start, completion, cancellation and reduced motion / 全スタイルで同じ基本アイコンを使用
