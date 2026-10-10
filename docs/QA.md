@@ -2,6 +2,24 @@
 
 Date: 2026-10-10. Source checks, real-browser checks and hosted access are reported separately.
 
+## 0.3.0 Cartoon and catalog / カートゥーンと一覧
+
+- 99 unit tests passed, including real SVG target resolution for every one of 12 actions × 5 treatments, toggle versus command semantics, selected-preview primary-path fill, hidden effects, pending suppression, cancellation and unmount ownership
+- All 28 Chromium desktop/mobile browser cases passed. The prior 16 motion combinations plus 44 additional catalog combinations supply temporal coverage for all 60 combinations in each viewport
+- Heart outline was measured while the animation ran normally: width grew approximately 20 → 26 → 34 px while opacity rose approximately 0.08 → 0.59 and fell to 0.07 on desktop. Mobile independently showed the same growth/fade pattern. Comment bubble opacity and size increased over elapsed time
+- Deterministic paused-phase screenshots supplement the elapsed-time measurements; still frames alone are not used as proof of movement
+- Maximum intensity with 28 px glyphs kept effects visible, and outer hit targets stayed fixed. Pending suppressed secondary echoes; cancellation, stop, manual and OS reduction removed movement without losing static status
+- EN/JA desktop/mobile catalog layouts and heart frames were visually reviewed. A mobile element-only capture showed an offscreen skip-link/native-select painting artifact; the independent full-page Japanese screenshot rendered correctly. A following narrow cleanup clips the unfocused skip-link and settles a reduced-motion Japanese overview before capture, while retaining keyboard skip-link access
+- Clean committed-source rebuild, strict external package consumption, React 18/19 checks and all 60 exported keyframe plans passed. No social-network or AI calls were added
+
+Evidence: application GitHub `f6d53ebf082f9f6f0734c74f7e77f8644b7fb9de`, corresponding Site source `7ee9363b499628480aa52ae74260162869a3cfe7`.
+
+- [Successful 28-case CI](https://github.com/domizo/social-interaction-lab/actions/runs/38056363811)
+- [Temporal JSON, heart phases and bilingual catalog screenshots](https://github.com/domizo/social-interaction-lab/actions/runs/38056363811/artifacts/11671121654), retained 14 days
+- Artifact SHA-256: `86e57bc83e85aeb48bd1760ffa2eaad23a2a1914aabe66e8fa8ee30c8598cbdd`
+
+This record and the narrow capture/deep-link cleanup follow the measured application source. Every subsequent exact repository commit reruns the full Quality workflow. Hosted sign-in, Safari, physical devices and assistive-technology limits below still apply.
+
 ## 0.2.0 glyph-motion verification / アイコンの動作検証
 
 Flow: open the Motion section → activate each action in each treatment → observe real SVG geometry or line/fill styling change over time → cancel/replay/reduce motion without changing the hit target or request result.

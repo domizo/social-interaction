@@ -8,7 +8,7 @@ await writeFile('package/package.json',JSON.stringify(pkg,null,2)+'\n');await co
 for(const name of ['README.md','README.ja.md','CHANGELOG.md','CONTRIBUTING.md','LICENSE'])await copyFile(name,`package/${name}`);
 await mkdir('package/docs',{recursive:true});for(const name of ['API.md','DESIGN.md','ACCESSIBILITY.md','MOTION.md'])await copyFile(`docs/${name}`,`package/docs/${name}`);
 const {tokensToDTCG}=await import(`${resolve('package/dist/tokens.js')}?build=${Date.now()}`);await writeFile('package/tokens.json',JSON.stringify(tokensToDTCG(),null,2)+'\n');
-await mkdir('public/downloads',{recursive:true});
+await rm('public/downloads',{recursive:true,force:true});await mkdir('public/downloads',{recursive:true});
 execFileSync('npm',['pack','./package','--pack-destination','public/downloads','--ignore-scripts','--cache','/tmp/social-lab-npm-cache'],{stdio:'inherit'});
 await copyFile('package/tokens.json','public/downloads/social-tokens-default.json');
 console.log('Built @social-interaction-lab/react; CSS and strict ESM declarations included.');
