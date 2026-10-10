@@ -13,9 +13,9 @@ export function startMorphPlayback(svg:SVGSVGElement,action:'comment'|'repost',t
  if(!group||typeof requestAnimationFrame!=='function')return()=>{};
  const nodes=Array.from(svg.querySelectorAll<SVGPathElement>(action==='comment'?'[data-glyph-part=comment-body]':'[data-glyph-part^=repost-]'));
  const snapshots=nodes.map(node=>({node,d:node.getAttribute('d'),opacity:node.style.getPropertyValue('opacity'),priority:node.style.getPropertyPriority('opacity'),lastD:null as string|null,lastOpacity:null as string|null}));
- let active=true,frame=0;
+ let active=true,frame=0,watchdog:ReturnType<typeof setTimeout>|undefined;
  const duration=pending?Math.max(1100,tokens.duration*1.8):tokens.duration;
- const started=performance.now();
+ const started=performance.now();let lastFrame=started;
  const render=(progress:number)=>{
   const p=Math.min(1,Math.max(0,progress)),a=tokens.intensity*(pending?.55:1),phase=p+.06*a*Math.sin(2*Math.PI*p);
   const comment=action==='comment'?commentMorph(p,a):null,top=action==='repost'?repostSegment(phase):null,bottom=action==='repost'?repostSegment(phase,true):null;
@@ -29,8 +29,12 @@ export function startMorphPlayback(svg:SVGSVGElement,action:'comment'|'repost',t
   if(item.lastD!==null&&item.node.getAttribute('d')===item.lastD){if(item.d===null)item.node.removeAttribute('d');else item.node.setAttribute('d',item.d);}
   if(item.lastOpacity!==null&&item.node.style.getPropertyValue('opacity')===item.lastOpacity){if(item.opacity)item.node.style.setProperty('opacity',item.opacity,item.priority);else item.node.style.removeProperty('opacity');}
  }};
- const finish=()=>{if(!active)return;active=false;cancelAnimationFrame(frame);restore();};
- const tick=()=>{if(!active)return;const elapsed=Math.max(0,performance.now()-started);if(!pending&&elapsed>=duration){finish();return;}render(morphEase((elapsed%duration)/duration));frame=requestAnimationFrame(tick);};
- render(0);frame=requestAnimationFrame(tick);
+ const finish=()=>{if(!active)return;active=false;cancelAnimationFrame(frame);clearTimeout(watchdog);restore();};
+ const sample=()=>{const elapsed=Math.max(0,performance.now()-started);if(!pending&&elapsed>=duration){finish();return;}render(morphEase((elapsed%duration)/duration));};
+ const tick=()=>{if(!active)return;lastFrame=performance.now();sample();if(active)frame=requestAnimationFrame(tick);};
+ // Some engines suspend document RAF while a native modal is open. A bounded
+ // watchdog keeps visible feedback progressing without relying on that timeline.
+ const checkFrame=()=>{if(!active)return;const now=performance.now();if((!pending&&now-started>=duration)||(document.visibilityState!=='hidden'&&now-lastFrame>=64))sample();if(active)watchdog=setTimeout(checkFrame,64);};
+ render(0);frame=requestAnimationFrame(tick);watchdog=setTimeout(checkFrame,64);
  return finish;
 }
