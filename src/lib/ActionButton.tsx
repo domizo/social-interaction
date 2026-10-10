@@ -6,8 +6,8 @@ export interface ActionButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonE
 }
 export const ActionButton=forwardRef<HTMLButtonElement,ActionButtonProps>(function ActionButton({action,label,count,variant='minimal',tokens,pending=false,error=false,selected=false,previewState,showLabel=true,className='',style,onClick,...props},ref){
   return <button {...props} ref={ref} type={props.type??'button'} className={`sil-action sil-${variant} ${className}`} style={{...(tokens?tokenStyle(tokens):{}),...style}} aria-label={label} aria-pressed={action==='like'?selected:undefined} aria-busy={pending||undefined} aria-disabled={pending||props.disabled||props['aria-disabled']||undefined} data-action={action} data-selected={action==='like'&&selected||undefined} data-pending={pending||undefined} data-error={error||undefined} data-preview={previewState} onClick={e=>{if(pending || props.disabled || props['aria-disabled']===true || props['aria-disabled']==='true'){e.preventDefault();return;}onClick?.(e);}}>
-    <span className="sil-icon-wrap"><ActionIcon action={action} filled={action==='like'&&selected}/>{pending&&<span className="sil-pending-dot"/>}{error&&<span className="sil-error-mark">!</span>}</span>
-    {showLabel&&<span className="sil-label">{label}</span>}{count!==undefined&&<span className="sil-count" aria-hidden="true">{count}</span>}
+    <span className="sil-content"><span className="sil-icon-wrap"><ActionIcon action={action} filled={action==='like'&&selected}/>{pending&&<span className="sil-pending-dot"/>}{error&&<span className="sil-error-mark">!</span>}</span>
+    {showLabel&&<span className="sil-label">{label}</span>}{count!==undefined&&<span className="sil-count" aria-hidden="true">{count}</span>}</span>
   </button>;
 });
 export type PrimitiveProps=Omit<ActionButtonProps,'action'>;

@@ -27,6 +27,7 @@ test('share keyboard navigation, tab and cancellation focus',async({page})=>{
  await context.getByLabel('Response delay').selectOption('2500');await share.click();await page.getByRole('menuitem',{name:'Prepare local share'}).click();await expect(share).toHaveAttribute('aria-busy','true');await context.getByRole('button',{name:'Cancel request'}).click();await expect(share).toBeFocused();
 });
 test('isolation and reduced motion reflect actual components',async({page})=>{
+ await page.getByRole('slider',{name:'Spacing',exact:true}).press('End');expect(await page.locator('.specimen .sil-action-bar').first().evaluate(el=>getComputedStyle(el).gap)).toBe('28px');expect(await page.locator('.diff-preview .sil-action-bar').last().evaluate(el=>getComputedStyle(el).gap)).toBe('28px');
  await page.getByRole('button',{name:'Isolate a variable'}).click();await expect(page.getByRole('slider',{name:'Icon size',exact:true})).toBeDisabled();await page.getByRole('checkbox',{name:'Reduce motion',exact:true}).check();expect(await page.locator('.sil-action').first().evaluate(el=>getComputedStyle(el).transitionDuration)).toBe('0s');
  await page.getByRole('checkbox',{name:'Reduce motion',exact:true}).uncheck();await page.emulateMedia({reducedMotion:'reduce'});expect(await page.locator('.sil-action').first().evaluate(el=>getComputedStyle(el).transitionDuration)).toBe('0s');
 });

@@ -5,14 +5,14 @@ const demoLink='https://example.com/posts/small-actions';
 type Mode='comment'|'quote';
 type MessageKey='liked'|'unliked'|'cancelled'|'saved'|'prepared'|'copied'|'copyError';
 function Composer({mode,locale,fail,delay,onClose,onSaved,onStart}:{mode:Mode;locale:Locale;fail:boolean;delay:number;onClose:()=>void;onSaved:(value:string)=>void;onStart?:()=>void}){
-  const t=words[locale],ref=useRef<HTMLDialogElement>(null),id=useId(),[text,setText]=useState('');const request=useAsyncAction<string>();
-  useEffect(()=>{const d=ref.current;d?.showModal();return()=>d?.close();},[]);
+  const t=words[locale],ref=useRef<HTMLDialogElement>(null),textRef=useRef<HTMLTextAreaElement>(null),id=useId(),[text,setText]=useState('');const request=useAsyncAction<string>();
+  useEffect(()=>{const d=ref.current;d?.showModal();textRef.current?.focus();return()=>d?.close();},[]);
   const close=()=>{request.cancel();ref.current?.close();onClose();};
-  return <dialog ref={ref} className="composer" aria-labelledby={id} onCancel={e=>{e.preventDefault();close();}}>
+  return <dialog ref={ref} className="composer" aria-labelledby={id} aria-modal="true" onKeyDown={e=>{if(e.key!=='Tab')return;const nodes=Array.from(e.currentTarget.querySelectorAll<HTMLElement>('button:not([disabled]),textarea:not([disabled]),input:not([disabled]),select:not([disabled]),a[href],[tabindex="0"]'));const first=nodes[0],last=nodes[nodes.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last?.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first?.focus();}}} onCancel={e=>{e.preventDefault();close();}}>
     <form onSubmit={async e=>{e.preventDefault();if(!text.trim()||text.length>280||request.status==='pending')return;onStart?.();const value=await request.run(signal=>simulateRequest(text.trim(),{signal,delay,fail}));if(value!==undefined){ref.current?.close();onSaved(value);}}}>
       <div className="dialog-head"><h2 id={id}>{t[mode]}</h2><button type="button" onClick={close} aria-label={t.close} className="close-button">×</button></div>
       <p className="muted">{t.local}</p>{mode==='quote'&&<blockquote>{t.post}</blockquote>}
-      <label htmlFor={`${id}-text`}>{t.draft}</label><textarea id={`${id}-text`} autoFocus value={text} onChange={e=>setText(e.target.value)} maxLength={280} readOnly={request.status==='pending'} rows={4}/>
+      <label htmlFor={`${id}-text`}>{t.draft}</label><textarea ref={textRef} id={`${id}-text`} value={text} onChange={e=>setText(e.target.value)} maxLength={280} readOnly={request.status==='pending'} rows={4}/>
       <div className="composer-meta"><span>{text.length} / 280 {t.character}</span><span>{locale==='en'?'Kept only during this session':'このセッション内のみ'}</span></div>
       <p className="request-status" role="status">{request.status==='pending'?t.pending:request.status==='error'?t.retry:''}</p>
       <div className="dialog-footer"><button type="button" onClick={close} className="text-button">{t.close}</button><button type="submit" className="primary-button" disabled={!text.trim()||request.status==='pending'}>{t.send}</button></div>

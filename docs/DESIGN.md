@@ -15,7 +15,7 @@ All variants use the same native button and icon geometry. Isolate mode holds ot
 
 ## Motion and geometry / 動きと形
 
-Default duration 180ms; icon 20px; stroke 1.6 CSS px; gap 16px; amplitude 4%; hit target 44px. The icon scales independently of stroke via vector-effect=non-scaling-stroke. Reduced motion removes transforms and animation, retaining static pending/error feedback. The spring variant uses a cubic-bezier curve, not simulated physics. No claim that one timing is ideal for every user.
+Default duration 180ms; icon 20px; stroke 1.6 CSS px; gap 16px; amplitude 4%; hit target 44px. The icon scales independently of stroke via vector-effect=non-scaling-stroke. Press feedback scales inner content while the outer44px hit target stays fixed. Reduced motion removes transforms and animation, retaining static pending/error feedback. The spring variant uses a cubic-bezier curve, not simulated physics. No claim that one timing is ideal for every user.
 
 ## References / 参照
 

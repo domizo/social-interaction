@@ -7,7 +7,7 @@
 - Focus uses a 2px blue ring with 3px separation. The simulated focus specimen is explicitly separate from real keyboard focus
 - Pending buttons remain focusable and suppress activation; text feedback has role=status
 - Share supports ArrowUp/Down, Home/End, Escape, Tab/Shift+Tab; Escape returns focus to the opener
-- Native dialog supplies modal focus containment; close/save calls close before restoring trigger focus
+- Native dialog supplies modal focus containment with explicit first/last Tab wrapping; close/save calls close before restoring trigger focus
 - Cancellation aborts requests and invalidates stale results. Text remains after an error for retry
 - Saved comment/quote text is retained in mounted session state and inspectable; reload clears it
 - Reduced-motion media query removes animation/transforms. Manual preview switch matches this behavior
