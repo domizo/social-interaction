@@ -26,10 +26,14 @@ test('Cartoon Comment inflates from its fixed bottom-left tail and settles',asyn
  for(const ms of [100,200,300]){await page.waitForTimeout(ms);elapsed.push(await bubbleState(b));}
  expect(elapsed[1].time).toBeGreaterThan(elapsed[0].time);expect(elapsed[2].width).toBeGreaterThan(elapsed[0].width);expect(elapsed[2].opacity).toBeGreaterThan(elapsed[0].opacity);
  for(const s of elapsed){expect(s.anchor.x).toBeCloseTo(3,3);expect(s.anchor.y).toBeCloseTo(21,3);expect(s.echoAnchor.x).toBeCloseTo(3,3);expect(s.echoAnchor.y).toBeCloseTo(21,3);}
+ // Natural playback must finish and clear trace styling; seeking a paused endpoint is not completion.
+ await expect.poll(()=>b.locator('svg').evaluate(svg=>svg.getAnimations({subtree:true}).length)).toBe(0);
+ await expect.poll(()=>b.locator('.sil-glyph path').evaluateAll(paths=>paths.every(path=>(path as SVGElement).style.strokeDasharray===''))).toBe(true);
+ const settled=await bubbleState(b);expect(settled.opacity).toBe(1);expect(settled.anchor.x).toBeCloseTo(3,3);expect(settled.anchor.y).toBeCloseTo(21,3);await b.screenshot({path:info.outputPath('comment-naturally-settled.png')});
  await b.click();const phases=[];for(const phase of [0,.15,.3,.48,.72,.95,1]){await seek(b,phase);const s=await bubbleState(b);phases.push({phase,...s});expect(s.anchor.x).toBeCloseTo(3,3);expect(s.anchor.y).toBeCloseTo(21,3);expect(s.echoAnchor.x).toBeCloseTo(3,3);expect(s.echoAnchor.y).toBeCloseTo(21,3);await b.screenshot({path:info.outputPath(`comment-frame-${phase}.png`)});}
  expect(phases[3].width).toBeGreaterThan(phases.at(-1)!.width);expect(phases[0].width).toBeLessThan(phases.at(-1)!.width*.25);
  const next=await b.boundingBox();expect(next!.width).toBeCloseTo(box!.width,3);expect(next!.height).toBeCloseTo(box!.height,3);
- await info.attach('comment-tail-evidence.json',{body:JSON.stringify({elapsed,phases},null,2),contentType:'application/json'});
+ await info.attach('comment-tail-evidence.json',{body:JSON.stringify({elapsed,settled,phases},null,2),contentType:'application/json'});
  await page.getByRole('slider',{name:'Intensity',exact:true}).press('End');await b.click();await seek(b,.48);const maximum=await bubbleState(b);expect(maximum.anchor.x).toBeCloseTo(3,3);expect(maximum.anchor.y).toBeCloseTo(21,3);await b.screenshot({path:info.outputPath('comment-max-intensity.png')});
  await page.getByRole('checkbox',{name:'Reduce glyph motion',exact:true}).check();await b.click();expect(await b.locator('svg').evaluate(svg=>svg.getAnimations({subtree:true}).length)).toBe(0);expect((await bubbleState(b)).width).toBeCloseTo(phases.at(-1)!.width,3);
 });
