@@ -1,3 +1,4 @@
+import {createHash} from 'node:crypto';
 import {describe,it,expect,vi,afterEach} from 'vitest';
 import {render,screen,fireEvent,act} from '@testing-library/react';
 import {ActionButton,ActionIcon,socialActions,iconMotions,glyphMotionPlan,isToggleAction,actionLabels,BookmarkButton,NoteButton,StarButton,BellButton,RepostButton,SendButton,SparklesButton,ReactionButton} from '../src/lib/index.js';
@@ -16,3 +17,18 @@ describe('complete catalog',()=>{
 });
 
 it.each(['like','bookmark','note','star','bell'] as const)('%s previews selection without changing semantic pressed state',action=>{const {container}=render(<ActionButton action={action} label="Toggle" previewState="selected"/>);expect(screen.getByRole('button').getAttribute('aria-pressed')).toBe('false');expect(screen.getByRole('button').getAttribute('data-visual-selected')).toBe('true');expect(container.querySelector('.sil-glyph path')?.getAttribute('fill')).toBe(action==='note'?'none':'currentColor');expect(container.querySelector('.sil-effect path')?.getAttribute('fill')).toBe('none');});
+
+describe('bounded Cartoon circuit and tail anchor',()=>{
+ it('repost travels one full rounded-rectangle circuit with opposite independent tips',()=>{
+  const plan=glyphMotionPlan('repost','cartoon');expect(plan.map(p=>p.part)).toEqual(['relay-top','relay-bottom']);expect(plan.every(p=>p.delay===0)).toBe(true);
+  const parse=(frame:Keyframe)=>String(frame.transform).match(/translate\(([-\d.]+)px, ([-\d.]+)px\) rotate\(([-\d.]+)deg\) scale\(([-\d.]+)\)/)!.slice(1).map(Number);
+  const top=plan[0].frames.map(parse),bottom=plan[1].frames.map(parse);expect(top).toHaveLength(65);expect(top[0]).toEqual([0,0,0,1]);expect(top.at(-1)).toEqual([0,0,360,1]);expect(bottom.at(-1)).toEqual([0,0,360,1]);
+  top.forEach(([x,y,angle],i)=>{expect(x).toBeCloseTo(-bottom[i][0],4);expect(y).toBeCloseTo(-bottom[i][1],4);expect(angle).toBe(bottom[i][2]);if(i)expect(angle).toBeGreaterThanOrEqual(top[i-1][2]);});
+  expect(top[16].slice(0,3)).toEqual([3,9,90]);expect(top[32].slice(0,3)).toEqual([-10,12,180]);expect(top[48].slice(0,3)).toEqual([-13,3,270]);
+ });
+ it('nonzero repost intensity changes squash but preserves a full circuit and closed return',()=>{const low=glyphMotionPlan('repost','cartoon',{intensity:.3}),high=glyphMotionPlan('repost','cartoon',{intensity:2});expect(low[0].frames[32].transform).not.toEqual(high[0].frames[32].transform);expect(low[0].frames.at(-1)?.transform).toBe(high[0].frames.at(-1)?.transform);expect(glyphMotionPlan('repost','cartoon',{intensity:0})).toEqual([]);});
+ it('comment inflates without a translating tail',()=>{const frames=glyphMotionPlan('comment','cartoon')[0].frames;expect(frames[0].transform).toBe('scale(0.19999999999999996)');expect(frames.slice(0,-1).every(f=>!String(f.transform).includes('translate'))).toBe(true);expect(frames.at(-1)?.transform).toBe('translate(0px, 0px) scale(1) rotate(0deg)');});
+ it.each(['repost','comment'] as const)('%s owns every replay and cancels pending/unmount cleanly',async action=>{mock();const r=render(<ActionButton action={action} label="Action" iconMotion="cartoon"/>);fireEvent.click(screen.getByRole('button'));const first=records.length;fireEvent.click(screen.getByRole('button'));expect(records.slice(0,first).every(v=>v.cancel.mock.calls.length===1)).toBe(true);r.rerender(<ActionButton action={action} label="Action" iconMotion="cartoon" pending/>);const pending=records.filter(v=>v.options.iterations===Infinity);expect(pending.length).toBeGreaterThan(0);r.rerender(<ActionButton action={action} label="Action" iconMotion="cartoon" pending reducedMotion/>);expect(pending.every(v=>v.cancel.mock.calls.length===1)).toBe(true);r.rerender(<ActionButton action={action} label="Action" iconMotion="cartoon" pending/>);r.unmount();await act(async()=>{await Promise.resolve()});expect(records.every(v=>v.cancel.mock.calls.length===1)).toBe(true);});
+});
+
+it('preserves every other action/treatment plan from 0.3.0 at three intensities',()=>{const plans=socialActions.flatMap(action=>iconMotions.filter(motion=>!(motion==='cartoon'&&['repost','comment'].includes(action))).flatMap(motion=>[.3,1,2].map(intensity=>glyphMotionPlan(action,motion,{intensity}))));expect(createHash('sha256').update(JSON.stringify(plans)).digest('hex')).toBe('45d2f755911e236b7a56cbe4c09f44d4912a3ec288a3a93e5b6fb48a7122c69a');});

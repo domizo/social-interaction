@@ -9,6 +9,34 @@ export function normalizeMotionTokens(input:Partial<IconMotionTokens>={}):IconMo
  return {duration:clamp(input.duration,560,0,1600),intensity:clamp(input.intensity,1,0,2),stagger:clamp(input.stagger,60,0,160)};
 }
 export interface GlyphPlan {part:string;frames:Keyframe[];delay:number}
+/** Arrow tips follow a clockwise rounded rectangle, not a rotation of the parent glyph.
+ * Opposite starts remain half a circuit apart. The invisible route is in viewBox units.
+ */
+function repostCircuit(intensity:number,bottom:boolean):Keyframe[] {
+ const r=3,arc=Math.PI*r/2,total=4*arc+32;
+ const segments:[number,(u:number)=>[number,number,number]][]=[
+  [arc,u=>[17+r*Math.sin(u*Math.PI/2),9-r*Math.cos(u*Math.PI/2),90*u]],
+  [6,u=>[20,9+6*u,90]],
+  [arc,u=>[17+r*Math.cos(u*Math.PI/2),15+r*Math.sin(u*Math.PI/2),90+90*u]],
+  [10,u=>[17-10*u,18,180]],
+  [arc,u=>[7-r*Math.sin(u*Math.PI/2),15+r*Math.cos(u*Math.PI/2),180+90*u]],
+  [6,u=>[4,15-6*u,270]],
+  [arc,u=>[7-r*Math.cos(u*Math.PI/2),9-r*Math.sin(u*Math.PI/2),270+90*u]],
+  [10,u=>[7+10*u,6,360]],
+ ];
+ const frames:Keyframe[]=[];let distance=0;
+ const clean=(v:number)=>Math.abs(v)<.00001?0:Number(v.toFixed(5));
+ segments.forEach(([length,point],index)=>{
+  for(let j=index?1:0;j<=8;j++){
+   const progress=(distance+length*j/8)/total,[x,y,angle]=point(j/8),sign=bottom?-1:1;
+   // Intensity controls the in-flight squash, not the number of turns. Zero disables the plan.
+   const scale=1-.18*intensity*Math.sin(Math.PI*progress)**2;
+   frames.push({transform:`translate(${clean(sign*(x-17))}px, ${clean(sign*(y-6))}px) rotate(${clean(angle)}deg) scale(${clean(scale)})`,offset:progress});
+  }
+  distance+=length;
+ });
+ return frames;
+}
 /** Pure keyframe plans, targeting SVG parts only. Echo geometry is decorative and hidden at rest. */
 export function glyphMotionPlan(action:SocialAction,motion:IconMotion,input:Partial<IconMotionTokens>={}):GlyphPlan[] {
  const t=normalizeMotionTokens(input),a=t.intensity,neutral={transform:'translate(0px, 0px) scale(1) rotate(0deg)',opacity:1};
@@ -23,10 +51,10 @@ export function glyphMotionPlan(action:SocialAction,motion:IconMotion,input:Part
   let main:GlyphPlan[];
   switch(action){
    case 'like':main=single([neutral,{transform:`rotate(${-9*a}deg) scale(${1-.1*a})`,offset:.12},{transform:`rotate(${9*a}deg)`,offset:.22},{transform:`rotate(${-7*a}deg)`,offset:.32},{transform:`rotate(${5*a}deg) scale(${1+.2*a})`,offset:.45},{transform:`rotate(${-3*a}deg)`,offset:.58},neutral]);break;
-   case 'comment':main=[part('glyph',[{transform:`scale(${Math.max(.1,1-.8*a)}) translateY(${3*a}px)`,opacity:0},{transform:`scale(${1+.2*a},${1+.12*a})`,opacity:1,offset:.48},{transform:`scale(${1-.06*a},${1+.05*a})`,offset:.72},neutral]),part('trace',[{strokeDashoffset:.65*a},{strokeDashoffset:0,offset:.7},{strokeDashoffset:0}])];break;
+   case 'comment':main=[part('glyph',[{transform:`scale(${Math.max(.1,1-.8*a)})`,opacity:0},{transform:`scale(${1+.2*a},${1+.12*a})`,opacity:1,offset:.48},{transform:`scale(${1-.06*a},${1+.05*a})`,offset:.72},neutral]),part('trace',[{strokeDashoffset:.65*a},{strokeDashoffset:0,offset:.7},{strokeDashoffset:0}])];break;
    case 'share':main=single([neutral,{transform:`translateY(${2*a}px) scaleY(${1-.18*a})`,offset:.2},{transform:`translateY(${-6*a}px) scaleY(${1+.1*a})`,offset:.48},neutral],'arrow');break;
    case 'quote':main=['quote-left','quote-right'].map((name,i)=>part(name,[neutral,{transform:`scale(${1-.2*a}) translateY(${2*a}px)`,offset:.18},{transform:`translate(${(i?1:-1)*2*a}px,${-3*a}px) scale(${1+.15*a})`,offset:.5},neutral],i*t.stagger));break;
-   case 'repost':main=['relay-top','relay-bottom'].map((name,i)=>part(name,[neutral,{transform:`translateX(${(i?1:-1)*2*a}px) scaleX(${1-.1*a})`,offset:.18},{transform:`translateX(${(i?-1:1)*4*a}px)`,offset:.5},neutral],i*t.stagger));break;
+   case 'repost':return ['relay-top','relay-bottom'].map((name,i)=>part(name,repostCircuit(a,!!i)));
    case 'bookmark':case 'note':main=[part('glyph',[neutral,{transform:`translateY(${-5*a}px) scaleY(${1-.12*a})`,offset:.2},{transform:`translateY(${2*a}px) scaleY(${1-.18*a}) scaleX(${1+.12*a})`,offset:.48},neutral]),part('fold',[neutral,{transform:`scaleY(${1-.7*a/2}) rotate(${-15*a}deg)`,offset:.3},neutral],t.stagger)];break;
    case 'star':main=single([neutral,{transform:`rotate(${-20*a}deg) scale(${1-.3*a})`,offset:.2},{transform:`rotate(${10*a}deg) scale(${1+.22*a})`,offset:.5},neutral]);break;
    case 'send':main=[part('plane',[neutral,{transform:`rotate(${-12*a}deg) scale(${1-.2*a})`,offset:.2},{transform:`translate(${7*a}px,${-7*a}px) scale(.85)`,opacity:0,offset:.48},{transform:`translate(${-4*a}px,${4*a}px) scale(.85)`,opacity:0,offset:.52},neutral]),part('crease',[neutral,{transform:`scaleX(${1-.6*a/2})`,offset:.22},neutral])];break;

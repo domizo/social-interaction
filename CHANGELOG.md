@@ -1,5 +1,12 @@
 # Changelog / 変更履歴
 
+## 0.3.1 — 2026-10-10
+
+- Refine only Cartoon Repost and Comment; preserve every other action/treatment plan / カートゥーンのリポスト・コメントだけを調整
+- Move both Repost arrows around one invisible rounded-rectangle circuit, with independent tangent orientation and an exact return / 2本の矢印が見えない角丸経路を一周して復帰
+- Inflate Comment from its fixed bottom-left tail, then overshoot and settle / 吹き出しを左下のしっぽから膨らませ、軽く弾んで収束
+- Add route winding, elapsed-time, multi-phase frame and fixed-anchor regressions / 一周・時間経過・複数フレーム・固定基準点の検証を追加
+
 ## 0.3.0 — 2026-10-10
 
 - Add `cartoon`: action-specific anticipation, squash, overshoot, heart quiver with an expanding/fading outline, and bubble pop / カートゥーン表現、震えるハートと広がって消える輪郭、吹き出しの出現

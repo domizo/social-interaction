@@ -22,3 +22,9 @@
 
 .sil-action[data-reduced-motion=true],.sil-action[data-reduced-motion=true]:hover,.sil-action[data-reduced-motion=true] .sil-content{transition:none!important;transform:none!important}
 .sil-effect{pointer-events:none;transform-origin:12px 12px!important;transform-box:view-box!important}.sil-icon [data-glyph-part=bell-body]{transform-origin:50% 15%}.sil-action[data-action=like][data-preview=selected] .sil-glyph path{fill:currentColor}
+
+/* Cartoon-only viewBox anchors: the comment tail stays planted; each repost arrow has its own tip pivot. */
+.sil-action[data-icon-motion=cartoon][data-action=comment] .sil-glyph{transform-box:view-box;transform-origin:3px 21px}
+.sil-action[data-icon-motion=cartoon][data-action=comment] .sil-effect{transform-origin:3px 21px!important}
+.sil-action[data-icon-motion=cartoon][data-action=repost] [data-glyph-part=relay-top]{transform-box:view-box;transform-origin:17px 6px}
+.sil-action[data-icon-motion=cartoon][data-action=repost] [data-glyph-part=relay-bottom]{transform-box:view-box;transform-origin:7px 18px}
