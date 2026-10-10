@@ -1,6 +1,8 @@
 import {useEffect,useRef,useState,type RefObject} from 'react';
 import type {SocialAction} from './tokens.js';
-import {repostTransition,commentTransition} from './canonicalMorph.js';
+import {repostTransition} from './canonicalMorph.js';
+import {commentPlaybackFrame} from './commentMotion.js';
+import {morphEase} from './motionTiming.js';
 import {startMorphPlayback} from './morphPlayback.js';
 export type IconMotion='none'|'pulse'|'spring'|'trace'|'gesture'|'cartoon';
 export interface IconMotionTokens {duration:number;intensity:number;stagger:number}
@@ -25,7 +27,7 @@ export function glyphMotionPlan(action:SocialAction,motion:IconMotion,input:Part
   let main:GlyphPlan[];
   switch(action){
    case 'like':main=single([neutral,{transform:`rotate(${-9*a}deg) scale(${1-.1*a})`,offset:.12},{transform:`rotate(${9*a}deg)`,offset:.22},{transform:`rotate(${-7*a}deg)`,offset:.32},{transform:`rotate(${5*a}deg) scale(${1+.2*a})`,offset:.45},{transform:`rotate(${-3*a}deg)`,offset:.58},neutral]);break;
-   case 'comment':return [part('comment-body',Array.from({length:65},(_,i)=>({d:`path("${commentTransition(i/64,a).sampledD}")`,offset:i/64})))];
+   case 'comment':{const frames=Array.from({length:129},(_,i)=>({frame:commentPlaybackFrame(i/128,a),offset:morphEase(i/128)}));return [part('comment-body',frames.map(({frame,offset})=>({d:`path("${frame.sampledD}")`,offset}))),part('glyph',frames.map(({frame,offset})=>({transform:frame.transform,offset})))];}
    case 'share':main=single([neutral,{transform:`translateY(${2*a}px) scaleY(${1-.18*a})`,offset:.2},{transform:`translateY(${-6*a}px) scaleY(${1+.1*a})`,offset:.48},neutral],'arrow');break;
    case 'quote':main=['quote-left','quote-right'].map((name,i)=>part(name,[neutral,{transform:`scale(${1-.2*a}) translateY(${2*a}px)`,offset:.18},{transform:`translate(${(i?1:-1)*2*a}px,${-3*a}px) scale(${1+.15*a})`,offset:.5},neutral],i*t.stagger));break;
    case 'repost':return [false,true].map(opposite=>part(`repost-${opposite?'bottom':'top'}`,Array.from({length:97},(_,i)=>({d:`path("${repostTransition(i/96,a,opposite).sampledD}")`,offset:i/96}))));

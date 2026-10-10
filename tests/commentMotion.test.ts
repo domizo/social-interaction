@@ -1,0 +1,7 @@
+import {expect,it} from 'vitest';
+import {commentPlaybackFrame,commentFormationFraction} from '../src/lib/commentMotion.js';
+import {canonicalComment,commentTransition} from '../src/lib/canonicalMorph.js';
+import {morphEase} from '../src/lib/motionTiming.js';
+it('keeps the accepted inflation contour at a25% shorter real-time duration',()=>{expect(commentFormationFraction).toBe(.75);for(let i=0;i<100;i++){const t=.75*i/100,f=commentPlaybackFrame(t);expect(f.d).toBe(commentTransition(morphEase(t/.75)).d);expect(f.transform).toBe('none');}expect(commentPlaybackFrame(.75).d).toBe(canonicalComment);});
+it('uses only the canonical path through two small damped transform oscillations',()=>{let previous=Infinity;for(const q of [.125,.375,.625,.875]){const f=commentPlaybackFrame(.75+.25*q);expect(f.d).toBe(canonicalComment);expect(Math.abs(f.rotation)).toBeLessThan(previous);previous=Math.abs(f.rotation);expect(Math.sign(f.rotation)).toBe(q===.125||q===.625?1:-1);}for(let i=0;i<=100;i++){const f=commentPlaybackFrame(.75+.25*i/100,2);expect(f.d).toBe(canonicalComment);expect(Math.abs(f.rotation)).toBeLessThanOrEqual(5.6);expect(Math.abs(f.squash)).toBeLessThanOrEqual(.03);}expect(commentPlaybackFrame(1).transform).toBe('none');});
+it('scales the quiver with intensity and keeps exact target geometry',()=>{const a=commentPlaybackFrame(.78125,.3),b=commentPlaybackFrame(.78125,2);expect(b.rotation/a.rotation).toBeCloseTo(2/.3);expect(a.d).toBe(b.d);expect(commentPlaybackFrame(.9,0).rotation).toBe(0);});

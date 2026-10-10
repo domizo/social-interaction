@@ -1,5 +1,13 @@
 # Changelog / 変更履歴
 
+## 0.3.6 — 2026-10-10
+
+- Refine only Cartoon Comment: preserve its circle-to-canonical contour, fitting eased inflation into the first 75% of the selected duration / カートゥーンのコメントだけを調整し、円から基本形への成長を指定時間の最初の75%に収める
+- Add two tiny damped rotation/squash oscillations to the fully formed bubble during the final 25%; keep total duration unchanged (420 ms + 140 ms at the 560 ms default) / 完成後にごく小さく2回揺らし、合計時間を維持
+- Bound the shake by 2.8° rotation and 1.5% squash × intensity, with `(1−q)²` damping; use no second path morph, trace, or echo / 強さに応じた回転・つぶれを減衰させ、別のパス変形・線描画・残像は加えない
+- Export path and glyph-transform plan steps with easing-compensated offsets; use raw runtime time for the inflation/shake split / 公開プランの時間配置を補正し、実時間で成長と揺れを分ける
+- Preserve reduced motion, cancellation ownership and prior group styles on cleanup; keep Repost unchanged / 動きの抑制・中止・既存スタイルの復元を維持し、リポストは変更しない
+
 ## 0.3.5 — 2026-10-10
 
 - Keep Cartoon Repost on its original `x=4…20`, `y=6…18` rectangle: perimeter 56, body length 16, original 3-back/3-side arrowheads, and half-perimeter separation / 元の長方形・矢印の長さ・矢じり・半周の間隔を維持

@@ -7,8 +7,10 @@ export async function installMorphClock(page:Page){await page.addInitScript(()=>
   // Invert CSS ease-in-out's y coordinate, then evaluate its x coordinate.
   let lo=0,hi=1;for(let i=0;i<40;i++){const s=(lo+hi)/2;if(3*s*s-2*s*s*s<progress)lo=s;else hi=s;}const s=(lo+hi)/2;
   fixed=start+(progress===1?1601:1600*(progress===0?0:3*.42*(1-s)*(1-s)*s+3*.58*(1-s)*s*s+s*s*s));
- },release:()=>{fixed=null;}};
+ },seekTime:(time:number)=>{fixed=start+(time===1?1601:1600*time);},release:()=>{fixed=null;}};
 });}
 export const freezeMorph=(page:Page)=>page.evaluate(()=>(window as unknown as {__morphClock:{freeze:()=>void}}).__morphClock.freeze());
 export const seekMorph=(page:Page,phase:number)=>page.evaluate(p=>{(window as unknown as {__morphClock:{seek:(p:number)=>void}}).__morphClock.seek(p);return new Promise<void>(resolve=>requestAnimationFrame(()=>requestAnimationFrame(()=>resolve())));},phase);
 export const releaseMorph=(page:Page)=>page.evaluate(()=>(window as unknown as {__morphClock:{release:()=>void}}).__morphClock.release());
+
+export const seekMorphTime=(page:Page,time:number)=>page.evaluate(t=>{(window as unknown as {__morphClock:{seekTime:(t:number)=>void}}).__morphClock.seekTime(t);return new Promise<void>(resolve=>requestAnimationFrame(()=>requestAnimationFrame(()=>resolve())));},time);
