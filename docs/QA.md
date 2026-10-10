@@ -5,7 +5,7 @@ Date: 2026-10-10. Source checks and native browser checks are separate.
 ## Passed / 通過
 
 - TypeScript application, component, and test-source checks
-- 38 DOM/hook behavioral tests: tokens, stable toggle semantics, native button activation, independent pending states, cancellation, stale results, repeated activation, retry, retained draft text, current-locale completion, share keyboard navigation, and focus restoration
+- 43 DOM/hook and contrast behavioral tests: tokens, stable toggle semantics, native button activation, independent pending states, cancellation, stale results, repeated activation, retry, retained draft text, current-locale completion, share keyboard navigation, and focus restoration
 - Production Vite build and generated installable library
 - Fresh external npm install: strict NodeNext, skipLibCheck:false, runtime ESM import, included CSS
 - Clean committed archive rebuilt with fresh npm ci, typecheck, tests, build, and external consumer verification (rerun after release changes)

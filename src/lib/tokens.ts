@@ -4,7 +4,7 @@ export type SocialVariant = 'minimal' | 'soft' | 'solid' | 'spring';
 export type SocialAction = 'like' | 'comment' | 'share' | 'quote';
 export type PreviewState = 'idle' | 'hover' | 'focus' | 'pressed' | 'selected' | 'pending' | 'error';
 export interface SocialTokens { iconSize: number; strokeWidth: number; gap: number; duration: number; amplitude: number; accent: string; hitTarget: number }
-export const defaultTokens: Readonly<SocialTokens> = Object.freeze({iconSize:20,strokeWidth:1.6,gap:16,duration:180,amplitude:4,accent:'#c83f4b',hitTarget:44});
+export const defaultTokens: Readonly<SocialTokens> = Object.freeze({iconSize:20,strokeWidth:1.6,gap:16,duration:180,amplitude:4,accent:'#b93240',hitTarget:44});
 export const tokenBounds = {iconSize:[16,28],strokeWidth:[1,3],gap:[4,28],duration:[0,400],amplitude:[0,8],hitTarget:[44,64]} as const;
 export function normalizeTokens(input: Partial<SocialTokens> = {}): SocialTokens {
   const value={...defaultTokens};
