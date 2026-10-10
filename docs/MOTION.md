@@ -1,6 +1,6 @@
 # Glyph motion / アイコンの動き
 
-Version 0.3.1 refines Cartoon Repost and Comment while preserving the other plans. Version 0.3.0 expands the catalog to 12 SVG icons and five treatments, adding `cartoon` alongside `pulse`, `spring`, `trace`, and `gesture`. `none` remains the opt-out. Motion changes the glyph, a glyph part, or its drawn path; it never resizes the button hit target. These are design hypotheses to compare in context, not universal rules about what feels beautiful.
+Version 0.3.2 corrects the shape deformation of Cartoon Repost and Comment while preserving the other plans. Version 0.3.0 expands the catalog to 12 SVG icons and five treatments, adding `cartoon` alongside `pulse`, `spring`, `trace`, and `gesture`. `none` remains the opt-out. Motion changes the glyph, a glyph part, or its drawn path; it never resizes the button hit target. These are design hypotheses to compare in context, not universal rules about what feels beautiful.
 
 | Treatment | Like | Comment | Share | Quote | Intended feel and tradeoff |
 |---|---|---|---|---|---|
@@ -8,7 +8,7 @@ Version 0.3.1 refines Cartoon Repost and Comment while preserving the other plan
 | `spring` | Heart bounce | Bubble squash/inflate | Arrow lift; tray stays still | Staggered mark bounce | Responsive and tactile; can be too expressive in dense interfaces |
 | `trace` | Outline redraw | Outline redraw | Staggered paths | Staggered paths | Deliberate drawing; briefly reduces the outline's completeness |
 | `gesture` | Heart tilt | Bubble sway | Arrow launch and return | Marks open in sequence | Action-specific expression; more visual attention and travel |
-| `cartoon` | Quiver + expanding, fading outline | Bottom-left bubble inflation | Arrow anticipation and launch | Exaggerated sequential marks | Anime/cartoon-inspired expression; larger overshoot and decorative effects demand more attention |
+| `cartoon` | Quiver + expanding, fading outline | Small circle grows; tail appears late | Arrow anticipation and launch | Exaggerated sequential marks | Anime/cartoon-inspired expression; larger overshoot and decorative effects demand more attention |
 
 pulse は統一感、spring は弾力、trace は線を描く印象、gesture は操作ごとの個性、cartoon はアニメ的な誇張を比較するための仮説です。ハートの震えと拡大して消える輪郭、吹き出しのポップな出現などを実際の SVG で表現します。trace は線の一部が一時的に欠け、cartoon は装飾と大きめの変形で視線を集めるため、表示の小ささや情報密度に合わせて判断してください。
 
@@ -19,10 +19,10 @@ All 12 actions can use every treatment. Cartoon gives each action its own sequen
 | Action | Cartoon sequence / 動き |
 |---|---|
 | Like / いいね | Heart anticipation and quiver; a duplicate outline expands and fades / ハートの予備動作と震え、拡大して消える輪郭 |
-| Comment / コメント | Bubble inflates from the bottom-left tail, with a short outline redraw, then overshoots and settles / 左下のしっぽを固定して吹き出しが膨らみ、軽く弾んで収束 |
+| Comment / コメント | A small closed circle grows from the lower-left, then a tail appears late / 左下の小さな円が膨らみ、最後にしっぽが現れる |
 | Share / 共有 | Arrow anticipates, launches, and returns / 矢印の予備動作・発射・復帰 |
 | Quote / 引用 | Quote marks exaggerate their movement in sequence / 引用符が時間差で大きく動く |
-| Repost / リポスト | Two opposed arrows follow one invisible rounded-rectangle circuit and return / 2本の矢印が見えない角丸の枠に沿って一周し、元に戻る |
+| Repost / リポスト | Two fixed-length arrow bodies deform along an invisible rounded rectangle / 一定の長さの矢印が、見えない角丸の経路に沿って曲がったり伸びたりする |
 | Bookmark / ブックマーク | Bookmark drops and settles / しおりが落ちて収束 |
 | Note / メモを保存 | Sticky-note corner folds / 付箋の角が折れる |
 | Star / スター | Star pops with brief rays / 星のポップと短い放射線 |
@@ -35,15 +35,17 @@ Decorative effect groups add no accessible names, state, or success meaning. The
 
 装飾グループはアクセシブル名・状態・成功の意味を追加しません。静止時は隠れ、主アイコンと同じ単位で中止されます。付箋は保存アイコンの別案、きらめきは AI 連携を持たない視覚表現です。
 
-### Two precise anchors / 2つの基準点
+### Path deformation, not rigid travel / 経路に沿って形を変える
 
-Cartoon Comment scales around SVG viewBox point `(3,21)`, the bottom-left tail. Its main bubble and decorative echo share this anchor; there is no translating start. Other Comment treatments keep their existing center-based transforms.
+Cartoon Repost uses two 10-unit-long sliding windows on an invisible rounded-rectangle centerline (`x=3…21`, `y=3…21`, corner radius `3`). Each body is sampled at 33 equal arc-length positions. It becomes straight when entirely on a straight span, and bends only where its current window crosses a corner. A separate arrowhead follows the tip's local tangent. The two segments stay half a perimeter apart and complete one lap. The bent resting pose is simply a window straddling a corner, not a permanently bent arrow translated around the frame. No guide, parent rotation or echo is rendered. Intensity adjusts the pace accent, preserving body length and a full lap; this synchronized pair does not use stagger.
 
-Cartoon Repost animates each arrow separately. The arrow tips start at `(17,6)` and `(7,18)`, follow the same clockwise rounded rectangle (`x=4…20`, `y=6…18`, radius `3`) half a lap apart, and return after exactly one circuit. Each arrow turns with the route tangent; the parent icon does not rotate and no guide or echo is drawn. Duration sets one lap; any nonzero intensity retains the full lap and controls in-flight compactness instead of turn count. The two arrows stay synchronized, so this pair does not use the stagger token. Zero intensity/duration and reduced motion still disable movement.
+Cartoon Comment starts as a closed circle of radius `1.5`, near the lower-left. The circle grows upward/rightward with its bounding-box corner at `(3,21)`, lightly overshoots, and develops the bubble tail only during the final 28% of geometric progress. All 64 sampled points form a circle before that late tail deformation. There is no stroke-dash drawing, outline echo, or separate tail visible in the early circle. The final closed bubble is also the static/reduced-motion shape. Intensity scales the growth overshoot.
 
-Comment は左下のしっぽ `(3,21)` を動かさずに膨らみます。Repost は2本の矢印が同じ見えない角丸の経路を半周ずれて進み、1周で元に戻ります。矢印ごとに向きが変わり、アイコン全体は回転しません。強さは移動中の縮み具合を変え、0以外では1周を保ちます。この2本は同期して動くため、時間差トークンを使用しません。他の操作・表現は変更していません。
+Cartoon uses compatible `d` path keyframes for these two actions, with no group translation/rotation/scale. All other treatments, including the explicit `trace` treatment, keep their previous plans and glyph geometry. `ActionIcon` accepts optional `motion` when rendering the corresponding Cartoon resting geometry; `ActionButton` supplies it automatically. Browsers that do not support CSS `d: path(...)` animation retain the static icon. Safari and physical-device behavior have not been verified.
 
-SVG anchors use the [CSS Transforms reference-box and origin rules](https://www.w3.org/TR/css-transforms-1/#transform-box).
+リポストの本体は一定長の経路断片です。直線区間ではまっすぐになり、角をまたぐ間だけ曲がります。矢印の先端は経路の接線方向を向き、2本は半周ずれて一周します。コメントは左下の小さな閉じた円から育ち、最後の段階でしっぽが現れて吹き出しになります。線を描く処理や輪郭の残像は使いません。明示的な Trace スタイルと他の動きは従来どおりです。
+
+Compatible command lists follow the [SVG path interpolation rules](https://www.w3.org/TR/SVG/paths.html#TheDProperty).
 
 ## Reusable API / 再利用
 
@@ -57,7 +59,7 @@ SVG anchors use the [CSS Transforms reference-box and origin rules](https://www.
 
 - `iconMotion`: `none | pulse | spring | trace | gesture | cartoon`; default `spring`. Independent of visual `variant`
 - `motionTokens.duration`: 0–1600 ms, default 560. Zero disables glyph motion
-- `motionTokens.intensity`: 0–2, default 1. Zero disables glyph motion; scales spatial motion (Cartoon Repost varies compactness while retaining one full lap); Trace adjusts how much outline is redrawn and how far its fill fades
+- `motionTokens.intensity`: 0–2, default 1. Zero disables glyph motion; scales spatial motion (Cartoon Repost varies pace while retaining fixed body length and one full lap); Trace adjusts how much outline is redrawn and how far its fill fades
 - `motionTokens.stagger`: 0–160 ms, default 60. Delay between staggered glyph parts, effects, or traced paths; it adds to the total duration
 - `motionTrigger`: number or string; changing it replays the selected glyph without invoking `onClick` or changing semantic state. Initial render does not replay
 - `reducedMotion`: default false; true suppresses both glyph motion and this button's CSS press/hover transforms, even outside the playground

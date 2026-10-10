@@ -20,10 +20,10 @@ npm run build
 
 ## Install the library
 
-Download `social-interaction-lab-react-0.3.1.tgz` from the playground or build it with `npm run build:package`. In your separate React project:
+Download `social-interaction-lab-react-0.3.2.tgz` from the playground or build it with `npm run build:package`. In your separate React project:
 
 ```sh
-npm install ./social-interaction-lab-react-0.3.1.tgz
+npm install ./social-interaction-lab-react-0.3.2.tgz
 ```
 
 React 18.2 or 19 is a peer dependency. The library is ESM-only; styles are explicitly imported and are not automatically injected.

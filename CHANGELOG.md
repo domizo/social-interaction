@@ -1,5 +1,11 @@
 # Changelog / 変更履歴
 
+## 0.3.2 — 2026-10-10
+
+- Correct Cartoon Repost to deform fixed-length sliding path segments, with tangent heads, rather than move rigid bent arrows / 矢印本体が経路の角で曲がり、直線で伸びる表現に修正
+- Correct Cartoon Comment to grow a closed circle from the lower-left and introduce its tail only near the end; remove its trace and echo / 左下の円が育ち、最後にしっぽが現れる。線描画と残像を除去
+- Preserve every other action/treatment, including explicit Trace; add path-shape, curvature, length, tangent, late-tail and no-dash browser checks / 他の表現を維持し、形そのものを検証
+
 ## 0.3.1 — 2026-10-10
 
 - Refine only Cartoon Repost and Comment; preserve every other action/treatment plan / カートゥーンのリポスト・コメントだけを調整

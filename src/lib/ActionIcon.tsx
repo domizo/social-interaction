@@ -1,8 +1,13 @@
 import {forwardRef} from 'react';
 import type {SocialAction} from './tokens.js';
+import type {IconMotion} from './iconMotion.js';
+import {repostSegment,commentMorph} from './cartoonGeometry.js';
 const shapes={heart:'M20.7 4.9a5.4 5.4 0 0 0-7.6 0L12 6 10.9 4.9a5.4 5.4 0 0 0-7.6 7.6L12 21l8.7-8.5a5.4 5.4 0 0 0 0-7.6Z',bubble:'M21 11.5a9 9 0 0 1-9 9 9.7 9.7 0 0 1-3.8-.8L3 21l1.3-5.2a9.7 9.7 0 0 1-.8-3.8 9 9 0 0 1 9-9H13a9 9 0 0 1 8 8v.5Z',bookmark:'M6 3h12v18l-6-4-6 4Z',star:'m12 2.5 2.9 5.9 6.5.9-4.7 4.6 1.1 6.5-5.8-3.1-5.8 3.1 1.1-6.5L2.6 9.3l6.5-.9Z',plane:'m3 10 18-7-7 18-3-8Z',note:'M5 3h14v12l-6 6H5Z',face:'M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z',glint:'m12 2 2.8 7.2L22 12l-7.2 2.8L12 22l-2.8-7.2L2 12l7.2-2.8Z'};
-function Path({d,filled=false}:{d:string;filled?:boolean}){return <path pathLength="1" vectorEffect="non-scaling-stroke" d={d} fill={filled?'currentColor':'none'}/>;}
-function Glyph({action,filled}:{action:SocialAction;filled:boolean}){
+function Path({d,filled=false,part}:{d:string;filled?:boolean;part?:string}){return <path data-glyph-part={part} pathLength="1" vectorEffect="non-scaling-stroke" d={d} fill={filled?'currentColor':'none'}/>;}
+function Glyph({action,filled,motion}:{action:SocialAction;filled:boolean;motion?:IconMotion}){
+ if(motion==='cartoon'&&action==='comment')return <Path d={commentMorph(1).d} part="comment-body"/>;
+ if(motion==='cartoon'&&action==='repost')return <>{[false,true].map(opposite=>{const shape=repostSegment(0,opposite),side=opposite?'bottom':'top';return <g key={side} data-glyph-part={`relay-${side}`}><Path d={shape.body} part={`repost-body-${side}`}/><Path d={shape.head} part={`repost-head-${side}`}/></g>;})}</>;
+
  switch(action){
  case 'like':return <Path d={shapes.heart} filled={filled}/>;
  case 'comment':return <Path d={shapes.bubble}/>;
@@ -19,6 +24,6 @@ function Glyph({action,filled}:{action:SocialAction;filled:boolean}){
  }
 }
 const echoes:Record<SocialAction,string>={like:shapes.heart,comment:shapes.bubble,share:'M8 5 12 1l4 4',quote:'M2 8 0 5m22 3 2-3',repost:'M3 3h5m13 18h-5',bookmark:shapes.bookmark,note:shapes.note,star:'M12-2v2m0 24v2M-2 12h2m24 0h2M2 2 0 0m22 22 2 2M22 2l2-2M2 22l-2 2',send:'M2 17-1 20m6-1-3 3',sparkles:shapes.glint,bell:'M3 7 1 5m20 2 2-2M2 12H0m22 0h2',reaction:'M3 3 1 1m20 2 2-2'};
-export const ActionIcon=forwardRef<SVGSVGElement,{action:SocialAction;filled?:boolean}>(function ActionIcon({action,filled=false},ref){
- return <svg ref={ref} className="sil-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" strokeWidth="var(--sil-stroke, 1.6)" strokeLinecap="round" strokeLinejoin="round"><g data-glyph-part="glyph" className="sil-glyph"><Glyph action={action} filled={filled}/></g><g data-glyph-part="echo" className="sil-effect" opacity="0" fill="none"><Path d={echoes[action]}/></g></svg>;
+export const ActionIcon=forwardRef<SVGSVGElement,{action:SocialAction;filled?:boolean;motion?:IconMotion}>(function ActionIcon({action,filled=false,motion},ref){
+ return <svg ref={ref} className="sil-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" strokeWidth="var(--sil-stroke, 1.6)" strokeLinecap="round" strokeLinejoin="round"><g data-glyph-part="glyph" className="sil-glyph"><Glyph action={action} filled={filled} motion={motion}/></g><g data-glyph-part="echo" className="sil-effect" opacity="0" fill="none"><Path d={echoes[action]}/></g></svg>;
 });
