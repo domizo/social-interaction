@@ -20,10 +20,10 @@ npm run build
 
 ## Install the library
 
-Download `social-interaction-lab-react-0.3.7.tgz` from the playground or build it with `npm run build:package`. In your separate React project:
+Download `social-interaction-lab-react-0.3.8.tgz` from the playground or build it with `npm run build:package`. In your separate React project:
 
 ```sh
-npm install ./social-interaction-lab-react-0.3.7.tgz
+npm install ./social-interaction-lab-react-0.3.8.tgz
 ```
 
 React 18.2 or 19 is a peer dependency. The library is ESM-only; styles are explicitly imported and are not automatically injected.
@@ -69,7 +69,7 @@ Choose `iconMotion="pulse"`, `"spring"`, `"trace"`, `"gesture"`, or `"cartoon"` 
   onClick={() => setLiked(value => !value)} />
 ```
 
-Cartoon gives the heart a quiver and an expanding, fading outline. Comment grows continuously from a tiny lower-left circle into the standard bubble during the first 75% of its duration, then the fully formed glyph makes a small whole-bubble bounce over the final 25%, inspired by the existing Reaction face action. Repost continues to slide fixed-length arrow bodies around its original rectangular route. Other icons use action-specific gestures. These expressive treatments are hypotheses to test in context, not universal rules for beauty.
+Cartoon gives the heart a quiver and an expanding, fading outline. Comment rises while growing from a tiny lower-left circle into the standard bubble during the first 75% of its duration, reaching its full contour at the peak. Over the final 25%, it falls, squashes on landing, rebounds mildly, and settles (420 ms + 140 ms at the 560 ms default). Repost continues to slide fixed-length arrow bodies around its original rectangular route. Other icons use action-specific gestures. These expressive treatments are hypotheses to test in context, not universal rules for beauty.
 
 Glyph duration is bounded to 0–1600 ms, intensity to 0–2, and part stagger to 0–160 ms. Activation feedback is not a success message. Pending uses a slower repeating glyph with static dots and accessible status; cartoon secondary bursts stay off during pending. OS/manual reduced motion preserves state without movement. Effects are decorative, cancellation-owned, and never enlarge the hit target. See [motion API and design tradeoffs](docs/MOTION.md).
 

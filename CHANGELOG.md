@@ -1,5 +1,13 @@
 # Changelog / 変更履歴
 
+## 0.3.8 — 2026-10-11
+
+- Lift Cartoon Comment while its accepted contour inflates through the first 75%; reach the exact full bubble at the peak, `−3 × intensity` SVG units / 最初の75%で膨らみながら上がり、基本の吹き出しが完成する瞬間を頂点にする
+- Use the final 25% for a fall, landing squash, mild rebound, and rest; keep the 560 ms default split at 420 ms + 140 ms / 最後の25%で落下・着地のつぶれ・小さな跳ね返り・静止をつなぎ、合計時間を維持
+- Keep scale neutral during inflation, then smoothstep between centered poses at `q=0,.48,.72,1`; use no rotation or tail pivot / 成長中は拡大縮小せず、完成後は中心基準の姿勢を滑らかにつなぐ
+- Preserve the path interpolation and local `(3,21)` growth bounds while the whole glyph moves upward on screen; retain intensity, cancellation cleanup, reduced motion, and the path-plus-transform plan / パスとローカル基準を保ち、画面上では全体が上がる。強さ・中止・動きの抑制・公開プランを維持
+- Keep the accepted Repost motion unchanged / 確定済みのリポストの動きは変更しない
+
 ## 0.3.7 — 2026-10-11
 
 - Replace only Cartoon Comment’s post-formation quiver with a whole-glyph bounce inspired by the existing Reaction face action, not the React brand / コメント完成後の震えを、既存の顔のリアクションを参考にした全体の弾みに置換
