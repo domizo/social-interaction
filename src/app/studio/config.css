@@ -1,0 +1,50 @@
+.studio-config { --config-border:#dedbd5; --config-muted:#68655e; margin:32px 0; padding:26px; border:1px solid var(--config-border); border-radius:14px; background:#fffefa; min-width:0; }
+.studio-config .studio-config-heading { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; margin-bottom:20px; }
+.studio-config .studio-config-heading h2 { margin:6px 0; font-size:24px; letter-spacing:-.7px; }
+.studio-config .studio-config-heading p { margin:0; color:var(--config-muted); font-size:14px; line-height:1.6; }
+.studio-config .studio-config-eyebrow,.studio-config .studio-config-version { font:10px/1.4 'IBM Plex Mono',monospace; letter-spacing:1.2px; color:var(--config-muted); }
+.studio-config .studio-config-version { white-space:nowrap; border:1px solid var(--config-border); border-radius:4px; padding:6px 8px; }
+.studio-config .studio-config-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; min-width:0; }
+.studio-config .studio-config-card { min-width:0; padding:18px; border:1px solid var(--config-border); border-radius:9px; background:#fff; }
+.studio-config .studio-config-card h3 { margin:0 0 9px; font-size:15px; }
+.studio-config .studio-config-actions { grid-column:1/-1; }
+.studio-config .studio-config-actions summary { display:flex; align-items:center; justify-content:space-between; gap:12px; min-height:30px; cursor:pointer; font-weight:650; font-size:15px; }
+.studio-config .studio-config-actions summary::before { content:'+'; font:18px monospace; }
+.studio-config .studio-config-actions[open] summary::before { content:'−'; }
+.studio-config .studio-config-actions summary span { margin-left:auto; color:var(--config-muted); font:11px monospace; }
+.studio-config .studio-config-hint { font-size:12px; line-height:1.7; color:var(--config-muted); margin:0 0 13px; }
+.studio-config .studio-config-actions .studio-config-hint { margin-top:12px; }
+.studio-config .studio-config-row { display:flex; align-items:center; flex-wrap:wrap; gap:8px; min-width:0; }
+.studio-config label { font-size:12px; }
+.studio-config button,.studio-config .studio-config-file-button { display:inline-flex; align-items:center; justify-content:center; min-height:40px; padding:8px 12px; border:1px solid #c9c5bd; border-radius:5px; background:#fff; color:#242721; font:inherit; font-size:12px; font-weight:600; line-height:1.4; cursor:pointer; text-decoration:none; }
+.studio-config button:disabled { opacity:.48; cursor:not-allowed; }
+.studio-config button:hover:not(:disabled),.studio-config .studio-config-file-button:hover { background:#f4f3ed; border-color:#777d6c; }
+.studio-config button:focus-visible,.studio-config input:focus-visible,.studio-config select:focus-visible,.studio-config textarea:focus-visible,.studio-config summary:focus-visible,.studio-config .studio-config-file-button:focus-within { outline:2px solid #465b43; outline-offset:3px; }
+.studio-config input:not([type='checkbox']):not([type='file']),.studio-config select { box-sizing:border-box; min-width:0; max-width:100%; min-height:40px; padding:9px 10px; border:1px solid #c9c5bd; border-radius:5px; background:#fff; color:#242721; font:inherit; font-size:12px; }
+.studio-config .studio-config-save > label { display:block; margin-bottom:7px; color:#45483f; }
+.studio-config .studio-config-save input,.studio-config .studio-config-preset-select select { flex:1 1 140px; }
+.studio-config .studio-config-preset-select { margin-top:12px; }
+.studio-config .studio-config-transfer { border-top:1px solid #ece9e2; margin-top:20px; padding-top:17px; }
+.studio-config .studio-config-file-button { position:relative; overflow:hidden; }
+.studio-config .studio-config-file-button input { position:absolute; inset:0; width:100%; opacity:0; cursor:pointer; }
+.studio-config .studio-config-file-button:has(input:disabled) { opacity:.48; cursor:wait; }
+.studio-config .studio-config-primary { background:#364833; border-color:#364833; color:white; }
+.studio-config .studio-config-primary:hover:not(:disabled) { background:#293a27; color:white; }
+.studio-config .studio-config-action-picker { display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); border:0; padding:0; margin:0 0 16px; gap:8px; min-width:0; }
+.studio-config .studio-config-action-picker label { display:flex; align-items:center; gap:7px; min-height:38px; padding:6px 8px; border:1px solid #e2dfd7; border-radius:5px; overflow-wrap:anywhere; }
+.studio-config .studio-config-action-picker label:has(input:checked) { background:#eff3ec; border-color:#a4b09d; }
+.studio-config input[type='checkbox'] { accent-color:#465b43; width:16px; height:16px; margin:0; flex:none; }
+.studio-config .studio-config-labels { display:grid; grid-template-columns:1fr 1fr; gap:12px 20px; margin-bottom:16px; }
+.studio-config .studio-config-label-row { display:grid; grid-template-columns:72px 1fr 1fr; align-items:end; gap:8px; min-width:0; }
+.studio-config .studio-config-label-row strong { align-self:center; font:11px monospace; color:#54584b; }
+.studio-config .studio-config-label-row label { min-width:0; }
+.studio-config .studio-config-label-row label span { display:block; margin-bottom:4px; color:var(--config-muted); font-size:10px; }
+.studio-config .studio-config-label-row input { width:100%; }
+.studio-config .studio-config-source { display:block; box-sizing:border-box; width:100%; height:310px; margin-top:16px; padding:15px; border:1px solid #444f41; border-radius:6px; background:#20271f; color:#f0f3eb; font:11px/1.7 'IBM Plex Mono',monospace; white-space:pre; overflow:auto; resize:vertical; tab-size:2; }
+.studio-config .studio-config-notice { border-radius:5px; padding:11px 13px; margin:14px 0 0; background:#f5eadc; color:#69461b; font-size:12px; line-height:1.65; overflow-wrap:anywhere; }
+.studio-config .studio-config-notice p { margin:0 0 8px; }
+.studio-config .studio-config-status { background:#eaf1e5; color:#36502b; }
+.studio-config .studio-config-sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+@media(max-width:900px) { .studio-config .studio-config-action-picker { grid-template-columns:repeat(4,minmax(0,1fr)); } .studio-config .studio-config-labels { grid-template-columns:1fr; } }
+@media(max-width:640px) { .studio-config { padding:16px; margin:20px 0; } .studio-config .studio-config-grid { grid-template-columns:1fr; } .studio-config .studio-config-card { padding:14px; } .studio-config .studio-config-heading h2 { font-size:21px; } .studio-config .studio-config-heading p { font-size:12px; } .studio-config .studio-config-version { display:none; } .studio-config .studio-config-action-picker { grid-template-columns:repeat(3,minmax(0,1fr)); } .studio-config .studio-config-label-row { grid-template-columns:60px minmax(0,1fr) minmax(0,1fr); } .studio-config button,.studio-config .studio-config-file-button { min-height:44px; } }
+@media(max-width:360px) { .studio-config .studio-config-action-picker { grid-template-columns:repeat(2,minmax(0,1fr)); } .studio-config .studio-config-label-row { grid-template-columns:1fr 1fr; } .studio-config .studio-config-label-row strong { grid-column:1/-1; } }

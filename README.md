@@ -1,6 +1,6 @@
 # Social Interaction Lab
 
-Four original visual styles and five glyph-motion treatments for 12 social-action icons, built from shared accessible React + TypeScript primitives. Cartoon motion adds anime-inspired anticipation, squash, overshoot, and decorative effects. Includes a bilingual EN/JA Vite playground and a real installable library.
+Four original visual styles and five glyph-motion treatments for 12 social-action icons, built from shared accessible React + TypeScript primitives. Cartoon motion adds anime-inspired anticipation, squash, overshoot, and decorative effects. Includes a bilingual EN/JA interaction studio, Vite playground, and installable library.
 
 [日本語](README.ja.md)
 
@@ -16,14 +16,24 @@ npm test
 npm run build
 ```
 
-`npm run build` emits the playground in `dist/`, ESM library in `package/`, and a downloadable tarball in `public/downloads/`. There are no accounts, API keys, analytics, social-network or AI connections, or posting. Every request in the playground is local simulation. Saved text lasts for the mounted session only; reload clears it.
+`npm run build` emits the playground in `dist/`, ESM library in `package/`, and a downloadable tarball in `public/downloads/`. There are no accounts, API keys, analytics, social-network or AI connections, or posting. Every request in the playground is local simulation. Drafts, selections, and simulated requests last for the mounted session only; reload clears them. Named Studio presets are the exception: they persist in this browser’s localStorage until deleted or browser data is cleared.
+
+## Use the interaction studio
+
+1. **Try a context.** Switch between a sample social feed, article footer, and scripted AI-chat response. The same action selection, EN/JA labels, variant, tokens, and motion power all three; the chat has no AI backend. Toggle actions, local Comment/Quote drafts, and a fixture Share menu are interactive.
+2. **Keep a configuration.** Select 1–12 actions and apply edited labels. Save up to 20 named presets in this browser, or download/import schema-v1 JSON. Imports are limited to 64 KB and validated completely before applying; invalid data leaves the current configuration unchanged.
+3. **Take the code.** Copy or download a complete `SocialActions.tsx` component with imports, controlled toggles, local composers, a sharing menu, and an optional `onCommand` callback. It carries the configuration and both label languages, using the selected display language. It does not reproduce the entire Studio page. Clipboard failure reveals selectable source.
+4. **Inspect time and state.** Scrub any of the 12 icons × five treatments with the shared motion engine, play at 0.25×/0.5×/1×, step about 16.7 ms, and inspect phase markers. Separately compare optimistic and after-success Like/Save updates with local failure, retry, cancellation, and displayed versus confirmed values.
+5. **Compare one variable.** The design lens changes spacing, icon size, or stroke width while matching the remaining configuration. Overlays show button bounds, icon-box geometric centers, and same-row horizontal gaps. These measurements support design hypotheses, not automatic judgments of beauty or accessibility.
+
+Presets and exports contain configuration, not drafts, selections, request state, or the manual reduced-motion preview switch. The generated component still honors OS reduced motion. Storage failures are reported without claiming a save; invalid stored data is left untouched until you explicitly clear it. See the [Studio guide](docs/STUDIO.md) for validation rules, export scope, and a testing workflow.
 
 ## Install the library
 
-Download `social-interaction-lab-react-0.3.8.tgz` from the playground or build it with `npm run build:package`. In your separate React project:
+Download `social-interaction-lab-react-0.4.0.tgz` from the playground or build it with `npm run build:package`. In your separate React project:
 
 ```sh
-npm install ./social-interaction-lab-react-0.3.8.tgz
+npm install ./social-interaction-lab-react-0.4.0.tgz
 ```
 
 React 18.2 or 19 is a peer dependency. The library is ESM-only; styles are explicitly imported and are not automatically injected.
@@ -61,7 +71,7 @@ Toggle `selected` values map to `aria-pressed`; keep the accessible label stable
 
 ### Animate the icons
 
-Choose `iconMotion="pulse"`, `"spring"`, `"trace"`, `"gesture"`, or `"cartoon"` independently of the visual style; `"none"` disables glyph motion. The Motion section compares the original four actions × five treatments, replays them together, and adjusts glyph duration, intensity, and part stagger. A separate 12-card catalog previews the selected treatment across every icon; those previews do not open popups or invoke a service. Select a treatment to use it in the original live local interactions.
+Choose `iconMotion="pulse"`, `"spring"`, `"trace"`, `"gesture"`, or `"cartoon"` independently of the visual style; `"none"` disables glyph motion. The Motion section compares the original four actions × five treatments, replays them together, and adjusts glyph duration, intensity, and part stagger. The Studio timeline adds seekable inspection using `createGlyphTimeline` on an exclusively owned standalone `ActionIcon` SVG. Never attach it to an active `ActionButton` SVG. A separate 12-card catalog previews the selected treatment across every icon; those previews do not open popups or invoke a service. Select a treatment to use it in the original live local interactions.
 
 ```tsx
 <LikeButton label="Like" selected={liked} iconMotion="cartoon"
@@ -103,12 +113,13 @@ Import `useAsyncAction` from the same package. One hook instance owns one action
 npm test
 npm run build
 npm run verify:consumer
+npm run verify:generated
 npm run verify:archive
 ```
 
-`verify:consumer` creates a fresh external npm project, installs the tarball, typechecks with strict NodeNext and skipLibCheck:false, imports the ESM at runtime, and checks the stylesheet. `verify:archive` requires a Git HEAD and tests only files in that committed archive. Do not ignore `src/lib/`.
+`verify:consumer` creates a fresh external npm project, installs the tarball, typechecks with strict NodeNext and skipLibCheck:false, imports the ESM at runtime, and checks the stylesheet. `verify:generated` compiles six generated EN/JA TSX examples against the built archive, including full-catalog and single-action configurations, using existing dependencies. `verify:archive` requires a Git HEAD and tests only files in that committed archive. Do not ignore `src/lib/`.
 
-DOM tests cover behavior but do not prove layout, native modal focus trapping, platform assistive-technology compatibility, or visual contrast on all custom surfaces. Browser checks and their status are recorded in `docs/QA.md`. Test your real integration.
+CI is defined in `.github/workflows/quality.yml`; a configured check is not evidence of a passing run. DOM tests cover behavior but do not prove layout, native modal focus trapping, platform assistive-technology compatibility, or visual contrast on all custom surfaces. Browser checks and their status are recorded in `docs/QA.md`. Test your real integration.
 
 ## Distribution
 

@@ -1,5 +1,16 @@
 # Changelog / 変更履歴
 
+## 0.4.0 — 2026-10-11
+
+- Add a bilingual interaction Studio with local feed, article-footer, and scripted AI-chat fixtures sharing actions, labels, visual tokens, and motion / 共通設定を使うフィード・記事末尾・固定チャットのローカルな制作画面を追加
+- Add named browser-local presets, strict transactional schema-v1 JSON import/export, bounded validation, and explicit storage/clipboard fallbacks / 名前付きローカルプリセット、厳密な JSON 入出力、保存・コピー失敗時の表示を追加
+- Generate complete React TSX with configuration, controlled toggles, local composers, a keyboard-operated share menu, and an optional integration callback / 設定・トグル・ローカル入力・共有メニュー・任意コールバックを含む TSX を生成
+- Add public `createGlyphTimeline` for exclusively owned standalone icons and a 12-action × five-treatment inspector with scrub, slow playback, frame steps, phase markers, and reduced-motion handling / 単独アイコン専用の公開時間軸と、スクラブ・低速・コマ送り・段階表示を追加
+- Compare independent local Like/Save optimistic and after-success transactions, including displayed/confirmed values, failure, retry, cancellation, and stale-result protection / いいね・保存の更新方針と、表示値・確定値・失敗・再試行・中止を比較
+- Add a one-variable design lens for spacing, icon size, or stroke width with rendered hit-area bounds, geometric icon-box centers, and same-row gap overlays / 余白・大きさ・線幅の単変数比較と、操作領域・幾何学的中心・横方向の間隔を表示
+- Add generated-consumer verification and Studio integration guidance; keep new verification evidence separate from historical QA / 生成コードの外部利用検証とガイドを追加し、実施結果は過去の QA と区別
+- Preserve the accepted 0.3.8 Comment/Repost motion, existing library contracts, local-only behavior, private metadata, and `UNLICENSED` distribution / 確定済みの動き・既存 API・ローカル動作・private・UNLICENSED を維持
+
 ## 0.3.8 — 2026-10-11
 
 - Lift Cartoon Comment while its accepted contour inflates through the first 75%; reach the exact full bubble at the peak, `−3 × intensity` SVG units / 最初の75%で膨らみながら上がり、基本の吹き出しが完成する瞬間を頂点にする

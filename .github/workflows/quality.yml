@@ -16,6 +16,7 @@ jobs:
       - run: npm test
       - run: npm run build
       - run: npm run verify:consumer
+      - run: npm run verify:generated
       - run: npm run verify:archive
       - run: npx playwright install --with-deps chromium firefox webkit
       - run: npm run test:e2e

@@ -10,3 +10,6 @@ export {iconMotions,defaultMotionTokens,normalizeMotionTokens,glyphMotionPlan} f
 export type {IconMotion,IconMotionTokens,GlyphPlan} from './iconMotion.js';
 
 export {socialActions,toggleActions,isToggleAction,actionLabels} from './actions.js';
+
+export {createGlyphTimeline} from './glyphTimeline.js';
+export type {GlyphTimeline,GlyphTimelineOptions,GlyphTimelineState} from './glyphTimeline.js';

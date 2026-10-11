@@ -74,3 +74,68 @@ iconSize 16–28 px, strokeWidth 1–3 CSS px, gap 4–28 px, duration 0–400 m
 useAsyncAction<T>(): { status, value, error, run, cancel, reset }. Status: idle | pending | success | error. run accepts `(signal: AbortSignal) => Promise<T>` and resolves T on current success, undefined on failure, cancellation, duplicate pending calls, or stale/unmounted completion. Use a non-undefined result type when you need to distinguish successful values. Failures are surfaced through error. cancel retains the last successful value; reset clears it.
 
 simulateRequest<T>(result, { signal, delay = 900, fail = false }): local only; finite delay 0–2147483647 ms; invalid delay rejects RangeError. Abort rejects AbortError. Do not use it as a network adapter in production.
+
+## Standalone glyph timeline / 単独アイコンの時間軸
+
+Added in 0.4.0: `createGlyphTimeline(svg, options)` returns a `GlyphTimeline` controller for a **standalone `ActionIcon` SVG that it exclusively owns**. Never pass an active `ActionButton` SVG, attach two controllers to one SVG, or change its action/geometry while a controller is alive. Button activation and timeline inspection share glyph plans, track timing, and the Comment/Repost morph renderer, but have separate lifecycle owners. Destroy the old controller before replacing it.
+
+`GlyphTimelineOptions`:
+
+- `action: SocialAction` and `iconMotion: IconMotion`: required; `action` must match the supplied icon
+- `motionTokens?: Partial<IconMotionTokens>`: normalized with the existing duration/intensity/stagger bounds and defaults
+- `reducedMotion?: boolean`: manual suppression; OS `prefers-reduced-motion` always wins, including changes during playback
+- `onUpdate?: (state: GlyphTimelineState) => void`: receives state updates; use `getState()` for the initial snapshot. This is not a success callback for an application action
+
+`GlyphTimelineState` contains `time` and `duration` in milliseconds, `playing`, `rate`, `reducedMotion`, and `supported`. `duration` is the resolved total, including part delays/stagger, rather than always the selected glyph duration. Cartoon Comment/Repost use the single morph duration. Empty plans (`none`, zero duration, or zero intensity) have zero duration. `supported` reports the required playback capability, not assistive-technology or visual-quality validation.
+
+| Method | Contract |
+|---|---|
+| `seek(milliseconds)` | Finite input only; throws `RangeError` otherwise. Pauses, clamps to `[0, duration]`, and paints that sample. Reduced motion keeps time at zero. Seeking to the end restores the canonical icon |
+| `play(rate?)` | Plays from the current position; restarts from zero when at the end. Uses the previous rate if omitted. Accepts finite 0.1–2 inclusive; throws `RangeError` otherwise. Does nothing for reduced/unsupported/zero-duration playback or absent animation-frame support |
+| `pause()` | Samples the current time and pauses, retaining the inspected shape |
+| `stop()` | Stops, sets time to zero, and releases animation resources to restore canonical geometry/styles |
+| `destroy()` | Idempotently stops and releases owned resources and preference listeners. Call on unmount; create a new controller to resume use |
+| `getState()` | Returns the current state snapshot |
+
+Playback uses a finite clock with animation-frame sampling and a completion watchdog; it does not loop. The clock measures timeline time and respects rate. OS/manual reduction stops playback and restores the icon. Playback does not mutate selected state, invoke a button, or start a request.
+
+```tsx
+import {useEffect, useRef} from 'react';
+import {ActionIcon, createGlyphTimeline, type GlyphTimeline} from '@social-interaction-lab/react';
+import '@social-interaction-lab/react/styles.css';
+
+export function CommentInspector() {
+  const svg = useRef<SVGSVGElement>(null);
+  const timeline = useRef<GlyphTimeline | null>(null);
+  useEffect(() => {
+    if (!svg.current) return;
+    const controller = createGlyphTimeline(svg.current, {
+      action: 'comment', iconMotion: 'cartoon',
+      motionTokens: {duration: 560, intensity: 1, stagger: 60},
+    });
+    timeline.current = controller;
+    return () => { controller.destroy(); timeline.current = null; };
+  }, []);
+  return <section aria-label="Comment motion inspection">
+    <div role="img" aria-label="Comment icon" style={{width: 48, height: 48}}>
+      <ActionIcon ref={svg} action="comment" />
+    </div>
+    <button onClick={() => timeline.current?.play(0.5)}>Play slowly</button>
+    <button onClick={() => timeline.current?.seek(420)}>Inspect the peak</button>
+    <button onClick={() => timeline.current?.pause()}>Pause</button>
+    <button onClick={() => timeline.current?.stop()}>Reset</button>
+  </section>;
+}
+```
+
+The example’s 420 ms peak is specific to Cartoon Comment at its 560 ms duration. General consumers should derive seek positions from `getState().duration` or `onUpdate`, and expose static/reduced-motion status when relevant. `ActionIcon` remains decorative; the wrapper supplies the description. Changing configuration requires destroying/recreating the controller with the matching standalone icon.
+
+`createGlyphTimeline` は単独の `ActionIcon` SVG を専有する公開 API です。動作中の `ActionButton` 内の SVG や、別の再生処理と共有した SVG には使用しません。`seek` は有限のミリ秒値を範囲内に収めて一時停止し、`play` は0.1〜2倍、`pause` は現在の形を保持、`stop` は基本形へ戻し、`destroy` はアンマウント時に後処理します。合計時間はパーツの時間差を含み、OS・手動の動き抑制を優先します。再生は選択状態や実リクエストを変更しません。
+
+## Studio configuration boundary / Studio 設定の境界
+
+`StudioConfig`, presets, config parsing, `generateReactUsage`, and `useToggleTransaction` are playground source modules under `src/app/studio/`, **not package-root exports**. The generated module exports its own configuration and callback types; that does not add those types to the library API. `useAsyncAction` remains the public async primitive.
+
+Studio JSON is strict schema-v1 configuration data, not DTCG token JSON and not executable code. Imports reject unknown/missing fields and out-of-range values; this differs intentionally from tolerant public token normalization. See [Studio](STUDIO.md) for the complete schema, limits, browser-storage behavior, generated component scope, and local async comparison.
+
+Studio の設定・プリセット・コード生成・比較用の非同期 hook はプレイグラウンド内部で、パッケージの公開 export ではありません。公開の非同期 hook は引き続き `useAsyncAction` です。Studio JSON は DTCG トークン出力と異なり、スキーマ1の厳密な設定データとして全体を検証します。

@@ -3,16 +3,13 @@ import type {IconMotionTokens} from './iconMotion.js';
 import {morphEase} from './motionTiming.js';
 export {morphEase} from './motionTiming.js';
 import {commentPlaybackFrame} from './commentMotion.js';
-/** Monotonic frame time and SVG attributes work even when a modal makes the trigger inert. */
-export function startMorphPlayback(svg:SVGSVGElement,action:'comment'|'repost',tokens:IconMotionTokens,pending:boolean):()=>void {
+/** Shared, cancel-owned attribute sampler for ordinary playback and explicit timeline seeking. */
+export function createMorphRenderer(svg:SVGSVGElement,action:'comment'|'repost',tokens:IconMotionTokens,pending=false){
  const group=svg.querySelector<SVGElement>('.sil-glyph');
- if(!group||typeof requestAnimationFrame!=='function')return()=>{};
+ if(!group)return {render:(_progress:number)=>{},restore:()=>{}};
  const nodes=Array.from(svg.querySelectorAll<SVGPathElement>(action==='comment'?'[data-glyph-part=comment-body]':'[data-glyph-part^=repost-]'));
  const snapshots=nodes.map(node=>({node,d:node.getAttribute('d'),opacity:node.style.getPropertyValue('opacity'),priority:node.style.getPropertyPriority('opacity'),lastD:null as string|null,lastOpacity:null as string|null}));
  const groupStyle=action==='comment'?['transform','transform-origin','transform-box'].map(name=>({name,value:group.style.getPropertyValue(name),priority:group.style.getPropertyPriority(name),last:null as string|null})):[],groupHadStyle=group.hasAttribute('style');
- let active=true,frame=0,watchdog:ReturnType<typeof setTimeout>|undefined;
- const duration=pending?Math.max(1100,tokens.duration*1.8):tokens.duration;
- const started=performance.now();let lastFrame=started;
  const render=(progress:number)=>{
   const time=Math.min(1,Math.max(0,progress)),p=morphEase(time),a=tokens.intensity*(pending?.55:1),comment=action==='comment'?commentPlaybackFrame(time,a):null;
   for(const item of snapshots){const d=comment?comment.d:repostTransition(p,a,item.node.getAttribute('data-glyph-part')==='repost-bottom').d;
@@ -28,6 +25,15 @@ export function startMorphPlayback(svg:SVGSVGElement,action:'comment'|'repost',t
   for(const property of groupStyle)if(property.last!==null&&group.style.getPropertyValue(property.name)===property.last&&group.style.getPropertyPriority(property.name)===''){if(property.value)group.style.setProperty(property.name,property.value,property.priority);else group.style.removeProperty(property.name);}
   if(groupStyle.length&&!groupHadStyle&&group.style.length===0)group.removeAttribute('style');
  };
+ return {render,restore};
+}
+/** Monotonic frame time and SVG attributes work even when a modal makes the trigger inert. */
+export function startMorphPlayback(svg:SVGSVGElement,action:'comment'|'repost',tokens:IconMotionTokens,pending:boolean):()=>void {
+ if(typeof requestAnimationFrame!=='function')return()=>{};
+ const {render,restore}=createMorphRenderer(svg,action,tokens,pending);
+ let active=true,frame=0,watchdog:ReturnType<typeof setTimeout>|undefined;
+ const duration=pending?Math.max(1100,tokens.duration*1.8):tokens.duration;
+ const started=performance.now();let lastFrame=started;
  const finish=()=>{if(!active)return;active=false;cancelAnimationFrame(frame);clearTimeout(watchdog);restore();};
  const sample=()=>{const elapsed=Math.max(0,performance.now()-started);if(!pending&&elapsed>=duration){finish();return;}render((elapsed%duration)/duration);};
  const tick=()=>{if(!active)return;lastFrame=performance.now();sample();if(active)frame=requestAnimationFrame(tick);};

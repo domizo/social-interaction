@@ -4,7 +4,7 @@ import {useEffect} from 'react';
 export function useInitialFragment(){
  useEffect(()=>{
   const hash=window.location.hash;
-  if(!['#compare','#motion','#icon-catalog','#states','#documentation'].includes(hash))return;
+  if(!['#studio','#studio-config','#timeline','#async-comparison','#design-lens','#compare','#motion','#icon-catalog','#states','#documentation'].includes(hash))return;
   let active=true,frame:number|undefined;
   const stop=()=>{active=false;if(frame!==undefined)cancelAnimationFrame(frame);};
   const events=['wheel','touchstart','pointerdown','keydown'] as const;

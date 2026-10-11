@@ -4,6 +4,7 @@ import {repostTransition} from './canonicalMorph.js';
 import {commentPlaybackFrame} from './commentMotion.js';
 import {morphEase} from './motionTiming.js';
 import {startMorphPlayback} from './morphPlayback.js';
+import {resolveGlyphTracks} from './motionTracks.js';
 export type IconMotion='none'|'pulse'|'spring'|'trace'|'gesture'|'cartoon';
 export interface IconMotionTokens {duration:number;intensity:number;stagger:number}
 export const iconMotions=['pulse','spring','trace','gesture','cartoon'] as const;
@@ -68,11 +69,10 @@ export function useIconMotion(ref:RefObject<SVGSVGElement|null>,options:MotionOp
   if(options.iconMotion==='cartoon'&&(options.action==='comment'||options.action==='repost'))return startMorphPlayback(svg,options.action,t,options.pending);
   const plan=glyphMotionPlan(options.action,options.iconMotion,{...t,intensity:options.pending?t.intensity*.55:t.intensity}).filter(step=>!options.pending||step.part!=='echo');
   const animations:Animation[]=[];let active=true;
-  for(const step of plan){const nodes=step.part==='trace'?Array.from(svg.querySelectorAll<SVGPathElement>('.sil-glyph path')):Array.from(svg.querySelectorAll<SVGElement>(`[data-glyph-part="${step.part}"]`));
-   nodes.forEach((node,index)=>{if(typeof node.animate!=='function')return;const trace=step.part==='trace';if(trace)node.style.strokeDasharray='1';
-    const animation=node.animate(step.frames,{duration:options.pending?Math.max(1100,t.duration*1.8):t.duration,delay:step.delay+(trace?index*t.stagger:0),iterations:options.pending?Infinity:1,easing:options.iconMotion==='spring'?'cubic-bezier(.2,.75,.25,1)':'ease-in-out',fill:'none'});
-    animations.push(animation);const clear=()=>{if(active&&trace)node.style.removeProperty('stroke-dasharray');};animation.finished.then(clear,clear);
-   });
+  for(const {node,frames,trace,duration,delay,easing} of resolveGlyphTracks(svg,plan,options.iconMotion,t,options.pending)){
+   if(typeof node.animate!=='function')continue;if(trace)node.style.strokeDasharray='1';
+   const animation=node.animate(frames,{duration,delay,iterations:options.pending?Infinity:1,easing,fill:'none'});
+   animations.push(animation);const clear=()=>{if(active&&trace)node.style.removeProperty('stroke-dasharray');};animation.finished.then(clear,clear);
   }
   return()=>{active=false;for(const animation of animations)animation.cancel();for(const path of svg.querySelectorAll<SVGPathElement>('.sil-glyph path'))path.style.removeProperty('stroke-dasharray');};
  },[activation,options.motionTrigger,options.action,options.iconMotion,t.duration,t.intensity,t.stagger,options.pending,options.disabled,options.reducedMotion,osReduced,ref]);

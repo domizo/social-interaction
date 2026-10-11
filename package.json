@@ -1,6 +1,6 @@
 {
   "name": "social-interaction-lab",
-  "version": "0.3.8",
+  "version": "0.4.0",
   "private": true,
   "type": "module",
   "license": "UNLICENSED",
@@ -14,7 +14,9 @@
     "verify:archive": "node scripts/verify-archive.mjs",
     "preview": "vite preview --host 127.0.0.1",
     "test:e2e": "playwright test",
-    "predev": "npm run build:package"
+    "predev": "npm run build:package",
+    "verify:generated": "node scripts/verify-generated.mjs",
+    "pretest:e2e": "npm run verify:generated"
   },
   "dependencies": {
     "@fontsource-variable/dm-sans": "^5.3.0",
