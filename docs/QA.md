@@ -1,6 +1,25 @@
 # Verification record / 検証記録
 
-Date: 2026-10-10. Source checks, real-browser checks and hosted access are reported separately.
+Updated: 2026-10-11. Source checks, real-browser checks and hosted access are reported separately.
+
+## 0.4.0 Interaction Studio / 実際の画面・設定・時間・状態をつなぐ
+
+The release gate is the exact-commit [Quality workflow](https://github.com/domizo/social-interaction-lab/actions). A configured test is not, by itself, a passing result. The Studio gate combines:
+
+- 215 unit/lifecycle/schema tests and strict TypeScript; fresh committed-source reconstruction and package consumption
+- React 18 and 19 consumers, strict NodeNext imports and CSS; eight generated EN/JA TSX configurations, including maximum-length labels
+- 118 native browser cases across Chromium desktop/mobile, WebKit desktop/mobile and Firefox, retaining the accepted motion regressions
+- All 60 timeline combinations: real slow playback, paused seek, backward seek after completion, exact reset, reduced motion and delayed Trace/Sparkles frame parity with normal activation
+- Context → shared settings → named preset → runnable code, JSON/clipboard failure behavior, local popup keyboard handling, optimistic/after-success state, one-variable overlays and fresh section links
+- A separate real generated-component page at 390 px, using the actual package and CSS rather than Studio styles
+
+The accepted 0.3.8 motion plans and canonical glyphs are frozen by regression. Timeline inspection shares the production target resolver and morph sampler. It owns a separate SVG and does not rewrite motion durations or shapes to simulate slow playback.
+
+Reviewed native layout captures: [desktop context/settings](screenshots/studio-context-desktop-en.png), [mobile Japanese context/settings](screenshots/studio-context-mobile-ja.png). These images were captured from the first Studio candidate's passing context workflow; they are layout evidence, not proof of animation. Native elapsed-time and paused-frame tests provide motion evidence. The exact release commit must pass the complete workflow before deployment.
+
+WebKit on Linux is useful cross-engine evidence, not a test on the user's Mac or a physical iPhone. Hosted sign-in remains outside this verification; owner-private access is unchanged. The QA-only generated page is excluded from deployment.
+
+0.4.0 は、設定の保存・生成コード・時間軸・非同期状態・比較表示を同じ設定で検証します。モーションの既存仕様は固定し、実際のブラウザーで時間経過と描画を確認します。画像はレイアウトの根拠であり、動きの証明には使いません。実機・支援技術・本番ログインの検証範囲は下記の制限を参照してください。
 
 ## 0.3.0 Cartoon and catalog / カートゥーンと一覧
 

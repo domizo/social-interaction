@@ -28,6 +28,10 @@ npm run build
 
 Presets and exports contain configuration, not drafts, selections, request state, or the manual reduced-motion preview switch. The generated component still honors OS reduced motion. Storage failures are reported without claiming a save; invalid stored data is left untouched until you explicitly clear it. See the [Studio guide](docs/STUDIO.md) for validation rules, export scope, and a testing workflow.
 
+![Real Studio context and shared controls, desktop](docs/screenshots/studio-context-desktop-en.png)
+
+[Mobile Japanese rendering](docs/screenshots/studio-context-mobile-ja.png). These are browser captures; still images do not establish animation behavior.
+
 ## Install the library
 
 Download `social-interaction-lab-react-0.4.0.tgz` from the playground or build it with `npm run build:package`. In your separate React project:
@@ -117,9 +121,9 @@ npm run verify:generated
 npm run verify:archive
 ```
 
-`verify:consumer` creates a fresh external npm project, installs the tarball, typechecks with strict NodeNext and skipLibCheck:false, imports the ESM at runtime, and checks the stylesheet. `verify:generated` compiles six generated EN/JA TSX examples against the built archive, including full-catalog and single-action configurations, using existing dependencies. `verify:archive` requires a Git HEAD and tests only files in that committed archive. Do not ignore `src/lib/`.
+`verify:consumer` creates a fresh external npm project, installs the tarball, typechecks with strict NodeNext and skipLibCheck:false, imports the ESM at runtime, and checks the stylesheet. `verify:generated` compiles eight generated EN/JA TSX examples against the built archive, including full-catalog, single-action, and maximum-label configurations, using existing dependencies. It also builds a separate generated-component fixture for the browser suite; that QA page is excluded from deployment. `verify:archive` requires a Git HEAD and tests only files in that committed archive. Do not ignore `src/lib/`.
 
-CI is defined in `.github/workflows/quality.yml`; a configured check is not evidence of a passing run. DOM tests cover behavior but do not prove layout, native modal focus trapping, platform assistive-technology compatibility, or visual contrast on all custom surfaces. Browser checks and their status are recorded in `docs/QA.md`. Test your real integration.
+CI is defined in `.github/workflows/quality.yml`; a configured check is not evidence of a passing run. DOM tests cover behavior but do not prove layout, native modal focus trapping, platform assistive-technology compatibility, or visual contrast on all custom surfaces. Browser checks and their status are recorded in the [QA guide](https://github.com/domizo/social-interaction-lab/blob/main/docs/QA.md). Test your real integration.
 
 ## Distribution
 

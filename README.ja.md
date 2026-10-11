@@ -31,6 +31,10 @@ SNS への投稿、SNS・AI サービスとの連携、アカウント連携、A
 
 プリセットと書き出しに下書き・選択・処理状態・手動の動き抑制スイッチは含みません。生成コードは OS の動き抑制に対応します。保存領域を使えない場合はエラーを示し、保存成功とは表示しません。不正な保存済みデータは、明示的に消去するまで残します。検証条件と書き出し範囲は [Studio ガイド](docs/STUDIO.md)を参照してください。
 
+![Studio の実際の画面と共有設定](docs/screenshots/studio-context-desktop-en.png)
+
+[モバイル・日本語の実画面](docs/screenshots/studio-context-mobile-ja.png)。ブラウザーでのキャプチャです。静止画像だけで動作を証明するものではありません。
+
 ## 別のアプリに組み込む
 
 ```sh
@@ -88,6 +92,6 @@ Studio の時間軸は、単独の `ActionIcon` SVG を `createGlyphTimeline` �
 
 ## 検証と配布
 
-`verify:consumer` は新しい外部プロジェクトに tarball をインストールし、厳密な NodeNext 型検査、ESM の実行時 import、CSS を確認します。`verify:generated` はビルド済み tarball と既存の依存関係を使い、EN/JA・全操作・単独操作を含む6つの生成 TSX を型検査します。CI の設定は `.github/workflows/quality.yml` にあります。コマンドや CI の定義が存在することと、実行済み・成功済みであることは別です。ブラウザー検証の実施範囲と結果は [QA 記録](docs/QA.md)を参照してください。
+`verify:consumer` は新しい外部プロジェクトに tarball をインストールし、厳密な NodeNext 型検査、ESM の実行時 import、CSS を確認します。`verify:generated` はビルド済み tarball と既存の依存関係を使い、EN/JA・全操作・単独操作・最大長ラベルを含む8つの生成 TSX を型検査します。ブラウザー検証用に独立した生成コンポーネントのページもビルドします。この QA ページは公開対象に含めません。CI の設定は `.github/workflows/quality.yml` にあります。コマンドや CI の定義が存在することと、実行済み・成功済みであることは別です。ブラウザー検証の実施範囲と結果は [QA 記録](https://github.com/domizo/social-interaction-lab/blob/main/docs/QA.md)を参照してください。
 
 private ソースと private デモです。公開ライセンス決定までは UNLICENSED。npm には公開していません。DOM テストはブラウザのレイアウトや実際の支援技術による確認を代替しません。
