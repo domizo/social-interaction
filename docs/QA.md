@@ -6,7 +6,7 @@ Updated: 2026-10-11. Source checks, real-browser checks and hosted access are re
 
 The release gate is the exact-commit [Quality workflow](https://github.com/domizo/social-interaction-lab/actions). A configured test is not, by itself, a passing result. The Studio gate combines:
 
-- 215 unit/lifecycle/schema tests and strict TypeScript; fresh committed-source reconstruction and package consumption
+- 218 unit/lifecycle/schema/raster-metric tests and strict TypeScript; fresh committed-source reconstruction and package consumption
 - React 18 and 19 consumers, strict NodeNext imports and CSS; eight generated EN/JA TSX configurations, including maximum-length labels
 - 118 native browser cases across Chromium desktop/mobile, WebKit desktop/mobile and Firefox, retaining the accepted motion regressions
 - All 60 timeline combinations: real slow playback, paused seek, backward seek after completion, exact reset, reduced motion and delayed Trace/Sparkles frame parity with normal activation
