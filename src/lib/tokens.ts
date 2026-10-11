@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react';
 import {normalizeMotionTokens,type IconMotionTokens} from './iconMotion.js';
-export const TOKEN_VERSION = '0.3.6';
+export const TOKEN_VERSION = '0.3.7';
 export type SocialVariant = 'minimal' | 'soft' | 'solid' | 'spring';
 export type SocialAction = 'like' | 'comment' | 'share' | 'quote' | 'repost' | 'bookmark' | 'note' | 'star' | 'send' | 'sparkles' | 'bell' | 'reaction';
 export type PreviewState = 'idle' | 'hover' | 'focus' | 'pressed' | 'selected' | 'pending' | 'error';

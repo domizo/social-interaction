@@ -1,5 +1,13 @@
 # Changelog / 変更履歴
 
+## 0.3.7 — 2026-10-11
+
+- Replace only Cartoon Comment’s post-formation quiver with a whole-glyph bounce inspired by the existing Reaction face action, not the React brand / コメント完成後の震えを、既存の顔のリアクションを参考にした全体の弾みに置換
+- Preserve the first 75% lower-left inflation and final 25% motion window (420 ms + 140 ms at the 560 ms default) / 左下からの成長と、合計時間・75%/25%の配分を維持
+- Interpolate centered vertical translation and squash/stretch through anticipation, lift, landing, and rest using smoothstep; use no rotation or tail pivot / 中心を基準に上下移動・つぶれ・伸びを滑らかにつなぎ、回転やしっぽ支点は使わない
+- Move only the fully formed canonical glyph; preserve intensity, reduced motion, style cleanup, and path-plus-transform plans without a new morph, trace, or echo / 完成した形だけを動かし、強さ・動きの抑制・後処理・公開プランを維持
+- Keep the accepted Repost motion unchanged / 確定済みのリポストの動きは変更しない
+
 ## 0.3.6 — 2026-10-10
 
 - Refine only Cartoon Comment: preserve its circle-to-canonical contour, fitting eased inflation into the first 75% of the selected duration / カートゥーンのコメントだけを調整し、円から基本形への成長を指定時間の最初の75%に収める
