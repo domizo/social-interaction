@@ -4,7 +4,7 @@ Updated: 2026-10-12. Source checks, real-browser checks and hosted access are re
 
 ## 0.4.2 Chosen action sets / 試す操作を選ぶ
 
-This release combines the icon-only setting below with a visible 1–12 icon picker and ordered previews. Its exact-commit gate includes 271 unit/schema/lifecycle tests, 12 generated EN/JA consumers and 163 native browser cases across the five engine/viewport projects. These numbers describe the configured gate; the exact run must finish successfully before deployment.
+This release combines the icon-only setting below with a visible 1–12 icon picker and ordered previews. Its exact-commit gate includes 272 unit/schema/lifecycle tests, 12 generated EN/JA consumers and 163 native browser cases across the five engine/viewport projects. These numbers describe the configured gate; the exact run must finish successfully before deployment.
 
 Selection, custom labels and order are checked across context, live, motion, state, diff and lens previews, preset reload, JSON and runnable generated modules. Native cases exercise keyboard reordering, the last-action guard, removed pending owners, removal of an open native modal/menu through a delayed configuration import, and all 12 icons in both presentations at 390 px. The full icon catalog and fixed Like/Save asynchronous experiment retain their clearly described scopes.
 

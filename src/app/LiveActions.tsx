@@ -61,7 +61,14 @@ export function LiveActions({variant,locale,tokens,actions,previewState,fail=fal
     const node=menuRef.current,anchor=triggers.current.share?.parentElement;
     if(!menu||!node||!anchor||!active.has('share'))return;
     const priorLeft=node.style.left,priorRight=node.style.right;let ownedLeft='';
-    const place=()=>{node.style.right='auto';node.style.left='0px';const width=node.getBoundingClientRect().width,x=anchor.getBoundingClientRect().left;ownedLeft=`${Math.max(8,Math.min(x,window.innerWidth-width-8))-x}px`;node.style.left=ownedLeft;};
+    const place=()=>{
+      // Mobile innerWidth can include the temporary overflow of an unshifted popup.
+      // Read the layout viewport before measuring, so placement cannot widen its own bound.
+      const viewportWidth=document.documentElement.clientWidth||window.innerWidth;
+      node.style.right='auto';node.style.left='0px';
+      const width=node.getBoundingClientRect().width,x=anchor.getBoundingClientRect().left;
+      ownedLeft=`${Math.max(8,Math.min(x,viewportWidth-width-8))-x}px`;node.style.left=ownedLeft;
+    };
     place();window.addEventListener('resize',place);window.addEventListener('scroll',place,true);
     return()=>{window.removeEventListener('resize',place);window.removeEventListener('scroll',place,true);if(node.style.left===ownedLeft)node.style.left=priorLeft;if(node.style.right==='auto')node.style.right=priorRight;};
   },[menu,actionKey,presentation,locale,tokens,configured]);

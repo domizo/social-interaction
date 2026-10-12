@@ -104,6 +104,13 @@ describe('selected legacy live actions',()=>{
   const r=render(<LiveActions {...base} actions={choose('star','send')}/>);fireEvent.click(button('star'));r.rerender(<LiveActions {...base} actions={choose('send')}/>);expect(screen.queryByRole('status')).toBeNull();fireEvent.click(button('send'));
   r.rerender(<LiveActions {...base} locale="ja" actions={choose('send','star')}/>);expect(screen.getByRole('button',{name:'日本語 star'}).getAttribute('aria-pressed')).toBe('true');expect(screen.getByRole('status').textContent).toContain('日本語 sendをローカルでプレビューしました');
  });
+ it('uses the stable layout viewport when an unshifted mobile popup expands innerWidth',()=>{
+  const width=window.innerWidth;window.innerWidth=393;
+  vi.spyOn(document.documentElement,'clientWidth','get').mockReturnValue(390);
+  const original=HTMLElement.prototype.getBoundingClientRect;
+  vi.spyOn(HTMLElement.prototype,'getBoundingClientRect').mockImplementation(function(this:HTMLElement){return this.classList.contains('share-anchor')?new DOMRect(203,100,170,44):this.getAttribute('role')==='menu'?new DOMRect(203,144,190,90):original.call(this);});
+  try{render(<LiveActions {...base} actions={choose('like','share')}/>);fireEvent.click(button('share'));expect(screen.getByRole('menu').style.left).toBe('-11px');expect(document.activeElement).toBe(screen.getByRole('menuitem',{name:'Copy demo link'}));}finally{window.innerWidth=width;}
+ });
  it('clamps a reordered Share popup horizontally and updates its anchor without losing menu focus',()=>{
   const width=window.innerWidth;window.innerWidth=390;let x=300;
   const original=HTMLElement.prototype.getBoundingClientRect;
