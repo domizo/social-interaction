@@ -6,9 +6,9 @@ For developers and designers building feeds, article pages, and chat interfaces.
 
 [日本語](README.ja.md) · [Five-step workflow](docs/STUDIO.md#five-step-workflow) · [Start locally](#start-locally) · [Use in React](#use-in-react)
 
-![Earlier Studio context close-up showing a scripted chat preview and shared controls](docs/screenshots/studio-context-desktop-en.png)
+![The Choose icons step, with the five-step navigation, optional Guide and ordered action picker](docs/screenshots/workflow-choose-desktop-en.png)
 
-This earlier browser capture shows the context preview, before the 0.5.0 step-tab layout. [The earlier mobile Japanese close-up](docs/screenshots/studio-context-mobile-ja.png) shows the same local fixture. Neither image shows the new navigation, and still images do not demonstrate motion.
+Choose only the actions your interface needs, then carry that setup through the five tabs. [The mobile Japanese In context page](docs/screenshots/workflow-preview-mobile-ja.png) shows the same workflow in a narrow screen, with a feed preview and local request controls. These are actual 0.5.0 browser captures; still images show layout, while temporal tests verify motion.
 
 ## From a design choice to a React component
 

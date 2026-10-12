@@ -6,9 +6,9 @@
 
 [English](README.md) · [5つのステップ](docs/STUDIO.md#five-step-workflow) · [ローカルで試す](#ローカルで試す) · [React に組み込む](#react-に組み込む)
 
-![以前の Studio で、固定のチャット回答と共有設定を表示した場面プレビューの実画面](docs/screenshots/studio-context-desktop-en.png)
+![5つのステップと独立したガイド、操作の選択・並び替えを表示した「アイコンを選ぶ」の実画面](docs/screenshots/workflow-choose-desktop-en.png)
 
-この画像は、0.5.0 のステップ式タブになる前の場面プレビューです。[以前のモバイル・日本語の拡大画面](docs/screenshots/studio-context-mobile-ja.png)でも同じローカルサンプルを確認できます。新しいタブ構成を示す画像ではありません。動きそのものは静止画では確認できません。
+必要な操作を選び、その設定を5つのタブへ引き継ぎます。[モバイル・日本語の「使用画面」](docs/screenshots/workflow-preview-mobile-ja.png)では、狭い画面でも同じ流れでフィードとローカルの処理状態を試せます。どちらも 0.5.0 の実ブラウザーで撮影した画像です。静止画では配置を確認し、動きは時間経過のテストで検証します。
 
 ## 5つのステップで、設定とコードを持ち帰る
 

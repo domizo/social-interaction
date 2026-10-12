@@ -7,6 +7,9 @@ The workflow now presents one active step at a time, with a separate Guide. The 
 Checks cover manual keyboard tabs, Next/Back focus, browser history, initial/legacy hashes, session-draft restoration and storage failures, retained unsaved labels/preset/composer drafts, and inactive animation/request/import cleanup. Existing accepted glyph plans and strict native motion trajectories are unchanged. Only the active page is visible and accessible; retained inactive panels are hidden and inert.
 
 
+The first exact step-page candidate [passed all 208 native cases without retries](https://github.com/domizo/social-interaction-lab/actions/runs/38202730327), alongside 302 unit tests and the clean-source/package gates. Reviewed captures show the [desktop icon-selection step](screenshots/workflow-choose-desktop-en.png) and [mobile Japanese context step](screenshots/workflow-preview-mobile-ja.png). The complete artifact also contains every step in both languages on all five projects. These images come from source `fe65898d`, remote `36c5c3aa`; the following documentation-only snapshot retains the same application and must pass its own exact-commit gate before deployment. Native workflow evidence includes fresh legacy routes, visible keyboard focus, browser Back/Forward, retained drafts, and aborted hidden imports/requests. The accepted default-speed flight and canonical glyph gates also pass.
+
+
 Updated: 2026-10-12. Source checks, real-browser checks and hosted access are reported separately.
 
 ## 0.4.2 Chosen action sets / 試す操作を選ぶ
