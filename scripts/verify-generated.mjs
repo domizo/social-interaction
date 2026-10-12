@@ -31,6 +31,13 @@ try {
     ['full', {...defaultStudioConfig, context: 'article', variant: 'solid', iconMotion: 'gesture', actions: socialActions.map(action => ({action, label: actionLabels[action]})), tokens: {...defaultStudioConfig.tokens, iconSize: 28, strokeWidth: 3, gap: 4, hitTarget: 64, duration: 0, amplitude: 8, accent: '#123abc'}, motionTokens: {duration: 1600, intensity: 2, stagger: 160}}],
     ['long-labels', {...defaultStudioConfig, actions: defaultStudioConfig.actions.map(item => item.action === 'like' ? {...item, label: {en: 'W'.repeat(80), ja: '長'.repeat(80)}} : item)}],
     ['single', {...defaultStudioConfig, context: 'chat', iconMotion: 'none', actions: [{action: 'bookmark', label: {en: 'Save "quoted" <text>\\path', ja: '保存 \u2028 テスト'}}]}],
+    ['custom', {...defaultStudioConfig, actions: [
+      {action: 'reaction', label: {en: 'Feel this', ja: '気持ちを伝える'}},
+      {action: 'bookmark', label: {en: 'Keep this', ja: 'あとで読む'}},
+      {action: 'repost', label: {en: 'Pass it on', ja: '広める'}},
+      {action: 'comment', label: {en: 'Add a thought', ja: 'ひとこと添える'}},
+      {action: 'share', label: {en: 'Send a link', ja: 'リンクを共有'}},
+    ]}],
   ];
   for (const [name, config] of cases) {
     for (const locale of ['en', 'ja']) {
@@ -52,11 +59,14 @@ import LabelledEnglish from './long-labels-en.tsx';
 import LabelledJapanese from './long-labels-ja.tsx';
 import IconsEnglish from './icon-only-en.tsx';
 import IconsJapanese from './icon-only-ja.tsx';
+import CustomEnglish from './custom-en.tsx';
+import CustomJapanese from './custom-ja.tsx';
 const query = new URLSearchParams(window.location.search);
 const locale = query.get('locale') === 'ja' ? 'ja' : 'en';
 const presentation = query.get('presentation') === 'icon-only' ? 'icon-only' : 'labelled';
 const examples = {en: {labelled: LabelledEnglish, 'icon-only': IconsEnglish}, ja: {labelled: LabelledJapanese, 'icon-only': IconsJapanese}};
-const SocialActions = examples[locale][presentation];
+const customExamples = {en: CustomEnglish, ja: CustomJapanese};
+const SocialActions = query.get('set') === 'custom' ? customExamples[locale] : examples[locale][presentation];
 document.documentElement.lang = locale;
 createRoot(document.getElementById('root')!).render(<SocialActions />);
 `);
@@ -68,6 +78,6 @@ createRoot(document.getElementById('root')!).render(<SocialActions />);
     build: {outDir: resolve(root, 'qa/generated'), emptyOutDir: true},
     logLevel: 'warn',
   });
-  console.log('QA fixture ready: qa/generated (default maximum-length Like label; ?presentation=icon-only&locale=en|ja selects icon-only; actual archive stylesheet; excluded from deployment).');
-  console.log(`PASS: ${cases.length * 2} generated TSX consumers, EN/JA, labelled, icon-only, full, single-action and maximum-length-label configurations, strict NodeNext types, archive CSS. No dependency installation.`);
+  console.log('QA fixture ready: qa/generated (default maximum-length Like label; ?presentation=icon-only&locale=en|ja selects icon-only; ?set=custom&locale=en|ja selects the labelled, ordered custom subset; actual archive stylesheet; excluded from deployment).');
+  console.log(`PASS: ${cases.length * 2} generated TSX consumers, EN/JA, labelled, icon-only, full, single-action, maximum-length-label and custom-ordered-subset configurations, strict NodeNext types, archive CSS. No dependency installation.`);
 } finally { await rm(temp, {recursive: true, force: true}); }

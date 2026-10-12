@@ -8,6 +8,10 @@ Version 0.4.1 adds a shared labelled/icon-only presentation setting, retained in
 
 0.4.1 では、ラベル付き／アイコンのみの表示設定を共有し、プリセット・JSON・生成 TSX に保持します。初期値は引き続きラベル付きです。
 
+Version 0.4.2 makes the existing action selection prominent with **Choose icons to test** and keyboard-operable ordering controls. Select 1–12 existing actions; the same ordered configuration now drives the original comparison, live actions, context previews, motion rows, state specimens, token-diff specimens, design lens, presets, and exports. This adds no new action types or library props and preserves the accepted glyph motion.
+
+0.4.2 では「試すアイコンを選ぶ」を見つけやすくし、キーボードで操作できる並べ替えを追加します。既存の12操作から1〜12個を選び、同じ順序と設定を従来の比較・実操作・場面プレビュー・動きの比較・状態見本・トークン差分・デザインレンズ・保存・書き出しで使います。操作の種類や公開 props は増やさず、確定済みのアイコンの動きを維持します。
+
 ## 1. Context and shared settings / 場面と共有設定
 
 Switch between **Social feed**, **Article footer**, and **AI chat**. These are fixed sample content, including the scripted chat response. They share one configuration: context, variant, presentation, action list/order, both label languages, visual tokens, treatment, and motion tokens. Switching context does not replace the configuration with a separate set of defaults.
@@ -23,13 +27,21 @@ Use the shared controls alongside the context preview. The presentation control 
 
 ## 2. Presets and JSON / プリセットと JSON
 
-Select 1–12 unique actions in **Actions & labels**. Newly selected actions are appended; config files preserve the array order. Edit the EN/JA labels, then choose **Apply labels** before saving or exporting. Selecting or removing an action also applies the current label edits.
+Select 1–12 unique actions in **Choose icons to test**, above **Make it yours**. The default remains Like, Comment, Share, Quote. Newly selected actions are appended with their catalog labels. **Preview order** lists the current order; use **Earlier** and **Later** to move an action one position without changing its labels. Checkboxes and ordering buttons work with the keyboard, preserve focus when reordered, and announce changes and boundaries. The last selected action cannot be removed.
+
+Edit the selected actions’ EN/JA names in **Actions & labels**, then choose **Apply labels** before saving or exporting. Unapplied edits are retained for unchanged selected actions when the picker adds, removes, or reorders actions, but are not yet part of the saved/exported configuration. Loading a preset or importing JSON replaces the label drafts with that configuration’s labels. Presets, JSON, and generated TSX preserve the exact selected array order; they do not sort it into catalog order.
+
+The timeline offers only selected actions, in that order and with the configured labels. **Async comparison** deliberately keeps its independent Like/Save examples, and the **12-action catalog** remains a full reference catalog. The picker does not filter either of those sections.
 
 A named preset saves a snapshot of the current configuration. Select it and choose **Load** to apply it. Presets are stored under `social-interaction-lab:studio-presets:v1` in this browser origin’s localStorage. They are not an account, cloud backup, or automatic save of every slider edit. Reload does not automatically apply a saved preset. Up to 20 names are allowed; trimmed names must be unique ignoring case, and each name must be 1–60 characters without control characters.
 
 Storage reads/writes can fail, including unavailable storage or quota limits. The UI reports the problem and keeps the current working configuration usable. A failed save/delete does not update the in-memory preset list as though it succeeded. Invalid stored collections are left untouched; **Clear invalid saved data** explicitly removes that collection. **Retry browser storage** retries an unavailable read. Download a config JSON when you need a portable copy.
 
-操作は1〜12個、重複不可です。追加した操作は末尾に入り、JSON の配列順を保持します。ラベルは「ラベルを適用」で確定してから保存・書き出ししてください。操作の追加・削除も編集中のラベルを適用します。プリセットは同じブラウザー・同じオリジンの localStorage 内だけに保存します。自動保存・クラウド同期ではなく、再読み込み後は選んで読み込みます。最大20件、名前は前後の空白を除去し、英字の大小を区別せず重複を拒否します。保存失敗は報告し、不正な既存データは明示的な消去まで保護します。
+「試すアイコンを選ぶ」で1〜12個を選びます。初期値は「いいね・コメント・共有・引用」のままです。追加した操作は標準ラベルで末尾に入り、「表示する順番」の「前へ」「後ろへ」で1つずつ移動できます。並べ替えではフォーカスとラベルを保持し、変更や端の位置を読み上げ用に通知します。最後の1個は外せません。
+
+「操作とラベル」で両言語の名前を編集し、「ラベルを適用」で確定してから保存・書き出ししてください。追加・削除・並べ替えの際、引き続き選択されていて確定ラベルが変わらない操作の編集中の名前は保持しますが、自動適用はしません。プリセットや JSON の読み込みでは読み込んだラベルに置き換えます。プリセット・JSON・生成 TSX は選択した配列順をそのまま保持します。時間軸も選択中の操作・順序・ラベルを使います。独立した非同期の「いいね／保存」比較と、全12操作の参照カタログは選択で絞り込みません。
+
+プリセットは同じブラウザー・同じオリジンの localStorage 内だけに保存します。自動保存・クラウド同期ではなく、再読み込み後は選んで読み込みます。最大20件、名前は前後の空白を除去し、英字の大小を区別せず重複を拒否します。保存失敗は報告し、不正な既存データは明示的な消去まで保護します。
 
 ### Schema v1 contract / スキーマ v1 の条件
 
@@ -92,7 +104,7 @@ Configuration labels are emitted as escaped JSON string literals, not executable
 
 ## 4. Motion timeline / 動きの時間軸
 
-Choose any of the 12 icons and five treatments, or `none`. The timeline shares glyph plans, target resolution, timing, and the Comment/Repost morph renderer with activation playback. It does not approximate the motion with a separate CSS animation.
+Choose any currently selected icon and five treatments, or `none`. The icon choices follow the picker’s order and configured labels. If the inspected icon is removed, inspection moves to the first remaining action and releases the previous playback controller. Reordering alone keeps the inspected action selected. The timeline shares glyph plans, target resolution, timing, and the Comment/Repost morph renderer with activation playback. It does not approximate the motion with a separate CSS animation.
 
 - Seek with the range input, its keyboard controls, or a phase marker; seeking pauses playback
 - Play at 0.25×, 0.5×, or 1×; step backward/forward by `1000 / 60` ms of timeline time, not the display’s measured frame rate
@@ -103,15 +115,15 @@ Choose any of the 12 icons and five treatments, or `none`. The timeline shares g
 
 The public `createGlyphTimeline` controller must exclusively own a standalone `ActionIcon` SVG. Never use it on an active `ActionButton` SVG or with another animation controller. Destroy it on unmount or before replacing it. See [API](API.md#standalone-glyph-timeline--単独アイコンの時間軸).
 
-12アイコン × 5表現を実際の再生処理と同じ計画・描画で観察します。コマ送りは時間軸上の約16.7 msで、端末の実フレームを測定したものではありません。合計時間にはパーツの遅延を含みます。コメントの段階名以外は開始・時間の中間・完了を表示します。単独 SVG の専有と破棄が必要で、ボタンの再生と競合させないでください。
+選択中のアイコン × 5表現を実際の再生処理と同じ計画・描画で観察します。選択肢はピッカーの順序と設定ラベルに従います。観察中の操作を外すと先頭の操作へ移り、以前の再生処理を破棄します。並べ替えだけでは観察中の操作を変えません。コマ送りは時間軸上の約16.7 msで、端末の実フレームを測定したものではありません。合計時間にはパーツの遅延を含みます。コメントの段階名以外は開始・時間の中間・完了を表示します。単独 SVG の専有と破棄が必要で、ボタンの再生と競合させないでください。
 
 ## 5. Async state and design lens / 非同期状態とデザインレンズ
 
-**Async comparison** has independent Like and Save (`bookmark`) transactions in each of two policies. Optimistic display uses the pending intent immediately; after-success display keeps the last confirmed value until success. Both display the confirmed value separately. Latency is 0, 700, or 1800 ms and is captured when a request starts.
+**Async comparison** has independent Like and Save (`bookmark`) transactions in each of two policies. These fixed teaching examples remain available regardless of the picker selection, while sharing appearance and motion settings. Optimistic display uses the pending intent immediately; after-success display keeps the last confirmed value until success. Both display the confirmed value separately. Latency is 0, 700, or 1800 ms and is captured when a request starts.
 
 Each action supports **Fail next request**, **Retry**, and **Cancel**. A failure/cancellation preserves the last confirmed value, including an already-on value; retry repeats the failed target. Each action ignores duplicate activation while pending, without blocking the other action. Cancellation invalidates late results even if an adapter ignores its AbortSignal. Locale and appearance changes do not restart pending transactions. These are local simulations; cancelling a real UI request would not undo a remote mutation.
 
-**Design lens** compares the current configuration with one altered token: gap, icon size, or stroke width. The adjusted value remains different from the baseline; all other configuration values match. Each specimen owns independent local interaction state, so reset or match those states when making a visual comparison.
+**Design lens** compares the current selected actions, order, and labels with one altered token: gap, icon size, or stroke width. The adjusted value remains different from the baseline; all other configuration values match. Each specimen owns independent local interaction state, so reset or match those states when making a visual comparison.
 
 Hit-area outlines show rendered button bounds, while the numeric minimum is the configured hit-target token. Visible labels and counts can make labelled buttons wider; icon-only presentation retains the same configured minimum hit target. Crosshairs mark the square icon box’s geometric center, not an optical center. Spacing overlays measure horizontal gaps between adjacent buttons on the same row; they do not measure every vertical/wrapped gap. Measurements refresh after layout, resize, and font readiness.
 
@@ -134,10 +146,10 @@ npm run verify:consumer
 npm run verify:generated
 ```
 
-`verify:consumer` installs the archive in a fresh external consumer. `verify:generated` compiles generated TSX examples against that archive with strict NodeNext types and existing dependencies. It covers EN/JA, default labelled, icon-only full-catalog, full-catalog/custom-token, single-action/escaped-label, and maximum-length-label cases. It also bundles an isolated, real React consumer using the archive stylesheet in `qa/generated`, outside the deployed build. The browser suite mounts that fixture for narrow-width and keyboard checks. After committing, run `npm run verify:archive` to test committed files, and `npm run test:e2e` with the Playwright browser dependencies installed. Review `.github/workflows/quality.yml` for the CI sequence.
+`verify:consumer` installs the archive in a fresh external consumer. `verify:generated` compiles 12 generated TSX examples against that archive with strict NodeNext types and existing dependencies: EN/JA versions of default labelled, icon-only full-catalog, full-catalog/custom-token, single-action/escaped-label, maximum-length-label, and custom-ordered-subset cases. The custom subset is Reaction, Bookmark, Repost, Comment, Share with custom EN/JA labels. It also bundles an isolated, real React consumer using the archive stylesheet in `qa/generated`, outside the deployed build. The default fixture retains the maximum-length Like label; `?presentation=icon-only&locale=en|ja` selects the full-catalog icon-only fixture, and `?set=custom&locale=en|ja` selects the labelled custom subset (taking precedence over `presentation`). The browser suite mounts that fixture for runtime checks. After committing, run `npm run verify:archive` to test committed files, and `npm run test:e2e` with the Playwright browser dependencies installed. Review `.github/workflows/quality.yml` for the CI sequence.
 
-For browser review, exercise both languages, both presentations, and narrow/wide layouts; labelled/icon-only switching across shared surfaces; stable accessible names, native title hints, hidden-count descriptions, and minimum hit targets; legacy schema-v1 imports without `presentation`, rejection of invalid presentation values, and preset/JSON/TSX round trips; keyboard menus/dialogs; storage denial/corruption; invalid, oversized, and racing imports; clipboard rejection; timeline replay/seek/reset/unmount and OS/manual reduction; async reversal/failure/retry/cancel; and lens wrapping with long labels. Inspect real SVG geometry over time for all 12 × five treatments, including the accepted 0.3.8 Comment/Repost behavior. Keep code-generation type checks separate from runtime, accessibility, and visual QA.
+For browser review, exercise both languages, both presentations, and narrow/wide layouts; picker inclusion/removal, one-action/12-action limits, keyboard ordering/focus, and custom label/order propagation across shared surfaces; labelled/icon-only switching; stable accessible names, native title hints, hidden-count descriptions, and minimum hit targets; legacy schema-v1 imports without `presentation`, rejection of invalid presentation values, and selected-subset preset/JSON/TSX round trips; keyboard menus/dialogs and removal while a popup or request is active; storage denial/corruption; invalid, oversized, and racing imports; clipboard rejection; timeline selected choices, removal fallback, replay/seek/reset/unmount and OS/manual reduction; independent async reversal/failure/retry/cancel; and lens wrapping with long labels. Check that the independent Like/Save examples and full 12-action catalog remain available when the picker changes. Inspect real SVG geometry over time for all 12 × five treatments, including the accepted 0.3.8 Comment/Repost behavior. Keep code-generation type checks separate from runtime, accessibility, and visual QA.
 
 These instructions describe the verification workflow, not a claim that new browser checks have passed. Historical results remain in [QA](https://github.com/domizo/social-interaction-lab/blob/main/docs/QA.md); record fresh evidence there only when executed. Private source/demo and `UNLICENSED` distribution remain unchanged.
 
-生成 TSX の型検査と、実ブラウザーでの操作・動き・アクセシビリティ確認は別です。両言語・両表示方法・画面幅・共有画面への反映・固定のアクセシブル名と件数の説明・旧 JSON の互換性と保存／書き出しの往復・中断や失敗・動き抑制を検証し、実行した範囲だけを QA に記録してください。このガイドは新しいブラウザー検証の成功を宣言するものではありません。private・UNLICENSED の配布方針は変更しません。
+生成 TSX の型検査は両言語の6設定、計12件です。任意の順序とラベルを持つ部分集合は `?set=custom&locale=en|ja` で実行用 fixture を選べます。これはラベル付き表示で、指定した `presentation` より優先します。生成コードの型検査と、実ブラウザーでの操作・動き・アクセシビリティ確認は別です。両言語・両表示方法・画面幅・選択数の上下限・キーボードでの並べ替えとフォーカス・共有画面への選択／順序／ラベルの反映・固定のアクセシブル名と件数の説明・旧 JSON の互換性と保存／書き出しの往復・中断や失敗・動き抑制を検証し、実行した範囲だけを QA に記録してください。このガイドは新しいブラウザー検証の成功を宣言するものではありません。private・UNLICENSED の配布方針は変更しません。

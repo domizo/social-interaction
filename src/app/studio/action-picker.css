@@ -1,0 +1,34 @@
+.studio-action-picker { min-width:0; padding:20px; border:1px solid #dfe4e8; border-radius:14px; background:#fff; color:#202226; }
+.studio-action-picker .action-picker-heading { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px 14px; }
+.studio-action-picker h3 { margin:0; font-size:18px; line-height:1.4; letter-spacing:-.4px; }
+.studio-action-picker .action-picker-count { border-radius:5px; padding:4px 7px; background:#f1f3f6; color:#475565; font:10px/1.6 'IBM Plex Mono',monospace; white-space:nowrap; }
+.studio-action-picker .action-picker-help { margin:9px 0 16px; color:#596574; font-size:12px; line-height:1.7; }
+.studio-action-picker .action-picker-options { display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:8px; min-width:0; padding:0; margin:0; border:0; }
+.studio-action-picker .action-picker-option { display:flex; align-items:center; gap:7px; min-width:0; min-height:44px; padding:8px; border:1px solid #dfe4e8; border-radius:7px; background:#fafbfc; cursor:pointer; font-size:11px; line-height:1.4; }
+.studio-action-picker .action-picker-option[data-included=true] { border-color:#c35a64; background:#fff3f4; color:#812731; }
+.studio-action-picker .action-picker-option:hover { border-color:#657384; }
+.studio-action-picker .action-picker-option:focus-within { outline:2px solid #285ab0; outline-offset:3px; }
+.studio-action-picker .action-picker-option input { width:16px; height:16px; margin:0; flex:none; accent-color:#b93240; cursor:pointer; }
+.studio-action-picker .action-picker-option input:focus-visible { outline:none; }
+.studio-action-picker .action-picker-glyph { display:block; width:18px; height:18px; flex:none; --sil-stroke:1.6; }
+.studio-action-picker .action-picker-glyph .sil-icon { display:block; width:100%; height:100%; }
+.studio-action-picker .action-picker-name { min-width:0; overflow-wrap:anywhere; }
+.studio-action-picker .action-picker-order-heading { display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap; gap:4px 10px; margin:20px 0 9px; }
+.studio-action-picker h4 { margin:0; font-size:12px; font-weight:650; }
+.studio-action-picker .action-picker-order-heading>span { color:#596574; font-size:10px; }
+.studio-action-picker .action-picker-order { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,270px),1fr)); gap:6px 12px; min-width:0; list-style:none; padding:0; margin:0; }
+.studio-action-picker .action-picker-order li { display:flex; align-items:center; justify-content:space-between; gap:8px; min-width:0; padding:3px 0; border-bottom:1px solid #edf0f3; }
+.studio-action-picker .action-picker-ordered-name { display:flex; align-items:center; gap:8px; min-width:0; font-size:12px; line-height:1.5; }
+.studio-action-picker .action-picker-position { flex:none; width:18px; color:#596574; font:10px/1.5 'IBM Plex Mono',monospace; text-align:center; }
+.studio-action-picker .action-picker-move { display:flex; gap:4px; flex:none; }
+.studio-action-picker .action-picker-move button { display:inline-flex; justify-content:center; align-items:center; min-width:44px; min-height:44px; padding:7px; border:1px solid #dfe4e8; border-radius:5px; background:#fff; color:#3b4b5c; font:inherit; font-size:10px; cursor:pointer; }
+.studio-action-picker .action-picker-move button:hover:not([aria-disabled=true]) { border-color:#657384; background:#f1f3f6; }
+.studio-action-picker .action-picker-move button[aria-disabled=true] { color:#697381; background:#f6f7f8; border-color:transparent; cursor:default; }
+.studio-action-picker .action-picker-move button:focus-visible { outline:2px solid #285ab0; outline-offset:2px; }
+.studio-action-picker .action-picker-status { min-height:18px; margin:10px 0 0; color:#596574; font-size:11px; line-height:1.6; overflow-wrap:anywhere; }
+.studio-action-picker .action-picker-sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+@media(max-width:1000px) { .studio-action-picker .action-picker-options { grid-template-columns:repeat(4,minmax(0,1fr)); } }
+@media(max-width:700px) { .studio-action-picker .action-picker-options { grid-template-columns:repeat(3,minmax(0,1fr)); } }
+@media(max-width:600px) { .studio-action-picker { padding:16px; } .studio-action-picker .action-picker-ordered-name { gap:6px; } }
+@media(max-width:430px) { .studio-action-picker .action-picker-options { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media(forced-colors:active) { .studio-action-picker .action-picker-option[data-included=true] { border-color:Highlight; } .studio-action-picker .action-picker-move button[aria-disabled=true] { color:GrayText; } }

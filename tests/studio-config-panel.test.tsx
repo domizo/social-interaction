@@ -165,11 +165,10 @@ describe('preset and configuration UI', () => {
     expect(code.value).toContain(`const locale = "${locale}"`);
     expect(screen.getByText(locale === 'en' ? /Icon-only buttons retain their accessible labels/ : /アイコンのみでも読み上げ用のラベルを保持/)).toBeTruthy();
   });
-  it('changes included actions and validates both editable labels transactionally', () => {
-    const {onApply} = harness();
+  it('validates both editable labels for the currently selected actions transactionally', () => {
+    const config=fresh();config.actions.push({action:'bookmark',label:{en:'Save',ja:'保存'}});
+    const {onApply} = harness(vi.fn(),'en',config);
     fireEvent.click(screen.getByText('Actions & labels', {selector: 'summary'}));
-    fireEvent.click(screen.getByLabelText('Save'));
-    expect(onApply.mock.calls.at(-1)![0].actions.some((row: {action: string}) => row.action === 'bookmark')).toBe(true);
     fireEvent.change(screen.getByLabelText('bookmark English'), {target: {value: 'Keep this'}});
     fireEvent.change(screen.getByLabelText('bookmark Japanese'), {target: {value: '残す'}});
     fireEvent.click(screen.getByRole('button', {name: 'Apply labels'}));
@@ -184,4 +183,22 @@ describe('preset and configuration UI', () => {
     expect((screen.getByLabelText('生成した React コード') as HTMLTextAreaElement).value).toContain('const locale = "ja"');
     expect(screen.getByRole('button', {name: 'プリセットを保存'})).toBeTruthy();
   });
+});
+
+
+describe('label drafts and the single shared selection source',()=>{
+ it('preserves dirty retained labels through reorder and applies them in current order only',()=>{
+  const config=fresh(),onApply=vi.fn(),r=render(<ConfigPanel config={config} locale="en" onApply={onApply}/>);
+  fireEvent.click(screen.getByText('Actions & labels',{selector:'summary'}));fireEvent.change(screen.getByLabelText('like English'),{target:{value:'Appreciate'}});
+  const changed={...config,actions:[config.actions[3],config.actions[0]]};r.rerender(<ConfigPanel config={changed} locale="en" onApply={onApply}/>);
+  expect((screen.getByLabelText('like English') as HTMLInputElement).value).toBe('Appreciate');expect(screen.queryByLabelText('comment English')).toBeNull();
+  fireEvent.click(screen.getByRole('button',{name:'Apply labels'}));expect(onApply.mock.lastCall?.[0].actions.map((item:{action:string})=>item.action)).toEqual(['quote','like']);expect(onApply.mock.lastCall?.[0].actions[1].label.en).toBe('Appreciate');expect(screen.queryByRole('checkbox')).toBeNull();
+ });
+ it('does not resurrect a removed dirty action or overwrite externally changed labels',()=>{
+  const config=fresh(),onApply=vi.fn(),r=render(<ConfigPanel config={config} locale="en" onApply={onApply}/>);fireEvent.click(screen.getByText('Actions & labels',{selector:'summary'}));fireEvent.change(screen.getByLabelText('like English'),{target:{value:'Old draft'}});fireEvent.change(screen.getByLabelText('comment English'),{target:{value:'Other draft'}});
+  const changed={...config,actions:[{...config.actions[1],label:{en:'Imported discussion',ja:'話す'}}]};r.rerender(<ConfigPanel config={changed} locale="en" onApply={onApply}/>);expect(screen.queryByLabelText('like English')).toBeNull();expect((screen.getByLabelText('comment English') as HTMLInputElement).value).toBe('Imported discussion');fireEvent.click(screen.getByRole('button',{name:'Apply labels'}));expect(onApply.mock.lastCall?.[0].actions).toEqual(changed.actions);
+ });
+ it('treats explicit preset load as a draft reset even if the saved applied labels are unchanged',()=>{
+  harness();save('Base');fireEvent.click(screen.getByText('Actions & labels',{selector:'summary'}));fireEvent.change(screen.getByLabelText('like English'),{target:{value:'Unsaved'}});fireEvent.click(screen.getByRole('button',{name:'Load'}));expect((screen.getByLabelText('like English') as HTMLInputElement).value).toBe('Like');
+ });
 });

@@ -51,7 +51,7 @@ function LocalComposer({mode, locale, onClose, onSave}: {mode: ComposerMode; loc
 
 /** The same configured controls power every fixture. All state stays in this mounted preview. */
 export function ConfiguredActions({config, locale, reducedMotion, label}: {config: StudioConfig; locale: Locale; reducedMotion: boolean; label?: string}) {
-  const t = text[locale], menuId = useId();
+  const t = text[locale], menuId = useId(), root = useRef<HTMLDivElement>(null), lastFocused = useRef<HTMLElement | null>(null);
   const [selected, setSelected] = useState<Partial<Record<SocialAction, boolean>>>({});
   const [composer, setComposer] = useState<ComposerMode | null>(null), [menuOpen, setMenuOpen] = useState(false);
   const [feedback, setFeedback] = useState<Feedback | null>(null), [showLink, setShowLink] = useState(false);
@@ -70,7 +70,14 @@ export function ConfiguredActions({config, locale, reducedMotion, label}: {confi
   // Removed actions cannot leave a hidden menu or modal behind.
   const hasShare = config.actions.some(item => item.action === 'share');
   const hasComposer = composer === null || config.actions.some(item => item.action === composer);
-  useEffect(() => {if (!hasShare) setMenuOpen(false); if (!hasComposer) setComposer(null);}, [hasShare, hasComposer]);
+  useEffect(() => {
+    const node=root.current, active=document.activeElement;
+    const closingMenu=!hasShare&&menuOpen, closingComposer=!hasComposer&&composer!==null;
+    const restore=(closingMenu&&!!menu.current?.contains(active))||(closingComposer&&!!node?.querySelector('dialog')?.contains(active))||(!lastFocused.current?.isConnected&&!!lastFocused.current&&active===document.body);
+    if(closingMenu)setMenuOpen(false);
+    if(closingComposer){node?.querySelector<HTMLDialogElement>('dialog')?.close();setComposer(null);}
+    if(restore)node?.querySelector<HTMLButtonElement>('.sil-action')?.focus();
+  }, [hasShare, hasComposer, menuOpen, composer, config.actions]);
   const menuKey = (event: KeyboardEvent<HTMLDivElement>) => {
     const items = Array.from(menu.current?.querySelectorAll<HTMLButtonElement>('[role="menuitem"]') ?? []);
     const index = items.indexOf(document.activeElement as HTMLButtonElement);
@@ -90,7 +97,7 @@ export function ConfiguredActions({config, locale, reducedMotion, label}: {confi
   const message = feedback?.kind === 'toggle' ? `${actionLabel(feedback.action)}: ${feedback.selected ? t.enabled : t.disabled}`
     : feedback?.kind === 'command' ? `${actionLabel(feedback.action)}: ${t.completed} (${feedback.count})`
     : feedback?.kind === 'draft' ? t.saved : feedback?.kind === 'share' ? t.prepared : feedback?.kind === 'link' ? t.shown : '';
-  return <div className="configured-actions" data-reduced-motion={reducedMotion || undefined}>
+  return <div ref={root} onFocusCapture={e=>{lastFocused.current=e.target as HTMLElement;}} onBlurCapture={e=>{if(e.relatedTarget&&!e.currentTarget.contains(e.relatedTarget as Node))lastFocused.current=null;}} className="configured-actions" data-reduced-motion={reducedMotion || undefined}>
     <ActionBar tokens={config.tokens} label={label ?? t.actions}>
       {config.actions.map(item => {
         const action = item.action;

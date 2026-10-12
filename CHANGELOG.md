@@ -1,5 +1,14 @@
 # Changelog / 変更履歴
 
+## 0.4.2 — 2026-10-12
+
+- Add a prominent EN/JA picker for 1–12 existing actions, with selected count, keyboard-operable Earlier/Later controls, retained reorder focus, and announced changes/boundaries / 既存の1〜12操作を選ぶ見つけやすいピッカー、選択数、キーボード対応の並べ替え、フォーカス維持、変更・境界の通知を追加
+- Use one selected action list, order, and applied labels across original comparisons, live actions, context previews, motion rows, state/token-diff specimens, and the design lens; preserve the default Like/Comment/Share/Quote selection / 選択操作・順序・適用済みラベルを各比較とプレビューで共有し、初期の4操作を維持
+- Preserve custom order and both label languages through browser presets, schema-v1 JSON, and generated TSX; retain unapplied label drafts for unchanged selected actions during picker changes / プリセット・JSON・生成 TSX に任意の順序と両言語ラベルを保持し、選択変更時も対象が変わらない編集中のラベルを維持
+- Limit Studio timeline choices to the selected order and configured labels, falling back to the first remaining action when the inspected icon is removed / 時間軸の選択肢も選択順・設定ラベルに合わせ、観察中の操作を外した場合は先頭へ移動
+- Keep independent Async Like/Save comparisons and the complete 12-action reference catalog, existing library contracts, and the accepted 0.3.8 Comment/Repost motion / 独立した非同期のいいね・保存比較、全12操作カタログ、既存 API、確定済みの動きを維持
+- Extend generated-consumer coverage to 12 EN/JA modules, including an ordered custom subset and a `set=custom` runtime fixture; document selection boundaries and verification requirements, with fresh execution results kept in the QA record / 任意の順序・ラベルを持つ部分集合と実行用 fixture を加えて生成コードの検証を12件へ拡張し、適用範囲と検証手順を記録。新しい実施結果は QA に記録
+
 ## 0.4.1 — 2026-10-12
 
 - Add optional `presentation` (`"labelled" | "icon-only"`) to shared action buttons, with labelled as the default; icon-only hides visible labels and counts while retaining stable accessible names, native title hints, and accessible count descriptions / 共通ボタンに表示方法を追加し、初期値はラベル付き。「アイコンのみ」は見えるラベル・件数を隠し、固定のアクセシブル名・標準の title ヒント・件数の説明を保持

@@ -2,6 +2,16 @@
 
 Updated: 2026-10-12. Source checks, real-browser checks and hosted access are reported separately.
 
+## 0.4.2 Chosen action sets / 試す操作を選ぶ
+
+This release combines the icon-only setting below with a visible 1–12 icon picker and ordered previews. Its exact-commit gate includes 270 unit/schema/lifecycle tests, 12 generated EN/JA consumers and 158 native browser cases across the five engine/viewport projects. These numbers describe the configured gate; the exact run must finish successfully before deployment.
+
+Selection, custom labels and order are checked across context, live, motion, state, diff and lens previews, preset reload, JSON and runnable generated modules. Native cases exercise keyboard reordering, the last-action guard, removed pending owners, removal of an open native modal/menu through a delayed configuration import, and all 12 icons in both presentations at 390 px. The full icon catalog and fixed Like/Save asynchronous experiment retain their clearly described scopes.
+
+Browser screenshots can take longer than a finite animation. Portable playback therefore has independent real elapsed geometry samples from actual click/replay handlers and separately labelled held-clock phase screenshots; geometry must remain unchanged before/after each phase capture. The default-speed flight video uses the actual mounted catalog with unrelated paint hidden, waits for fonts/foreground/scroll readiness, and records RAF, visibility and timing telemetry. Whole-page native clicks remain covered separately. No accepted animation plan or production renderer was changed to accommodate capture scheduling; exact formation, landing/rebound, completion and cancellation gates remain.
+
+選択・順序・名前を一つの設定で共有し、保存と書き出しまで検証します。実時間の再生と停止したコマの画像は別の証拠として扱います。実機・支援技術の読み上げ・本番ログインの検証範囲は引き続き限定されます。
+
 ## 0.4.1 Icon-only presentation / アイコンのみの表示
 
 The exact-commit release gate adds a shared labelled/icon-only setting without changing any accepted motion plan. Before deployment it must pass the [Quality workflow](https://github.com/domizo/social-interaction-lab/actions), including:

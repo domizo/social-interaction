@@ -1,70 +1,105 @@
 # Social Interaction Lab
 
-Four original visual styles and five glyph-motion treatments for 12 social-action icons, built from shared accessible React + TypeScript primitives. Cartoon motion adds anime-inspired anticipation, squash, overshoot, and decorative effects. Includes a bilingual EN/JA interaction studio, Vite playground, and installable library.
+**Choose how social actions look and feel in context, then take them into React.**
 
-[日本語](README.ja.md)
+For developers and designers building feeds, article pages, and chat interfaces. Try the actions in sample screens, adjust their appearance and motion, save a configuration, and copy a React component that carries those choices into your application.
 
-## Run the playground
+[日本語](README.ja.md) · [Start locally](#start-locally) · [Use in React](#use-in-react)
 
-Requires Node.js 22.12+, 24, or 26 (supported even-numbered releases) and npm.
+![Studio with a scripted chat preview beside shared appearance and motion controls](docs/screenshots/studio-context-desktop-en.png)
+
+Use the same configuration across a feed, article footer, and scripted chat to judge how it fits each setting. This capture shows the context and appearance controls; the icon picker sits below them. [See the mobile Japanese preview](docs/screenshots/studio-context-mobile-ja.png). These are actual browser captures; still images do not demonstrate motion.
+
+## From a design choice to a React component
+
+1. **Choose a context and the actions you need.** Switch between the sample screens. In **Choose icons to test**, select 1–12 actions and use **Earlier / Later** to set their order. The chosen set and order carry through the context previews, style and motion comparisons, design lens, state specimens, presets, and generated code. The timeline lets you inspect an icon from that selection.
+2. **Tune it in place.** Adjust style, spacing, icon size, stroke, and motion while watching the preview. Switch between visible labels and icon-only presentation. Edit the EN/JA names in **Actions & labels**, then choose **Apply labels** before saving or exporting.
+3. **Keep a setup you can revisit.** Save a named preset in this browser, or download a configuration JSON to load later. The action order, both label languages, presentation, and visual and motion settings travel together.
+4. **Take the working starting point.** **Copy React** or **Download TSX** gives you a complete `SocialActions.tsx` module with the selected configuration, controlled toggles, local composers, a keyboard-operated sharing menu, and an optional `onCommand` callback. Install the package below and mount the generated component. If clipboard access fails, selectable source is shown.
+
+The previews use local interactions and simulated requests. The chat response is scripted; no social-network or AI service is connected.
+
+## What you can explore
+
+### Find a composition that fits the screen
+
+Try a compact action row for an article or a more expressive set for a community feed. The design lens changes only spacing, icon size, or stroke width while holding the remaining configuration constant. Button bounds, icon-box centers, and same-row horizontal gaps help you see what changed. Match the two specimens' interaction states when comparing them; the overlays do not score visual quality or accessibility.
+
+### Examine the moment a motion feels off
+
+Use the timeline to pause, scrub, slow down, and step through a selected icon's movement. It shares the activation motion engine, so you can inspect the actual animation plan rather than a separate approximation. Try a different duration or intensity, then return to the context preview. Reduced-motion preview keeps the icon static.
+
+### Compare feedback before connecting a backend
+
+The async comparison focuses on **Like and Save**, independently of your selected action set. Compare an immediate optimistic update with an update after success, then try failure, retry, and cancellation. Displayed and confirmed values are shown separately so you can examine what the interface tells someone while a request is unresolved. These are local simulations, not a backend integration or performance benchmark.
+
+## Start locally
+
+Requires Node.js 22.12+ in the 22.x line, 24.x, or 26.x, and npm.
 
 ```sh
 npm ci
 npm run dev
-npm run check
-npm test
+```
+
+Open the local URL printed by Vite. No account or API key is required. To build the playground and the installable library:
+
+```sh
 npm run build
 ```
 
-`npm run build` emits the playground in `dist/`, ESM library in `package/`, and a downloadable tarball in `public/downloads/`. There are no accounts, API keys, analytics, social-network or AI connections, or posting. Every request in the playground is local simulation. Drafts, selections, and simulated requests last for the mounted session only; reload clears them. Named Studio presets are the exception: they persist in this browser’s localStorage until deleted or browser data is cleared.
+The build emits the playground in `dist/`, the ESM library in `package/`, and the package archive in `public/downloads/`.
 
-## Use the interaction studio
+## Use in React
 
-1. **Try a context.** Switch between a sample social feed, article footer, and scripted AI-chat response. The same action selection, EN/JA labels, labelled/icon-only presentation, variant, tokens, and motion power all three; the chat has no AI backend. Toggle actions, local Comment/Quote drafts, and a fixture Share menu are interactive.
-2. **Keep a configuration.** Select 1–12 actions and apply edited labels. Save up to 20 named presets in this browser, or download/import schema-v1 JSON, including the presentation setting. Imports are limited to 64 KB and validated completely before applying; invalid data leaves the current configuration unchanged.
-3. **Take the code.** Copy or download a complete `SocialActions.tsx` component with imports, controlled toggles, local composers, a sharing menu, and an optional `onCommand` callback. It carries the configuration and both label languages, using the selected display language. It does not reproduce the entire Studio page. Clipboard failure reveals selectable source.
-4. **Inspect time and state.** Scrub any of the 12 icons × five treatments with the shared motion engine, play at 0.25×/0.5×/1×, step about 16.7 ms, and inspect phase markers. Separately compare optimistic and after-success Like/Save updates with local failure, retry, cancellation, and displayed versus confirmed values.
-5. **Compare one variable.** The design lens changes spacing, icon size, or stroke width while matching the remaining configuration. Overlays show button bounds, icon-box geometric centers, and same-row horizontal gaps. These measurements support design hypotheses, not automatic judgments of beauty or accessibility.
-
-The shared presentation control defaults to labelled buttons. Choose icon-only to hide visible labels and counts across the contexts, design lens, async comparison, original comparisons, and applicable motion/state specimens. Accessible names, count descriptions, and native title hints remain available. Older schema-v1 presets/JSON without `presentation` load as labelled.
-
-Presets and exports contain configuration, not drafts, selections, request state, or the manual reduced-motion preview switch. The generated component still honors OS reduced motion. Storage failures are reported without claiming a save; invalid stored data is left untouched until you explicitly clear it. See the [Studio guide](docs/STUDIO.md) for validation rules, export scope, and a testing workflow.
-
-![Real Studio context and shared controls, desktop](docs/screenshots/studio-context-desktop-en.png)
-
-[Mobile Japanese rendering](docs/screenshots/studio-context-mobile-ja.png). These are browser captures; still images do not establish animation behavior.
-
-## Install the library
-
-Download `social-interaction-lab-react-0.4.1.tgz` from the playground or build it with `npm run build:package`. In your separate React project:
+Download `social-interaction-lab-react-0.4.2.tgz` from the playground, or create it with `npm run build:package`. Copy the archive into your separate React project, then install it there:
 
 ```sh
-npm install ./social-interaction-lab-react-0.4.1.tgz
+npm install ./social-interaction-lab-react-0.4.2.tgz
 ```
 
-React 18.2 or 19 is a peer dependency. The library is ESM-only; styles are explicitly imported and are not automatically injected.
+This is a private archive, not an npm registry release. React 18.2 or 19 is a peer dependency; the package is ESM-only. Styles must be explicitly imported.
+
+For the setup you chose in Studio, save its generated module as `SocialActions.tsx` and render it:
+
+```tsx
+import SocialActions from './SocialActions';
+import '@social-interaction-lab/react/styles.css';
+
+export default function App() {
+  return <SocialActions />;
+}
+```
+
+You can also compose individual primitives:
 
 ```tsx
 import { useState } from 'react';
-import { ActionBar, LikeButton, CommentButton, ShareButton, QuoteButton } from '@social-interaction-lab/react';
+import { LikeButton } from '@social-interaction-lab/react';
 import '@social-interaction-lab/react/styles.css';
 
-export function PostActions() {
+export function PostLike() {
   const [liked, setLiked] = useState(false);
   return (
-    <ActionBar tokens={{ gap: 12, iconSize: 20 }}>
-      <LikeButton label="Like" selected={liked} variant="soft"
-        onClick={() => setLiked(value => !value)} />
-      <CommentButton label="Comment" onClick={() => openYourComposer('comment')} />
-      <ShareButton label="Share" aria-expanded={shareMenuOpen}
-        onClick={() => openYourShareMenu()} />
-      <QuoteButton label="Quote" onClick={() => openYourComposer('quote')} />
-    </ActionBar>
+    <LikeButton label="Like" selected={liked} variant="soft"
+      onClick={() => setLiked(value => !value)} />
   );
 }
 ```
 
-The popup callbacks above are integration placeholders for your application. LikeButton is controlled, as are the other toggle components listed below. CommentButton and QuoteButton announce a dialog; ShareButton announces a menu. You must supply matching accessible popups, keyboard navigation, focus handling, and aria-expanded/aria-controls. The full working popup implementations are in `src/app/LiveActions.tsx` in the source project. The exported primitives do not create popups themselves.
+The generated module includes local popup behavior. Individual CommentButton and QuoteButton primitives announce a dialog, and ShareButton announces a menu, but do not create those popups. When using primitives directly, provide matching accessible popups, keyboard navigation, focus handling, and `aria-expanded` / `aria-controls`. See `src/app/LiveActions.tsx` for working local examples.
+
+## Scope and saved data
+
+- **Application integration:** Generated code carries the chosen actions, order, labels, presentation, tokens, and motion. It does not export the Studio panels, sample article/chat content, timeline, or async comparison. `onCommand` is a synchronous notification callback; real requests, persistence, permissions, and error policy belong to your application.
+- **Local state:** Toggle values, drafts, and simulated request state last only for the mounted session and reset on reload. There are no accounts, analytics, social-network or AI connections, or posting.
+- **Reusable configuration:** Up to 20 named presets persist in this browser's localStorage until deleted or browser data is cleared. They are not cloud backup or automatic saving; choose a saved preset and load it after reloading. JSON import/export uses schema v1, is limited to 64 KB, and validates the entire input before applying it. Invalid input leaves the current configuration unchanged.
+- **Failure handling:** Storage errors are reported without claiming a save. Invalid stored data is left untouched until explicitly cleared. Clipboard failure reveals selectable source.
+- **Export boundaries:** Presets and exports retain the chosen action set, but not pressed toggle values, drafts, request state, or the manual reduced-motion preview switch. Generated components still honor the OS reduced-motion preference. Older schema-v1 presets/JSON without `presentation` load as labelled.
+
+See the [Studio guide](docs/STUDIO.md) for validation rules, export scope, and inspection workflows.
+
+## Library reference
 
 ### Explore the action catalog
 
@@ -88,7 +123,7 @@ Existing `showLabel={false}` retains its original label-only behavior: in labell
 
 ### Animate the icons
 
-Choose `iconMotion="pulse"`, `"spring"`, `"trace"`, `"gesture"`, or `"cartoon"` independently of the visual style; `"none"` disables glyph motion. The Motion section compares the original four actions × five treatments, replays them together, and adjusts glyph duration, intensity, and part stagger. The Studio timeline adds seekable inspection using `createGlyphTimeline` on an exclusively owned standalone `ActionIcon` SVG. Never attach it to an active `ActionButton` SVG. A separate 12-card catalog previews the selected treatment across every icon; those previews do not open popups or invoke a service. Select a treatment to use it in the original live local interactions.
+Choose `iconMotion="pulse"`, `"spring"`, `"trace"`, `"gesture"`, or `"cartoon"` independently of the visual style; `"none"` disables glyph motion. The Motion section compares the selected actions across five treatments, replays them together, and adjusts glyph duration, intensity, and part stagger. The Studio timeline inspects an icon from the selected set using `createGlyphTimeline` on an exclusively owned standalone `ActionIcon` SVG. Never attach it to an active `ActionButton` SVG. A separate 12-card catalog previews the selected treatment across every icon; those previews do not open popups or invoke a service. Select a treatment to use it in the live local interactions.
 
 ```tsx
 <LikeButton label="Like" selected={liked} iconMotion="cartoon"
@@ -127,6 +162,7 @@ Import `useAsyncAction` from the same package. One hook instance owns one action
 ## Verification
 
 ```sh
+npm run check
 npm test
 npm run build
 npm run verify:consumer
