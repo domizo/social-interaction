@@ -8,6 +8,10 @@ Checks cover transactional drag/drop and keyboard alternatives, pointer cancella
 
 Trusted touch uses Chromium mobile CDP input; dispatched touch-shaped events in other harnesses are lifecycle checks rather than physical touch evidence. Native screenshots and interaction artifacts must be inspected after the exact-source run. Existing WebKit/Safari, physical-device and hosted-authentication limits below still apply.
 
+The [first native run](https://github.com/domizo/social-interaction-lab/actions/runs/38264679869) passed all new practical-configuration flows, including trusted Chromium touch and the viewport-edge drag. It reported 234 passes, four deliberate skips and five instances of one migrated test failure: it compared rendered bounds after the owning panel became hidden. The corrected test verifies exact path/style cleanup while hidden, then exact native bounds on return, with actual-click samples collected in-page. It does not change production rendering or relax the accepted motion plans. The final exact-source gate must pass before deployment.
+
+Reviewed 0.6.0 layout captures: [drag ordering](screenshots/workflow-drag-desktop-en.png), [mixed assignments](screenshots/workflow-motion-desktop-en.png), [mobile Japanese context](screenshots/workflow-context-mobile-ja.png). They come unchanged from source `f7fd54db`, remote `95bf1a22`; the following docs/evidence snapshot has identical application code. Still images do not establish motion. Native mouse/keyboard, real touch, temporal movement, presets and generated-module outcomes are separate evidence.
+
 ドラッグとキーボードの並べ替え、全体設定と個別設定の継承、保存・生成コードへの引き継ぎを検証します。既存モーションの形状や時間は変更していません。上記は実行予定の検証対象であり、正確なコミットの結果を確認してから配信します。
 
 ## 0.5.0 Step pages / ステップ別ページ

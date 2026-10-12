@@ -205,6 +205,9 @@ test('per-icon inherit override reset and hidden selections survive presets JSON
   const legacy = {...saved}; delete legacy.motionOverrides;
   await importConfig(page, legacy); expect((await workingConfig(page)).motionOverrides).toEqual({});
   await visitStep(page, 'animation'); await expect(assignment(page, 'comment').getByRole('combobox')).toHaveValue('inherit');
+  await importConfig(page, saved); await visitStep(page, 'animation');
+  await expect(assignment(page, 'like').getByRole('combobox')).toHaveValue('trace');
+  await expect(assignment(page, 'comment').getByRole('combobox')).toHaveValue('none');
   await page.getByRole('button', {name: '日本語', exact: true}).click();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.screenshot({path: info.outputPath('mixed-motion-ja.png'), fullPage: true});

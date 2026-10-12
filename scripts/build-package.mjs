@@ -7,7 +7,7 @@ const pkg={name:'@social-interaction-lab/react',version:JSON.parse(await readFil
 await writeFile('package/package.json',JSON.stringify(pkg,null,2)+'\n');await copyFile('src/lib/styles.css','package/dist/styles.css');
 for(const name of ['README.md','README.ja.md','CHANGELOG.md','CONTRIBUTING.md','LICENSE'])await copyFile(name,`package/${name}`);
 await mkdir('package/docs',{recursive:true});for(const name of ['API.md','DESIGN.md','ACCESSIBILITY.md','MOTION.md','STUDIO.md'])await copyFile(`docs/${name}`,`package/docs/${name}`);
-await mkdir('package/docs/screenshots',{recursive:true});for(const name of ['studio-context-desktop-en.png','studio-context-mobile-ja.png','workflow-choose-desktop-en.png','workflow-preview-mobile-ja.png'])await copyFile(`docs/screenshots/${name}`,`package/docs/screenshots/${name}`);
+await mkdir('package/docs/screenshots',{recursive:true});for(const name of ['studio-context-desktop-en.png','studio-context-mobile-ja.png','workflow-choose-desktop-en.png','workflow-preview-mobile-ja.png','workflow-drag-desktop-en.png','workflow-motion-desktop-en.png','workflow-context-mobile-ja.png'])await copyFile(`docs/screenshots/${name}`,`package/docs/screenshots/${name}`);
 const {tokensToDTCG}=await import(`${resolve('package/dist/tokens.js')}?build=${Date.now()}`);await writeFile('package/tokens.json',JSON.stringify(tokensToDTCG(),null,2)+'\n');
 await rm('public/downloads',{recursive:true,force:true});await mkdir('public/downloads',{recursive:true});
 execFileSync('npm',['pack','./package','--pack-destination','public/downloads','--ignore-scripts','--cache','/tmp/social-lab-npm-cache'],{stdio:'inherit'});

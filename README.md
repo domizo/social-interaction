@@ -6,9 +6,13 @@ For developers and designers building feeds, article pages, and chat interfaces.
 
 [日本語](README.ja.md) · [Five-step workflow](docs/STUDIO.md#five-step-workflow) · [Start locally](#start-locally) · [Use in React](#use-in-react)
 
-![Historical 0.5.0 Choose icons screen, before the 0.6.0 drag-handle refinement](docs/screenshots/workflow-choose-desktop-en.png)
+![Choose actions and reorder them with drag handles](docs/screenshots/workflow-drag-desktop-en.png)
 
-Choose only the actions your interface needs, then carry that setup through the five tabs. [The mobile Japanese In context page](docs/screenshots/workflow-preview-mobile-ja.png) shows the same workflow in a narrow screen, with a feed preview and local request controls. These are historical 0.5.0 browser captures, before the 0.6.0 controls described below. They are not evidence of the refined UI or its motion; fresh verification is recorded separately.
+Choose only the actions your interface needs, then carry that setup through the five tabs. [The mobile Japanese In context page](docs/screenshots/workflow-context-mobile-ja.png) shows the same choices in a feed, with separate local request controls.
+
+![Assign a shared motion and individual icon treatments](docs/screenshots/workflow-motion-desktop-en.png)
+
+Give the row one shared motion, keep a few icons different, and inspect the resolved result below. These are actual 0.6.0 browser captures; still images show the layout, while interaction and elapsed-time checks are recorded in the [verification guide](https://github.com/domizo/social-interaction-lab/blob/main/docs/QA.md).
 
 ## From a design choice to a React component
 

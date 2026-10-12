@@ -6,9 +6,13 @@
 
 [English](README.md) · [5つのステップ](docs/STUDIO.md#five-step-workflow) · [ローカルで試す](#ローカルで試す) · [React に組み込む](#react-に組み込む)
 
-![0.6.0 のドラッグハンドル導入前に撮影した、0.5.0 の「アイコンを選ぶ」画面](docs/screenshots/workflow-choose-desktop-en.png)
+![使う操作を選び、ハンドルで順番を整える画面](docs/screenshots/workflow-drag-desktop-en.png)
 
-必要な操作を選び、その設定を5つのタブへ引き継ぎます。[モバイル・日本語の「使用画面」](docs/screenshots/workflow-preview-mobile-ja.png)では、狭い画面でも同じ流れでフィードとローカルの処理状態を試せます。どちらも更新前の 0.5.0 を実ブラウザーで撮影した画像です。以下で説明する 0.6.0 の UI や動きの検証結果を示すものではありません。新しい検証結果は別途記録します。
+必要な操作を選び、その設定を5つのタブへ引き継ぎます。[モバイル・日本語の「使用画面」](docs/screenshots/workflow-context-mobile-ja.png)では、同じ設定のフィードと、独立したローカルの処理状態を試せます。
+
+![全体の動きとアイコンごとの動きを割り当てる画面](docs/screenshots/workflow-motion-desktop-en.png)
+
+全体をそろえつつ、必要なアイコンだけ別の動きにできます。下の時間軸で適用結果も確認できます。画像は 0.6.0 を実ブラウザーで撮影したものです。静止画はレイアウトを示し、操作や時間経過の検証は[検証記録](https://github.com/domizo/social-interaction-lab/blob/main/docs/QA.md)で区別して扱います。
 
 ## 5つのステップで、設定とコードを持ち帰る
 

@@ -38,14 +38,26 @@ test('actual generated icon-only modules preserve names, focus and minimum targe
 
 test('changing presentation releases inactive Cartoon paths and returning starts cleanly',async({page},info)=>{
  await page.goto('/#appearance');const setting=page.getByRole('combobox',{name:'Button presentation',exact:true});await setting.selectOption('icon-only');
- await visitGuide(page,'catalog');await page.getByRole('slider',{name:'Glyph duration',exact:true}).press('End');const evidence=[];
+ await visitGuide(page,'catalog');await page.getByRole('slider',{name:'Glyph duration',exact:true}).press('End');
  for(const action of ['comment','repost']){
   const button=page.locator(`[data-catalog-action=${action}] .sil-action`),svg=button.locator('svg');
   const read=()=>svg.evaluate(svg=>Array.from(svg.querySelectorAll('.sil-glyph path')).map(path=>{const p=path as SVGPathElement,b=p.getBBox();return {d:p.getAttribute('d'),bounds:[b.x,b.y,b.width,b.height],length:p.getTotalLength()};}));
-  const baseline=await read();await svg.evaluate(svg=>(window as any).__motionNode=svg);await button.click();await expect.poll(read).not.toEqual(baseline);const during=await read();expect(during.map(p=>p.bounds)).not.toEqual(baseline.map(p=>p.bounds));await expect.poll(read).not.toEqual(during);const advancing=await read();expect(advancing).not.toEqual(baseline);
-  await visitStep(page,'appearance');await setting.selectOption('labelled');await expect.poll(read).toEqual(baseline);await expect.poll(()=>svg.locator('.sil-glyph').evaluate(g=>!g.hasAttribute('style')&&Array.from(g.querySelectorAll('path')).every(p=>!p.hasAttribute('style')))).toBe(true);
-  await visitGuide(page,'catalog');expect(await svg.evaluate(svg=>svg===(window as any).__motionNode)).toBe(true);await button.click();await expect.poll(read).not.toEqual(baseline);await expect.poll(read).toEqual(baseline);
-  await visitStep(page,'appearance');await setting.selectOption('icon-only');await visitGuide(page,'catalog');evidence.push({action,baseline,during,advancing,settled:await read()});
+  const clean=()=>svg.locator('.sil-glyph').evaluate(g=>!g.hasAttribute('style')&&Array.from(g.querySelectorAll('path')).every(p=>!p.hasAttribute('style'))&&g.getAnimations({subtree:true}).length===0);
+  const sampleClick=async()=>{
+   // Sample in the page from the actual click, avoiding multiple Node round trips
+   // that can outlast this finite motion on slower browser engines.
+   await svg.evaluate(svg=>{(window as any).__presentationSamples=new Promise(resolve=>{svg.closest('button')!.addEventListener('click',()=>{const start=performance.now(),samples:any[]=[];const sample=()=>{samples.push({elapsed:performance.now()-start,paths:Array.from(svg.querySelectorAll('.sil-glyph path')).map(path=>{const p=path as SVGPathElement,b=p.getBBox();return {d:p.getAttribute('d'),bounds:[b.x,b.y,b.width,b.height]};})});if(samples.length<5)setTimeout(sample,80);else resolve(samples);};setTimeout(sample,40);},{once:true});});});
+   await button.click();return await page.evaluate(()=> (window as any).__presentationSamples) as Array<{elapsed:number;paths:Array<{d:string|null;bounds:number[]}>}>;
+  };
+  const baseline=await read();await svg.evaluate(svg=>(window as any).__motionNode=svg);
+  const samples=await sampleClick();await info.attach(`${action}-icon-only-elapsed.json`,{body:JSON.stringify({baseline,samples}),contentType:'application/json'});
+  const moved=samples.filter(s=>s.paths.some((p,i)=>p.d!==baseline[i].d));expect(moved.length).toBeGreaterThanOrEqual(2);expect(new Set(moved.map(s=>JSON.stringify(s.paths))).size).toBeGreaterThanOrEqual(2);expect(moved.some(s=>s.paths.some((p,i)=>JSON.stringify(p.bounds)!==JSON.stringify(baseline[i].bounds)))).toBe(true);
+  await visitStep(page,'appearance');await setting.selectOption('labelled');
+  // Hidden SVGs have no rendered bounding box. Check owned data/cleanup here,
+  // then the exact native geometry again after the retained panel is visible.
+  await expect.poll(()=>svg.locator('.sil-glyph path').evaluateAll(paths=>paths.map(p=>p.getAttribute('d')))).toEqual(baseline.map(p=>p.d));await expect.poll(clean).toBe(true);await expect(svg).toBeHidden();
+  await visitGuide(page,'catalog');expect(await svg.evaluate(svg=>svg===(window as any).__motionNode)).toBe(true);await expect.poll(read).toEqual(baseline);
+  const replay=await sampleClick();await info.attach(`${action}-labelled-replay-elapsed.json`,{body:JSON.stringify({baseline,replay}),contentType:'application/json'});expect(replay.some(s=>s.paths.some((p,i)=>p.d!==baseline[i].d))).toBe(true);await expect.poll(read).toEqual(baseline);await expect.poll(clean).toBe(true);
+  await visitStep(page,'appearance');await setting.selectOption('icon-only');await visitGuide(page,'catalog');await expect.poll(read).toEqual(baseline);
  }
- await info.attach('icon-only-real-path-playback.json',{body:JSON.stringify(evidence),contentType:'application/json'});
 });

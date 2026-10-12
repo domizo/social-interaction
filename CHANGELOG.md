@@ -9,7 +9,7 @@
 - Move the comparison matrix to Guide → Motion reference and keep its exploratory controls, along with Icon catalog controls, local to each experiment; default the catalog to Assigned motions / 動きの比較をガイドへ移し、カタログとともに共有設定を書き換えない参照実験にする。カタログは設定したモーションから開始
 - Remove separate pending-dot markup and pseudo-element decoration; retain slower assigned glyph motion, busy/disabled semantics, duplicate-activation guards, and contextual status, including when reduced motion makes the glyph static / 独立した処理中の点の要素・疑似要素を除去し、割り当てたアイコンの反復・処理中の意味・重複防止・状況説明を維持。動き抑制時も意味を保つ
 - Preserve all 60 existing geometry/timing plans, including accepted Cartoon Comment/Repost behavior; retain local-only examples, explicit stylesheet installation, private archive distribution, and UNLICENSED status / 全60組の形状・時間配分、ローカルの例、CSS の明示的な導入、private アーカイブ、UNLICENSED を維持
-- Update EN/JA workflow, schema, motion, accessibility, and 0.6.0 archive instructions. Existing README screenshots remain explicitly labelled historical 0.5.0; fresh browser/CI evidence is recorded only after execution / 両言語の導線・設定・動き・アクセシビリティ・導入手順を更新。既存画像は0.5.0の記録と明記し、新しい検証結果は実行後だけ記録
+- Update EN/JA workflow, schema, motion, accessibility, and 0.6.0 archive instructions. Add reviewed 0.6.0 browser captures for drag ordering, mixed motion assignments and mobile context / 両言語の導線・設定・動き・アクセシビリティ・導入手順を更新。実ブラウザーで撮影・確認した並べ替え、個別モーション、モバイルの使用画面を追加
 
 ## 0.5.0 — 2026-10-12
 
