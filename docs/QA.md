@@ -6,12 +6,12 @@ Updated: 2026-10-12. Source checks, real-browser checks and hosted access are re
 
 The exact-commit release gate adds a shared labelled/icon-only setting without changing any accepted motion plan. Before deployment it must pass the [Quality workflow](https://github.com/domizo/social-interaction-lab/actions), including:
 
-- 237 unit/schema/lifecycle tests, strict types, clean tracked-source reconstruction and fresh package consumers
+- 240 unit/schema/lifecycle tests, strict types, clean tracked-source reconstruction and fresh package consumers
 - Ten generated EN/JA TSX consumers, including full-catalog icon-only modules using the actual archive and stylesheet
 - 138 native cases across Chromium desktop/mobile, WebKit desktop/mobile and Firefox; the new flows cover all three contexts, shared previews, legacy imports, preset reload, exported presentation, native keyboard focus, count descriptions and minimum 44 px targets
 - Actual icon-only generated modules at 390 px, EN/JA screenshots and no horizontal overflow
 
-The visible label and count are hidden together. Required accessible names remain stable; count descriptions merge with caller descriptions, and pending/status semantics remain available. Existing `showLabel={false}` remains label-only. Static screenshots establish layout only; the existing temporal regressions continue to establish motion. Actual Mac/iPhone, assistive-technology speech output and hosted authentication remain outside these automated checks.
+The visible label and count are hidden together. Required accessible names remain stable; count descriptions merge with caller descriptions, and pending/status semantics remain available. Existing `showLabel={false}` remains label-only. Static screenshots establish layout only; the existing temporal regressions continue to establish motion. Actual Mac/iPhone, assistive-technology speech output and hosted authentication remain outside these automated checks. Native elapsed-frame peak recognition permits a fixed 0.25 SVG-unit size difference (less than 0.3 CSS px at the maximum 28 px icon), independently checked against recorded WebKit frames; materially incomplete shapes are rejected. Deterministic formation, full canonical completion, descent, contact and rebound remain exact gates.
 
 表示だけを切り替え、保存した設定と生成コードにも引き継ぎます。旧形式の設定はラベル付きへ補完し、キーボード操作・読み上げ用の名前・処理中の状態・操作領域を維持します。上の件数はリリースの検証対象であり、正確なコミットの CI 結果を確認してから公開します。
 

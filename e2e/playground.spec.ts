@@ -1,4 +1,5 @@
 import {test,expect} from '@playwright/test';
+import {TOKEN_VERSION} from '../src/lib/tokens.js';
 test.beforeEach(async({page})=>{await page.goto('/');});
 test('responsive specimen and hit targets; EN and JA screenshots',async({page},info)=>{
  await expect(page.getByRole('heading',{level:1})).toBeVisible();
@@ -31,4 +32,4 @@ test('isolation and reduced motion reflect actual components',async({page})=>{
  await page.getByRole('button',{name:'Isolate a variable'}).click();await expect(page.getByRole('slider',{name:'Icon size',exact:true})).toBeDisabled();await page.getByRole('checkbox',{name:'Reduce motion',exact:true}).check();expect(await page.locator('.sil-action').first().evaluate(el=>getComputedStyle(el).transitionDuration)).toBe('0s');
  await page.getByRole('checkbox',{name:'Reduce motion',exact:true}).uncheck();await page.emulateMedia({reducedMotion:'reduce'});expect(await page.locator('.sil-action').first().evaluate(el=>getComputedStyle(el).transitionDuration)).toBe('0s');
 });
-test('exported archive downloads successfully',async({page})=>{const [download]=await Promise.all([page.waitForEvent('download'),page.locator('.header-actions a.export').click()]);expect(download.suggestedFilename()).toBe('social-interaction-lab-react-0.4.0.tgz');expect(await download.failure()).toBeNull();});
+test('exported archive downloads successfully',async({page})=>{const [download]=await Promise.all([page.waitForEvent('download'),page.locator('.header-actions a.export').click()]);expect(download.suggestedFilename()).toBe(`social-interaction-lab-react-${TOKEN_VERSION}.tgz`);expect(await download.failure()).toBeNull();});
