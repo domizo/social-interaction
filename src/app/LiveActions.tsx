@@ -55,6 +55,16 @@ export function LiveActions({variant,locale,tokens,actions,previewState,fail=fal
   },[actionKey]);
   useEffect(()=>{alive.current=true;return()=>{alive.current=false;requestGeneration.current.like++;requestGeneration.current.share++;};},[]);
   useEffect(()=>{if(!menu||!active.has('share'))return;const items=menuRef.current?.querySelectorAll<HTMLButtonElement>('button');items?.[menuStart.current==='last'?items.length-1:0]?.focus();const outside=(e:PointerEvent)=>{if(!menuRef.current?.contains(e.target as Node)&&!triggers.current.share?.contains(e.target as Node))setMenu(false);};document.addEventListener('pointerdown',outside);return()=>document.removeEventListener('pointerdown',outside);},[menu]);
+  // Reordered Share can occupy either edge of a narrow row. Keep the existing
+  // vertical anchor, but clamp the popup's horizontal bounds to the viewport.
+  useLayoutEffect(()=>{
+    const node=menuRef.current,anchor=triggers.current.share?.parentElement;
+    if(!menu||!node||!anchor||!active.has('share'))return;
+    const priorLeft=node.style.left,priorRight=node.style.right;let ownedLeft='';
+    const place=()=>{node.style.right='auto';node.style.left='0px';const width=node.getBoundingClientRect().width,x=anchor.getBoundingClientRect().left;ownedLeft=`${Math.max(8,Math.min(x,window.innerWidth-width-8))-x}px`;node.style.left=ownedLeft;};
+    place();window.addEventListener('resize',place);window.addEventListener('scroll',place,true);
+    return()=>{window.removeEventListener('resize',place);window.removeEventListener('scroll',place,true);if(node.style.left===ownedLeft)node.style.left=priorLeft;if(node.style.right==='auto')node.style.right=priorRight;};
+  },[menu,actionKey,presentation,locale,tokens,configured]);
   const menuKey=(e:KeyboardEvent)=>{const items=Array.from(menuRef.current?.querySelectorAll<HTMLButtonElement>('[role=menuitem]')??[]),i=items.indexOf(document.activeElement as HTMLButtonElement);if(['ArrowDown','ArrowUp','Home','End'].includes(e.key)){e.preventDefault();items[e.key==='Home'?0:e.key==='End'?items.length-1:(i+(e.key==='ArrowDown'?1:-1)+items.length)%items.length]?.focus();}else if(e.key==='Escape'){e.preventDefault();closeMenu();}else if(e.key==='Tab'){e.preventDefault();const all=Array.from(document.querySelectorAll<HTMLElement>('button:not([disabled]),a[href],input:not([disabled]),select:not([disabled]),textarea:not([disabled]),summary,[tabindex]')).filter(el=>!menuRef.current?.contains(el)&&isSequentiallyFocusable(el)).sort((a,b)=>(a.tabIndex>0?a.tabIndex:Infinity)-(b.tabIndex>0?b.tabIndex:Infinity));const idx=all.indexOf(triggers.current.share!);closeMenu(false);const target=all[idx+(e.shiftKey?-1:1)];(target??triggers.current.share)?.focus();}};
   const common={presentation,variant,tokens,previewState,iconMotion,motionTokens,reducedMotion};
   const closeComposer=()=>{setMode(null);focusTrigger(mode);};

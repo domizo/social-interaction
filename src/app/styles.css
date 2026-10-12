@@ -19,3 +19,12 @@
 .skip-link:not(:focus){clip-path:inset(50%);width:1px;height:1px;overflow:hidden;padding:0;border:0;white-space:nowrap}
 
 .icon-card .sil-action[data-presentation="icon-only"]{width:var(--sil-target,64px);min-height:var(--sil-target,64px)}.icon-card .sil-action[data-presentation="icon-only"] .sil-icon-wrap{margin-top:0}
+
+/* Shared custom labels can be up to 80 characters. Every chosen-action
+   specimen wraps them inside its own layout, without clipping glyph motion. */
+.live-actions,.live-actions .share-anchor,.live-actions .sil-action-bar{min-width:0;max-width:100%}
+:is(.live-actions,.motion-row,.state-row,.diff-preview) .sil-action{max-width:100%;white-space:normal}
+:is(.live-actions,.motion-row,.state-row,.diff-preview) .sil-content{min-width:0;max-width:100%}
+:is(.live-actions,.motion-row,.state-row,.diff-preview) .sil-label{min-width:0;white-space:normal;overflow-wrap:anywhere}
+:is(.live-actions,.motion-row,.state-row,.diff-preview) .sil-count{flex:none}
+.live-actions .action-feedback,.live-actions .feedback-item,.live-actions .saved-drafts,.composer h2{min-width:0;max-width:100%;overflow-wrap:anywhere}
