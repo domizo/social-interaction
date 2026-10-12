@@ -1,5 +1,6 @@
 import {test,expect} from '@playwright/test';
-test.beforeEach(async({page})=>{await page.goto('/');});
+import {visitStep} from './workflow-helpers.js';
+test.beforeEach(async({page})=>{await page.goto('/#animation');});
 test('all16 glyph treatments actually progress over time with fixed hit areas',async({page},info)=>{
  await page.getByRole('slider',{name:'Glyph duration',exact:true}).press('End');const samples=[];
  for(const motion of ['pulse','spring','trace','gesture'])for(const action of ['like','comment','share','quote']){
@@ -9,11 +10,11 @@ test('all16 glyph treatments actually progress over time with fixed hit areas',a
   const afterBox=await button.boundingBox();expect(afterBox!.width).toBeCloseTo(beforeBox!.width,3);expect(afterBox!.height).toBeCloseTo(beforeBox!.height,3);expect(afterBox!.height).toBeGreaterThanOrEqual(44);samples.push({motion,action,before,after});
  }
  await info.attach('glyph-animation-progress.json',{body:JSON.stringify(samples,null,2),contentType:'application/json'});
- await page.getByRole('button',{name:'Play all',exact:true}).click();for(const [index,delay] of [0,140,260].entries()){if(delay)await page.waitForTimeout(delay);await page.locator('.motion-lab').screenshot({path:info.outputPath(`glyph-frame-${index}.png`)});}
+ await page.getByRole('button',{name:'Play all',exact:true}).click();for(const [index,delay] of [0,140,260].entries()){if(delay)await page.waitForTimeout(delay);await page.locator('[data-step-panel=animation] .motion-lab').screenshot({path:info.outputPath(`glyph-frame-${index}.png`)});}
 });
 test('pending uses the glyph, keeps honest status, and cancellation stops it',async({page})=>{
- const context=page.locator('.context-section'),like=context.getByRole('button',{name:'Like',exact:true});await context.getByLabel('Response delay').selectOption('2500');await like.click();await expect(like).toHaveAttribute('aria-busy','true');await expect(like.locator('.sil-pending-mark')).toBeVisible();expect(await like.locator('svg').evaluate(svg=>svg.getAnimations({subtree:true}).some(a=>(a.effect as KeyframeEffect).getTiming().iterations===Infinity))).toBe(true);
- await page.getByRole('radio',{name:'Use in live actions: Trace',exact:true}).check();expect(await like.locator('svg').evaluate(svg=>svg.getAnimations({subtree:true}).every(a=>(a.effect as KeyframeEffect).target?.tagName==='path'))).toBe(true);
+ await page.getByRole('radio',{name:'Use in live actions: Trace',exact:true}).check();await visitStep(page,'preview');const context=page.locator('.context-section'),like=context.getByRole('button',{name:'Like',exact:true});await context.getByLabel('Response delay').selectOption('2500');await like.click();await expect(like).toHaveAttribute('aria-busy','true');await expect(like.locator('.sil-pending-mark')).toBeVisible();expect(await like.locator('svg').evaluate(svg=>svg.getAnimations({subtree:true}).some(a=>(a.effect as KeyframeEffect).getTiming().iterations===Infinity))).toBe(true);
+ expect(await like.locator('svg').evaluate(svg=>svg.getAnimations({subtree:true}).every(a=>(a.effect as KeyframeEffect).target?.tagName==='path'))).toBe(true);
  await context.getByRole('button',{name:'Cancel request',exact:true}).click();expect(await like.locator('svg').evaluate(svg=>svg.getAnimations({subtree:true}).length)).toBe(0);await expect(like).toHaveAttribute('aria-pressed','false');await expect(context.getByText('Request cancelled',{exact:true})).toBeVisible();
 });
 test('rapid replay owns trace cleanup; reduced motion preserves static state',async({page})=>{
@@ -24,12 +25,12 @@ test('rapid replay owns trace cleanup; reduced motion preserves static state',as
 test('zero duration and stop keep still glyphs and selectable variants',async({page})=>{
  await page.getByRole('slider',{name:'Glyph duration',exact:true}).press('Home');await page.getByRole('button',{name:'Play all',exact:true}).click();expect(await page.locator('.motion-matrix svg').evaluateAll(s=>s.flatMap(svg=>svg.getAnimations({subtree:true})).length)).toBe(0);
  await page.getByRole('slider',{name:'Glyph duration',exact:true}).press('End');await page.getByRole('button',{name:'Play all',exact:true}).click();await page.getByRole('button',{name:'Stop motion',exact:true}).click();expect(await page.locator('.motion-matrix svg').evaluateAll(s=>s.flatMap(svg=>svg.getAnimations({subtree:true})).length)).toBe(0);
- await page.getByRole('button',{name:'日本語',exact:true}).click();await expect(page.getByRole('heading',{name:'アイコンそのものを動かす。',exact:true})).toBeVisible();await page.getByRole('radio',{name:'実際の操作に使う: ジェスチャー',exact:true}).check();await expect(page.locator('.context-section [data-action="like"]')).toHaveAttribute('data-icon-motion','gesture');
+ await page.getByRole('button',{name:'日本語',exact:true}).click();await expect(page.getByRole('heading',{name:'アイコンそのものを動かす。',exact:true})).toBeVisible();await page.getByRole('radio',{name:'実際の操作に使う: ジェスチャー',exact:true}).check();await visitStep(page,'preview');await expect(page.locator('.context-section [data-action="like"]')).toHaveAttribute('data-icon-motion','gesture');
 });
 
 test('standalone reduced prop suppresses CSS movement and selected specimens stay filled',async({page})=>{
- await page.locator('input[name="preview"][value="selected"]').check();expect(await page.locator('.motion-lab>.section-title p').evaluate(el=>getComputedStyle(el).color)).toBe('rgb(100, 113, 129)');const selected=page.locator('.specimen [data-action="like"]').first();await expect(selected).toHaveAttribute('aria-pressed','false');expect(await selected.locator('svg').evaluate(el=>getComputedStyle(el).fill)).not.toBe('none');
- await page.getByRole('checkbox',{name:'Reduce glyph motion',exact:true}).check();const button=page.locator('[data-motion-row="spring"] [data-action="like"]');
+ expect(await page.locator('.motion-lab>.section-title p').first().evaluate(el=>getComputedStyle(el).color)).toBe('rgb(100, 113, 129)');await visitStep(page,'appearance');await page.locator('input[name="preview"][value="selected"]').check();const selected=page.locator('.specimen [data-action="like"]').first();await expect(selected).toHaveAttribute('aria-pressed','false');expect(await selected.locator('svg').evaluate(el=>getComputedStyle(el).fill)).not.toBe('none');
+ await visitStep(page,'animation');await page.getByRole('checkbox',{name:'Reduce glyph motion',exact:true}).check();const button=page.locator('[data-motion-row="spring"] [data-action="like"]');
  await expect(button).toHaveAttribute('data-reduced-motion','true');await button.evaluate(el=>{for(let p=el.parentElement;p;p=p.parentElement)p.removeAttribute('data-reduced-motion');el.setAttribute('data-preview','pressed');});await button.hover();
  expect(await button.evaluate(el=>getComputedStyle(el).transform)).toBe('none');expect(await button.locator('.sil-content').evaluate(el=>getComputedStyle(el).transform)).toBe('none');
 });

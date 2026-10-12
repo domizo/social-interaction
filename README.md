@@ -1,37 +1,40 @@
 # Social Interaction Lab
 
-**Choose how social actions look and feel in context, then take them into React.**
+**Find the right social actions for your interface, then take the working choices into React.**
 
-For developers and designers building feeds, article pages, and chat interfaces. Try the actions in sample screens, adjust their appearance and motion, save a configuration, and copy a React component that carries those choices into your application.
+For developers and designers building feeds, article pages, and chat interfaces. Choose icons, tune their appearance and motion, try them in context, and export a React component. Five focused tabs keep one shared configuration, so you can revisit any decision without starting over.
 
-[日本語](README.ja.md) · [Start locally](#start-locally) · [Use in React](#use-in-react)
+[日本語](README.ja.md) · [Five-step workflow](docs/STUDIO.md#five-step-workflow) · [Start locally](#start-locally) · [Use in React](#use-in-react)
 
-![Studio with a scripted chat preview beside shared appearance and motion controls](docs/screenshots/studio-context-desktop-en.png)
+![Earlier Studio context close-up showing a scripted chat preview and shared controls](docs/screenshots/studio-context-desktop-en.png)
 
-Use the same configuration across a feed, article footer, and scripted chat to judge how it fits each setting. This capture shows the context and appearance controls; the icon picker sits below them. [See the mobile Japanese preview](docs/screenshots/studio-context-mobile-ja.png). These are actual browser captures; still images do not demonstrate motion.
+This earlier browser capture shows the context preview, before the 0.5.0 step-tab layout. [The earlier mobile Japanese close-up](docs/screenshots/studio-context-mobile-ja.png) shows the same local fixture. Neither image shows the new navigation, and still images do not demonstrate motion.
 
 ## From a design choice to a React component
 
-1. **Choose a context and the actions you need.** Switch between the sample screens. In **Choose icons to test**, select 1–12 actions and use **Earlier / Later** to set their order. The chosen set and order carry through the context previews, style and motion comparisons, design lens, state specimens, presets, and generated code. The timeline lets you inspect an icon from that selection.
-2. **Tune it in place.** Adjust style, spacing, icon size, stroke, and motion while watching the preview. Switch between visible labels and icon-only presentation. Edit the EN/JA names in **Actions & labels**, then choose **Apply labels** before saving or exporting.
-3. **Keep a setup you can revisit.** Save a named preset in this browser, or download a configuration JSON to load later. The action order, both label languages, presentation, and visual and motion settings travel together.
-4. **Take the working starting point.** **Copy React** or **Download TSX** gives you a complete `SocialActions.tsx` module with the selected configuration, controlled toggles, local composers, a keyboard-operated sharing menu, and an optional `onCommand` callback. Install the package below and mount the generated component. If clipboard access fails, selectable source is shown.
+1. **Choose icons.** Select 1–12 actions and arrange them with **Earlier / Later**. The chosen order follows you through the other steps.
+2. **Appearance.** Compare styles and adjust spacing, icon size, stroke, color, and hit targets. Switch between visible labels and icon-only presentation.
+3. **Motion.** Compare the five motion treatments or choose `none`. Tune duration, intensity, and stagger, then pause, scrub, or step through a selected icon on the timeline.
+4. **In context.** Try the same actions in a feed, article footer, or scripted chat. Test the local toggles, composers, and sharing menu with the configuration you chose.
+5. **Export.** Edit the EN/JA names in **Actions & labels** and choose **Apply labels**, then save a named browser preset, download or import configuration JSON, and use **Copy React** or **Download TSX** to get `SocialActions.tsx`. Download the private package archive here, then install it in your application.
 
-The previews use local interactions and simulated requests. The chat response is scripted; no social-network or AI service is connected.
+These are freely revisitable tabs, not locked milestones. Each shows its own workspace instead of adding another section to a long page. Tab changes, browser Back/Forward, and language changes keep the configuration. A validated session draft restores the configuration, language, and appearance-isolation choices after reload when browser storage is available. Leaving a panel stops its motion and pending local work, invalidates unfinished file imports, and closes its popups; its local toggles and composer drafts remain available when you return during the mounted session.
+
+**Guide** is a separate reference area for explanations, the full icon catalog, async feedback, the design lens, and state specimens. The previews use local interactions and simulated requests. The chat response is fixed sample content; no social-network or AI service is connected.
 
 ## What you can explore
 
-### Find a composition that fits the screen
+### Build an action row for an article, feed, or chat
 
-Try a compact action row for an article or a more expressive set for a community feed. The design lens changes only spacing, icon size, or stroke width while holding the remaining configuration constant. Button bounds, icon-box centers, and same-row horizontal gaps help you see what changed. Match the two specimens' interaction states when comparing them; the overlays do not score visual quality or accessibility.
+Choose a compact icon-only set for an article, or compare labelled actions for a community feed. Check the same configuration in all three contexts before exporting. In **Guide → Design lens**, the lens changes only spacing, icon size, or stroke width while holding the remaining configuration constant. Match the two specimens' interaction states when comparing them. Its bounds and spacing overlays help explain differences; they do not score beauty or accessibility.
 
 ### Examine the moment a motion feels off
 
-Use the timeline to pause, scrub, slow down, and step through a selected icon's movement. It shares the activation motion engine, so you can inspect the actual animation plan rather than a separate approximation. Try a different duration or intensity, then return to the context preview. Reduced-motion preview keeps the icon static.
+In **Motion**, pause, scrub, slow down, and step through a selected icon's movement using the same engine as activation playback. Try another duration or intensity, then revisit **In context** without rebuilding the setup. Reduced-motion preview keeps the icon static. The accepted Comment/Repost motion and the other existing treatments are unchanged in 0.5.0.
 
-### Compare feedback before connecting a backend
+### Decide how to show a wait or failure before wiring a backend
 
-The async comparison focuses on **Like and Save**, independently of your selected action set. Compare an immediate optimistic update with an update after success, then try failure, retry, and cancellation. Displayed and confirmed values are shown separately so you can examine what the interface tells someone while a request is unresolved. These are local simulations, not a backend integration or performance benchmark.
+**Guide → Async states** compares immediate optimistic feedback with feedback after success for independent **Like and Save** examples. Try failure, retry, and cancellation, and compare displayed values with confirmed values. These are local simulations for discussing interface behavior, not a backend integration or performance benchmark.
 
 ## Start locally
 
@@ -42,7 +45,7 @@ npm ci
 npm run dev
 ```
 
-Open the local URL printed by Vite. No account or API key is required. To build the playground and the installable library:
+Open the local URL printed by Vite. The workflow starts at `#choose`; `#appearance`, `#animation`, `#preview`, `#export`, and `#guide` open the other workspaces directly. No account or API key is required. To build the playground and the installable library:
 
 ```sh
 npm run build
@@ -52,10 +55,10 @@ The build emits the playground in `dist/`, the ESM library in `package/`, and th
 
 ## Use in React
 
-Download `social-interaction-lab-react-0.4.2.tgz` from the playground, or create it with `npm run build:package`. Copy the archive into your separate React project, then install it there:
+Download `social-interaction-lab-react-0.5.0.tgz` from **Export**, or create it with `npm run build:package`. Copy the archive into your separate React project, then install it there:
 
 ```sh
-npm install ./social-interaction-lab-react-0.4.2.tgz
+npm install ./social-interaction-lab-react-0.5.0.tgz
 ```
 
 This is a private archive, not an npm registry release. React 18.2 or 19 is a peer dependency; the package is ESM-only. Styles must be explicitly imported.
@@ -92,9 +95,10 @@ The generated module includes local popup behavior. Individual CommentButton and
 ## Scope and saved data
 
 - **Application integration:** Generated code carries the chosen actions, order, labels, presentation, tokens, and motion. It does not export the Studio panels, sample article/chat content, timeline, or async comparison. `onCommand` is a synchronous notification callback; real requests, persistence, permissions, and error policy belong to your application.
-- **Local state:** Toggle values, drafts, and simulated request state last only for the mounted session and reset on reload. There are no accounts, analytics, social-network or AI connections, or posting.
-- **Reusable configuration:** Up to 20 named presets persist in this browser's localStorage until deleted or browser data is cleared. They are not cloud backup or automatic saving; choose a saved preset and load it after reloading. JSON import/export uses schema v1, is limited to 64 KB, and validates the entire input before applying it. Invalid input leaves the current configuration unchanged.
-- **Failure handling:** Storage errors are reported without claiming a save. Invalid stored data is left untouched until explicitly cleared. Clipboard failure reveals selectable source.
+- **Working configuration:** The shared action list/order, applied EN/JA labels, context, presentation, appearance, and motion survive navigation and language changes. A validated sessionStorage draft restores configuration, locale, and the appearance-isolation mode/variable on a same-tab reload when storage is available. Invalid or blocked storage uses defaults with a visible notice and is not automatically overwritten until a user edit. This draft is separate from named presets and does not sync across devices.
+- **Local interaction state:** Toggle values and composer drafts survive step changes while the panels remain mounted, but reset on reload. Leaving a panel cancels pending local work and motion, closes popups, and prevents an unfinished import from applying later. Unapplied label edits are not exported. There are no accounts, analytics, social-network or AI connections, or posting.
+- **Named presets and portable files:** Up to 20 named presets persist in this browser's localStorage until deleted or browser data is cleared. Saving a preset is explicit; subsequent slider edits do not overwrite it. Choose **Load** to apply one. JSON import/export uses schema v1, is limited to 64 KB, and validates the entire input before applying it. Invalid input leaves the current configuration unchanged.
+- **Failure handling:** Storage errors are reported without claiming a save. Invalid named-preset data is left untouched until explicitly cleared. Clipboard failure reveals selectable source. Keep a configuration JSON if you need a portable copy.
 - **Export boundaries:** Presets and exports retain the chosen action set, but not pressed toggle values, drafts, request state, or the manual reduced-motion preview switch. Generated components still honor the OS reduced-motion preference. Older schema-v1 presets/JSON without `presentation` load as labelled.
 
 See the [Studio guide](docs/STUDIO.md) for validation rules, export scope, and inspection workflows.
@@ -123,7 +127,7 @@ Existing `showLabel={false}` retains its original label-only behavior: in labell
 
 ### Animate the icons
 
-Choose `iconMotion="pulse"`, `"spring"`, `"trace"`, `"gesture"`, or `"cartoon"` independently of the visual style; `"none"` disables glyph motion. The Motion section compares the selected actions across five treatments, replays them together, and adjusts glyph duration, intensity, and part stagger. The Studio timeline inspects an icon from the selected set using `createGlyphTimeline` on an exclusively owned standalone `ActionIcon` SVG. Never attach it to an active `ActionButton` SVG. A separate 12-card catalog previews the selected treatment across every icon; those previews do not open popups or invoke a service. Select a treatment to use it in the live local interactions.
+Choose `iconMotion="pulse"`, `"spring"`, `"trace"`, `"gesture"`, or `"cartoon"` independently of the visual style; `"none"` disables glyph motion. The **Motion** tab compares the selected actions across five treatments, replays them together, and adjusts glyph duration, intensity, and part stagger. The Studio timeline inspects an icon from the selected set using `createGlyphTimeline` on an exclusively owned standalone `ActionIcon` SVG. Never attach it to an active `ActionButton` SVG. **Guide → Icon catalog** previews the selected treatment across every icon; those previews do not open popups or invoke a service. Select a treatment to use it in the live local interactions.
 
 ```tsx
 <LikeButton label="Like" selected={liked} iconMotion="cartoon"

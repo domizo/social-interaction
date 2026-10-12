@@ -22,14 +22,14 @@ function differentValue(variable: Variable, proposed: number | undefined, baseli
   return number(value);
 }
 
-function LensSpecimen({config, locale, reducedMotion, overlays, adjusted, variable}: {config: StudioConfig; locale: Locale; reducedMotion: boolean; overlays: Overlays; adjusted: boolean; variable: Variable}) {
+function LensSpecimen({config, locale, reducedMotion, overlays, adjusted, variable, active}: {active:boolean;config: StudioConfig; locale: Locale; reducedMotion: boolean; overlays: Overlays; adjusted: boolean; variable: Variable}) {
   const t = copy[locale], root = useRef<HTMLDivElement>(null), id = useId();
   const [measurement, setMeasurement] = useState<Measurements>({gaps: [], bounds: []});
   useLayoutEffect(() => {
-    const node = root.current; if (!node) return;
-    let active = true;
+    const node = root.current; if (!node || !active) return;
+    let alive = true;
     const measure = () => {
-      if (!active) return;
+      if (!alive) return;
       const frame = node.getBoundingClientRect();
       const rects = Array.from(node.querySelectorAll<HTMLButtonElement>('.sil-action-bar > .sil-action')).map(button => button.getBoundingClientRect()).filter(rect => rect.width > 0 && rect.height > 0);
       const gaps: Measurements['gaps'] = [];
@@ -47,13 +47,13 @@ function LensSpecimen({config, locale, reducedMotion, overlays, adjusted, variab
     for (const button of node.querySelectorAll('.sil-action')) observer?.observe(button);
     window.addEventListener('resize', measure);
     void document.fonts?.ready.then(measure);
-    return () => {active = false; observer?.disconnect(); window.removeEventListener('resize', measure);};
-  }, [config.tokens, config.actions, config.variant, config.presentation, locale]);
+    return () => {alive = false; observer?.disconnect(); window.removeEventListener('resize', measure);};
+  }, [config.tokens, config.actions, config.variant, config.presentation, locale, active]);
   const tokens = normalizeTokens(config.tokens);
   return <article className="lens-specimen" aria-labelledby={`${id}-title`} data-specimen={adjusted ? 'adjusted' : 'baseline'}>
     <div className="lens-specimen-heading"><div><p>{adjusted ? t.one : t.current}</p><h3 id={`${id}-title`}>{adjusted ? t.adjusted : t.baseline}</h3></div><span>{t[variable]} <strong>{tokens[variable]} {t.units}</strong></span></div>
     <div ref={root} className="lens-measurement-stage" data-lens-targets={overlays.targets || undefined} data-lens-centers={overlays.centers || undefined}>
-      <ConfiguredActions config={config} locale={locale} reducedMotion={reducedMotion} label={`${t.actions}: ${adjusted ? t.adjusted : t.baseline}`}/>
+      <ConfiguredActions active={active} config={config} locale={locale} reducedMotion={reducedMotion} label={`${t.actions}: ${adjusted ? t.adjusted : t.baseline}`}/>
       {overlays.spacing && <div className="lens-spacing-overlay" aria-hidden="true">{measurement.gaps.map((gap, index) => <i key={index} style={{left: gap.left, top: gap.top, width: gap.width, height: gap.height} as CSSProperties}/>)}</div>}
     </div>
     <dl className="lens-numbers">
@@ -68,7 +68,7 @@ function LensSpecimen({config, locale, reducedMotion, overlays, adjusted, variab
   </article>;
 }
 
-export function DesignLens({config, locale, reducedMotion}: {config: StudioConfig; locale: Locale; reducedMotion: boolean}) {
+export function DesignLens({config, locale, reducedMotion, active=true}: {active?:boolean;config: StudioConfig; locale: Locale; reducedMotion: boolean}) {
   const t = copy[locale], id = useId();
   const [variable, setVariable] = useState<Variable>('gap');
   const [values, setValues] = useState<Partial<Record<Variable, number>>>({});
@@ -97,7 +97,7 @@ export function DesignLens({config, locale, reducedMotion}: {config: StudioConfi
         }
       }}/></label></div>
     </div>
-    <div className="lens-comparison"><LensSpecimen config={baselineConfig} locale={locale} reducedMotion={reducedMotion} overlays={overlays} adjusted={false} variable={variable}/><LensSpecimen config={adjustedConfig} locale={locale} reducedMotion={reducedMotion} overlays={overlays} adjusted variable={variable}/></div>
+    <div className="lens-comparison"><LensSpecimen active={active} config={baselineConfig} locale={locale} reducedMotion={reducedMotion} overlays={overlays} adjusted={false} variable={variable}/><LensSpecimen active={active} config={adjustedConfig} locale={locale} reducedMotion={reducedMotion} overlays={overlays} adjusted variable={variable}/></div>
     <div className="lens-rationale"><span aria-hidden="true">↳</span><div><p>{t[`${variable}Why`]}</p><p>{t.invariant}</p></div></div>
     <p className="lens-caveat">{t.note}</p><p className="lens-local-note">{t.local}</p>
   </section>;

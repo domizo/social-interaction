@@ -1,10 +1,11 @@
 import {test,expect} from '@playwright/test';
+import {visitStep} from './workflow-helpers.js';
 import {TOKEN_VERSION} from '../src/lib/tokens.js';
-test.beforeEach(async({page})=>{await page.goto('/');});
+test.beforeEach(async({page})=>{await page.goto('/#preview');});
 test('responsive specimen and hit targets; EN and JA screenshots',async({page},info)=>{
  await expect(page.getByRole('heading',{level:1})).toBeVisible();
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
- for(const box of await page.locator('.sil-action').evaluateAll(buttons=>buttons.map(b=>{const r=b.getBoundingClientRect();return {w:r.width,h:r.height};}))){expect(box.w).toBeGreaterThanOrEqual(44);expect(box.h).toBeGreaterThanOrEqual(44);}
+ for(const box of await page.locator('.sil-action:visible').evaluateAll(buttons=>buttons.map(b=>{const r=b.getBoundingClientRect();return {w:r.width,h:r.height};}))){expect(box.w).toBeGreaterThanOrEqual(44);expect(box.h).toBeGreaterThanOrEqual(44);}
  await page.screenshot({path:info.outputPath('social-en.png'),fullPage:true});
  await page.getByRole('button',{name:'日本語',exact:true}).click();await expect(page.locator('html')).toHaveAttribute('lang','ja');
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
@@ -28,8 +29,8 @@ test('share keyboard navigation, tab and cancellation focus',async({page})=>{
  await context.getByLabel('Response delay').selectOption('2500');await share.click();await page.getByRole('menuitem',{name:'Prepare local share'}).click();await expect(share).toHaveAttribute('aria-busy','true');await context.getByRole('button',{name:'Cancel request'}).click();await expect(share).toBeFocused();
 });
 test('isolation and reduced motion reflect actual components',async({page})=>{
- await page.getByRole('slider',{name:'Spacing',exact:true}).press('End');expect(await page.locator('.specimen .sil-action-bar').first().evaluate(el=>getComputedStyle(el).gap)).toBe('28px');expect(await page.locator('.diff-preview .sil-action-bar').last().evaluate(el=>getComputedStyle(el).gap)).toBe('28px');
- await page.getByRole('button',{name:'Isolate a variable'}).click();await expect(page.getByRole('slider',{name:'Icon size',exact:true})).toBeDisabled();await page.getByRole('checkbox',{name:'Reduce motion',exact:true}).check();expect(await page.locator('.sil-action').first().evaluate(el=>getComputedStyle(el).transitionDuration)).toBe('0s');
- await page.getByRole('checkbox',{name:'Reduce motion',exact:true}).uncheck();await page.emulateMedia({reducedMotion:'reduce'});expect(await page.locator('.sil-action').first().evaluate(el=>getComputedStyle(el).transitionDuration)).toBe('0s');
+ await visitStep(page,'appearance');await page.getByRole('slider',{name:'Spacing',exact:true}).press('End');expect(await page.locator('.specimen .sil-action-bar').first().evaluate(el=>getComputedStyle(el).gap)).toBe('28px');expect(await page.locator('.diff-preview .sil-action-bar').last().evaluate(el=>getComputedStyle(el).gap)).toBe('28px');
+ await page.getByRole('button',{name:'Isolate a variable'}).click();await expect(page.getByRole('slider',{name:'Icon size',exact:true})).toBeDisabled();await page.getByRole('checkbox',{name:'Reduce preview motion',exact:true}).check();expect(await page.locator('[data-step-panel=appearance] .sil-action').first().evaluate(el=>getComputedStyle(el).transitionDuration)).toBe('0s');
+ await page.getByRole('checkbox',{name:'Reduce preview motion',exact:true}).uncheck();await page.emulateMedia({reducedMotion:'reduce'});expect(await page.locator('[data-step-panel=appearance] .sil-action').first().evaluate(el=>getComputedStyle(el).transitionDuration)).toBe('0s');
 });
-test('exported archive downloads successfully',async({page})=>{const [download]=await Promise.all([page.waitForEvent('download'),page.locator('.header-actions a.export').click()]);expect(download.suggestedFilename()).toBe(`social-interaction-lab-react-${TOKEN_VERSION}.tgz`);expect(await download.failure()).toBeNull();});
+test('exported archive downloads successfully',async({page})=>{await visitStep(page,'export');const [download]=await Promise.all([page.waitForEvent('download'),page.locator(`[data-step-panel=export] a[href$="social-interaction-lab-react-${TOKEN_VERSION}.tgz"]`).first().click()]);expect(download.suggestedFilename()).toBe(`social-interaction-lab-react-${TOKEN_VERSION}.tgz`);expect(await download.failure()).toBeNull();});

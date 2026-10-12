@@ -8,3 +8,10 @@ describe('default accent small-text contrast',()=>{
 });
 
 it('new motion helper text remains readable on white and control surfaces',()=>{const css=readFileSync('src/app/styles.css','utf8').split('.motion-lab{')[1];const colors=[...css.matchAll(/(?<![-\w])color:(#[0-9a-f]{6})/g)].map(m=>m[1]);expect(colors.length).toBeGreaterThan(3);for(const color of colors)for(const surface of ['#ffffff','#f5f6f8','#fbfcfd'])expect(contrastRatio(color,surface),`${color} on ${surface}`).toBeGreaterThanOrEqual(4.5);});
+
+it('workflow small text and tab numbers meet contrast on their actual surfaces',()=>{
+ const css=readFileSync('src/app/workflow.css','utf8');
+ const selectors=['.workflow-version','.export-summary li>code','.export-summary li:before'];
+ for(const selector of selectors){const body=css.slice(css.indexOf(selector+'{')).split('}')[0];const color=body.match(/(?<![-\w])color:(#[0-9a-f]{6})/)?.[1];expect(color).toBeTruthy();expect(contrastRatio(color!,'#ffffff')).toBeGreaterThanOrEqual(4.5);}
+ const number=css.slice(css.indexOf('.workflow-tab-number{')).split('}')[0];expect(number).not.toMatch(/opacity:/);expect(number).toContain('color:inherit');expect(contrastRatio('#586472','#ffffff')).toBeGreaterThanOrEqual(4.5);expect(contrastRatio('#ffffff','#282b2f')).toBeGreaterThanOrEqual(4.5);
+});

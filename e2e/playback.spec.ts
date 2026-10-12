@@ -1,4 +1,5 @@
 import {test,expect,type Locator} from '@playwright/test';
+import {visitStep} from './workflow-helpers.js';
 import {installMorphClock,freezeMorph,seekMorphTime,releaseMorph} from './morph-clock.js';
 const geometry=(b:Locator)=>b.locator('.sil-glyph').evaluate(g=>[...g.querySelectorAll<SVGPathElement>('path')].map(p=>{const box=p.getBBox(),point=p.getPointAtLength(p.getTotalLength()/2);return {groupStyle:g.getAttribute('style'),groupTransform:getComputedStyle(g).transform,d:p.getAttribute('d'),opacity:p.style.opacity,length:p.getTotalLength(),bbox:[box.x,box.y,box.width,box.height],point:[point.x,point.y]};}));
 test('engine diagnostic distinguishes legacy CSS d support from rendered movement',async({page},info)=>{
@@ -28,7 +29,7 @@ test('click and Play all change actual geometry and sampled pixels even when CSS
  await info.attach('actual-attribute-and-sampled-pixel-geometry.json',{body:JSON.stringify(evidence,null,2),contentType:'application/json'});
 });
 test('normal live Comment click opens its composer while its glyph animates',async({page},info)=>{
- await page.goto('/');await page.getByRole('slider',{name:'Glyph duration',exact:true}).press('End');
+ await page.goto('/#animation');await page.getByRole('slider',{name:'Glyph duration',exact:true}).press('End');await visitStep(page,'appearance');
  await page.evaluate(()=>{let frames=0,timers=0;const tick=()=>{frames++;requestAnimationFrame(tick);};requestAnimationFrame(tick);setInterval(()=>timers++,32);(window as unknown as {__heartbeat:()=>{frames:number;timers:number}}).__heartbeat=()=>({frames,timers});});
  const timing=()=>page.evaluate(()=>({time:performance.now(),visibility:document.visibilityState,focus:document.hasFocus(),...(window as unknown as {__heartbeat:()=>{frames:number;timers:number}}).__heartbeat()}));
  const b=page.locator('.specimen [data-action=comment]').first(),baseline=await geometry(b),start=await timing();await b.click();await expect(page.getByRole('dialog')).toBeVisible();await page.waitForTimeout(100);const before=await geometry(b),beforeTiming=await timing();await page.waitForTimeout(220);const after=await geometry(b),afterTiming=await timing();

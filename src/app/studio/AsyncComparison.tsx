@@ -1,4 +1,4 @@
-import {useId, useState} from 'react';
+import {useId, useLayoutEffect, useState} from 'react';
 import {ActionButton,type ActionPresentation} from '../../lib/ActionButton.js';
 import type {IconMotion, IconMotionTokens} from '../../lib/iconMotion.js';
 import type {SocialTokens, SocialVariant} from '../../lib/tokens.js';
@@ -13,6 +13,7 @@ export interface AsyncComparisonProps {
   locale: 'en' | 'ja';
   reducedMotion: boolean;
   presentation?: ActionPresentation;
+  active?: boolean;
 }
 
 const copy = {
@@ -74,8 +75,9 @@ interface TransactionExampleProps extends AsyncComparisonProps {
   delay: number;
 }
 
-function TransactionExample({policy, action, delay, locale, ...appearance}: TransactionExampleProps) {
+function TransactionExample({policy, action, delay, locale, active = true, ...appearance}: TransactionExampleProps) {
   const transaction = useToggleTransaction({policy, delay});
+  useLayoutEffect(() => {if (!active) transaction.cancel();}, [active, transaction.cancel]);
   const t = copy[locale];
   const id = useId();
   const label = action === 'like' ? t.like : t.save;
@@ -93,6 +95,8 @@ function TransactionExample({policy, action, delay, locale, ...appearance}: Tran
     <div className="async-example-top">
       <ActionButton
         {...appearance}
+        reducedMotion={appearance.reducedMotion || !active}
+        aria-disabled={!active || undefined}
         action={action}
         label={label}
         count={displayCount}
@@ -112,7 +116,7 @@ function TransactionExample({policy, action, delay, locale, ...appearance}: Tran
     <div className="async-example-controls">
       <label className="async-fail-control"><input type="checkbox" checked={transaction.failNext} onChange={event => transaction.setFailNext(event.target.checked)}/><span>{t.failNext}</span></label>
       <div className="async-recovery-controls">
-        <button type="button" aria-disabled={transaction.status !== 'error'} onClick={() => {void transaction.retry();}}>{t.retry}</button>
+        <button type="button" aria-disabled={transaction.status !== 'error'} onClick={() => {if (active) void transaction.retry();}}>{t.retry}</button>
         <button type="button" aria-disabled={!transaction.pending} onClick={() => {transaction.cancel();}}>{t.cancel}</button>
       </div>
     </div>
@@ -124,7 +128,7 @@ export function AsyncComparison(props: AsyncComparisonProps) {
   const [delay, setDelay] = useState(700);
   const id = useId();
   const t = copy[props.locale];
-  return <section className="async-comparison" aria-labelledby={`${id}-title`} data-reduced-motion={props.reducedMotion || undefined}>
+  return <section className="async-comparison" aria-labelledby={`${id}-title`} data-reduced-motion={props.reducedMotion || props.active === false || undefined}>
     <div className="async-comparison-heading">
       <div><span className="async-eyebrow">{props.locale === 'en' ? 'ASYNC BEHAVIOR' : '非同期の動作'}</span><h2 id={`${id}-title`}>{t.title}</h2><p>{t.intro}</p></div>
       <label className="async-latency-control">{t.latency}<select value={delay} onChange={event => setDelay(Number(event.target.value))} aria-describedby={`${id}-settings`}><option value={0}>0 ms</option><option value={700}>700 ms</option><option value={1800}>1800 ms</option></select></label>

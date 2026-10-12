@@ -2,7 +2,7 @@ import {useEffect, useLayoutEffect, useId, useMemo, useRef, useState} from 'reac
 import {generateReactUsage, MAX_CONFIG_BYTES, MAX_PRESETS, parsePresetCollection, parseStudioConfig, PRESET_STORAGE_KEY, serializePresets, type StudioConfig, type StudioPreset} from './config.js';
 import './config.css';
 
-type Props = {config: StudioConfig; onApply: (config: StudioConfig) => void; locale: 'en' | 'ja'};
+type Props = {config: StudioConfig; onApply: (config: StudioConfig) => void; locale: 'en' | 'ja'; active?: boolean};
 const copy = {
   en: {
     title: 'Make it yours', intro: 'Choose actions, save a setup, and take the complete React example with you.',
@@ -46,16 +46,21 @@ function downloadText(name: string, content: string, type: string) {
     document.body.appendChild(anchor); anchor.click(); anchor.remove();
   } finally { setTimeout(() => URL.revokeObjectURL(url), 1000); }
 }
-function readFile(file: File): Promise<string> {
+function readFile(file: File, signal: AbortSignal): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.onerror = () => reject(new Error('File could not be read'));
-    reader.onload = () => typeof reader.result === 'string' ? resolve(reader.result) : reject(new Error('Invalid file'));
-    reader.readAsText(file);
+    const cleanup = () => {signal.removeEventListener('abort', abort); reader.onload = null; reader.onerror = null; reader.onabort = null;};
+    const abort = () => {cleanup(); reader.abort(); reject(new DOMException('Cancelled', 'AbortError'));};
+    reader.onerror = () => {cleanup(); reject(new Error('File could not be read'));};
+    reader.onabort = () => {cleanup(); reject(new DOMException('Cancelled', 'AbortError'));};
+    reader.onload = () => {const result = reader.result; cleanup(); typeof result === 'string' ? resolve(result) : reject(new Error('Invalid file'));};
+    if (signal.aborted) {abort(); return;}
+    signal.addEventListener('abort', abort, {once: true});
+    try {reader.readAsText(file);} catch (problem) {cleanup(); reject(problem);}
   });
 }
 
-export function ConfigPanel({config, onApply, locale}: Props) {
+export function ConfigPanel({config, onApply, locale, active = true}: Props) {
   const t = copy[locale];
   const id = useId();
   const [presets, setPresets] = useState<StudioPreset[]>([]);
@@ -70,6 +75,9 @@ export function ConfigPanel({config, onApply, locale}: Props) {
   const [importing, setImporting] = useState(false);
   const codeField = useRef<HTMLTextAreaElement>(null);
   const importVersion = useRef(0);
+  const importOwner = useRef<AbortController | null>(null);
+  const visible = useRef(active);
+  const focusFrame = useRef<number | null>(null);
   const latestConfig = useRef(config);
   latestConfig.current = config;
   const generated = useMemo(() => generateReactUsage(config, locale), [config, locale]);
@@ -83,7 +91,11 @@ export function ConfigPanel({config, onApply, locale}: Props) {
     labelBase.current=config.actions;
   }, [config.actions]);
   // Invalidate old reads at commit, before a new read can start against this config.
-  useLayoutEffect(() => { importVersion.current++; setImporting(false); }, [config]);
+  useLayoutEffect(() => {
+    visible.current = active;
+    importVersion.current++; importOwner.current?.abort(); importOwner.current = null; setImporting(false);
+    if (focusFrame.current !== null) {cancelAnimationFrame(focusFrame.current); focusFrame.current = null;}
+  }, [config, active]);
   useEffect(() => {
     try {
       const stored = window.localStorage.getItem(PRESET_STORAGE_KEY);
@@ -92,13 +104,13 @@ export function ConfigPanel({config, onApply, locale}: Props) {
         catch { setStorageIssue('corrupt'); }
       }
     } catch { setStorageIssue('read'); }
-    return () => { importVersion.current++; };
+    return () => { visible.current = false; importVersion.current++; importOwner.current?.abort(); if (focusFrame.current !== null) cancelAnimationFrame(focusFrame.current); };
   }, []);
 
   const error = (text: string) => setNotice({kind: 'error', text});
   const success = (text: string) => setNotice({kind: 'status', text});
   function apply(next: StudioConfig, message?: string, resetDrafts=false) {
-    try { const parsed = parseStudioConfig(next); importVersion.current++; setImporting(false); if(resetDrafts){labelBase.current=parsed.actions;setLabels(parsed.actions);} onApply(parsed); if (message) success(message); else setNotice(null); }
+    try { const parsed = parseStudioConfig(next); importVersion.current++; importOwner.current?.abort(); importOwner.current = null; setImporting(false); if(resetDrafts){labelBase.current=parsed.actions;setLabels(parsed.actions);} onApply(parsed); if (message) success(message); else setNotice(null); }
     catch (problem) { error(`${t.validation}: ${detail(problem)}`); }
   }
   function savePreset() {
@@ -122,25 +134,30 @@ export function ConfigPanel({config, onApply, locale}: Props) {
     } catch { error(t.storageDelete); }
   }
   async function importFile(file: File | undefined) {
-    if (!file) return;
+    if (!file || !visible.current) return;
     const version = ++importVersion.current;
+    importOwner.current?.abort(); importOwner.current = null;
     const startingConfig = config;
     if (file.size > MAX_CONFIG_BYTES) { error(t.tooLarge); return; }
+    const owner = new AbortController(); importOwner.current = owner;
     setImporting(true);
     try {
-      const imported = parseStudioConfig(await readFile(file));
-      if (version !== importVersion.current || latestConfig.current !== startingConfig) return;
+      const imported = parseStudioConfig(await readFile(file, owner.signal));
+      if (!visible.current || owner.signal.aborted || version !== importVersion.current || latestConfig.current !== startingConfig) return;
       labelBase.current=imported.actions;setLabels(imported.actions);onApply(imported); success(t.imported);
     } catch (problem) { if (version === importVersion.current) error(`${t.invalid}: ${detail(problem)}`); }
-    finally { if (version === importVersion.current) setImporting(false); }
+    finally { if (version === importVersion.current) {importOwner.current = null; setImporting(false);} }
   }
   async function copyCode() {
+    if (!visible.current) return;
+    const version = importVersion.current;
     try {
       if (!navigator.clipboard?.writeText) throw new Error('Clipboard unavailable');
-      await navigator.clipboard.writeText(generated); success(t.copied);
+      await navigator.clipboard.writeText(generated); if (visible.current && version === importVersion.current) success(t.copied);
     } catch {
+      if (!visible.current || version !== importVersion.current) return;
       setShowCode(true); error(t.clipboard);
-      requestAnimationFrame(() => { codeField.current?.focus(); codeField.current?.select(); });
+      focusFrame.current = requestAnimationFrame(() => { focusFrame.current = null; if (visible.current && version === importVersion.current) {codeField.current?.focus(); codeField.current?.select();} });
     }
   }
   const chosen = presets.find(item => item.name === selectedPreset);

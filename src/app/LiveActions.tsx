@@ -31,18 +31,29 @@ function Composer({mode,label,locale,fail,delay,text,onText,onClose,onSaved,onSt
     </form>
   </dialog>;
 }
-export function LiveActions({variant,locale,tokens,actions,previewState,fail=false,delay=700,consumeFailure,compact=false,presentation='labelled',iconMotion='spring',motionTokens,reducedMotion=false}:{variant:SocialVariant;locale:Locale;tokens:SocialTokens;actions?:StudioConfig['actions'];previewState?:PreviewState;fail?:boolean;delay?:number;consumeFailure?:()=>void;compact?:boolean;presentation?:ActionPresentation;iconMotion?:IconMotion;motionTokens?:Partial<IconMotionTokens>;reducedMotion?:boolean}){
-  const t=words[locale],configured=actions??legacyActions.map(action=>({action,label:{en:words.en[action],ja:words.ja[action]}})),actionOrder=configured.map(item=>item.action),actionKey=actionOrder.join(','),active=new Set(actionOrder),label=(action:SocialAction)=>configured.find(item=>item.action===action)?.label[locale]??(legacyActions.includes(action as typeof legacyActions[number])?t[action as typeof legacyActions[number]]:action);
+export function LiveActions({variant,locale,tokens,actions,previewState,fail=false,delay=700,consumeFailure,compact=false,presentation='labelled',iconMotion='spring',motionTokens,reducedMotion=false,active=true}:{variant:SocialVariant;locale:Locale;tokens:SocialTokens;actions?:StudioConfig['actions'];previewState?:PreviewState;fail?:boolean;delay?:number;consumeFailure?:()=>void;compact?:boolean;presentation?:ActionPresentation;iconMotion?:IconMotion;motionTokens?:Partial<IconMotionTokens>;reducedMotion?:boolean;active?:boolean}){
+  const t=words[locale],configured=actions??legacyActions.map(action=>({action,label:{en:words.en[action],ja:words.ja[action]}})),actionOrder=configured.map(item=>item.action),actionKey=actionOrder.join(','),presentActions=new Set(actionOrder),label=(action:SocialAction)=>configured.find(item=>item.action===action)?.label[locale]??(legacyActions.includes(action as typeof legacyActions[number])?t[action as typeof legacyActions[number]]:action);
   const [liked,setLiked]=useState(false),[selected,setSelected]=useState<Partial<Record<SocialAction,boolean>>>({}),[comments,setComments]=useState(24),[mode,setMode]=useState<Mode|null>(null),[drafts,setDrafts]=useState<Record<Mode,string>>({comment:'',quote:''}),[menu,setMenu]=useState(false),[message,setMessage]=useState<Message|null>(null),[copyFallback,setCopyFallback]=useState(false),[saved,setSaved]=useState<{mode:Mode;text:string}[]>([]);
   const likeRequest=useAsyncAction<boolean>(),shareRequest=useAsyncAction<string>(),triggers=useRef<Partial<Record<SocialAction,HTMLButtonElement|null>>>({}),requestTrigger=useRef<SocialAction|null>(null),menuRef=useRef<HTMLDivElement>(null),menuStart=useRef<'first'|'last'>('first'),menuId=useId();
-  const enabled=useRef(active),previous=useRef(active),requestGeneration=useRef({like:0,share:0}),alive=useRef(true),lastFocus=useRef<HTMLElement|null>(null),commandCounts=useRef<Partial<Record<SocialAction,number>>>({});
-  const focusTrigger=(preferred?:SocialAction|null)=>{const target=preferred&&enabled.current.has(preferred)?triggers.current[preferred]:undefined;(target??actionOrder.map(action=>triggers.current[action]).find(node=>node?.isConnected))?.focus();};
+  const enabled=useRef(presentActions),previous=useRef(presentActions),requestGeneration=useRef({like:0,share:0}),alive=useRef(true),visible=useRef(active),lastFocus=useRef<HTMLElement|null>(null),commandCounts=useRef<Partial<Record<SocialAction,number>>>({});
+  const focusTrigger=(preferred?:SocialAction|null)=>{if(!visible.current)return;const target=preferred&&enabled.current.has(preferred)?triggers.current[preferred]:undefined;(target??actionOrder.map(action=>triggers.current[action]).find(node=>node?.isConnected))?.focus();};
   const closeMenu=(restore=true)=>{setMenu(false);if(restore)focusTrigger('share');};
+  // Retained panels keep durable values, but never retain transient request owners.
+  useLayoutEffect(()=>{
+    visible.current=active;
+    if(active)return;
+    requestGeneration.current.like++;requestGeneration.current.share++;
+    const wasPending=likeRequest.status==='pending'||shareRequest.status==='pending';
+    if(likeRequest.status==='pending')likeRequest.cancel();
+    if(shareRequest.status==='pending')shareRequest.cancel();
+    if(wasPending)setMessage({key:'cancelled'});
+    setMode(null);setMenu(false);requestTrigger.current=null;
+  },[active]);
   // Invalidate the removed owner's work before a settled promise can publish a late result.
   // Completed selections and per-action drafts remain local so re-adding an action restores them.
   useLayoutEffect(()=>{
-    enabled.current=active;
-    const removed=[...previous.current].filter(action=>!active.has(action));previous.current=active;
+    enabled.current=presentActions;
+    const removed=[...previous.current].filter(action=>!presentActions.has(action));previous.current=presentActions;
     if(!removed.length)return;
     if(removed.includes('like')){requestGeneration.current.like++;likeRequest.reset();}
     if(removed.includes('share')){requestGeneration.current.share++;shareRequest.reset();setCopyFallback(false);}
@@ -51,15 +62,15 @@ export function LiveActions({variant,locale,tokens,actions,previewState,fail=fal
     if(removedMenu)setMenu(false);
     setMessage(value=>value&&removed.includes('action' in value?value.action:value.owner!)?null:value);
     if(lastFocus.current&&!lastFocus.current.isConnected&&document.activeElement===document.body)focusTrigger();
-    if(requestTrigger.current&&removed.includes(requestTrigger.current))requestTrigger.current=active.has('like')&&likeRequest.status==='pending'?'like':active.has('share')&&shareRequest.status==='pending'?'share':null;
+    if(requestTrigger.current&&removed.includes(requestTrigger.current))requestTrigger.current=presentActions.has('like')&&likeRequest.status==='pending'?'like':presentActions.has('share')&&shareRequest.status==='pending'?'share':null;
   },[actionKey]);
   useEffect(()=>{alive.current=true;return()=>{alive.current=false;requestGeneration.current.like++;requestGeneration.current.share++;};},[]);
-  useEffect(()=>{if(!menu||!active.has('share'))return;const items=menuRef.current?.querySelectorAll<HTMLButtonElement>('button');items?.[menuStart.current==='last'?items.length-1:0]?.focus();const outside=(e:PointerEvent)=>{if(!menuRef.current?.contains(e.target as Node)&&!triggers.current.share?.contains(e.target as Node))setMenu(false);};document.addEventListener('pointerdown',outside);return()=>document.removeEventListener('pointerdown',outside);},[menu]);
+  useEffect(()=>{if(!active||!menu||!presentActions.has('share'))return;const items=menuRef.current?.querySelectorAll<HTMLButtonElement>('button');items?.[menuStart.current==='last'?items.length-1:0]?.focus();const outside=(e:PointerEvent)=>{if(!menuRef.current?.contains(e.target as Node)&&!triggers.current.share?.contains(e.target as Node))setMenu(false);};document.addEventListener('pointerdown',outside);return()=>document.removeEventListener('pointerdown',outside);},[menu,active]);
   // Reordered Share can occupy either edge of a narrow row. Keep the existing
   // vertical anchor, but clamp the popup's horizontal bounds to the viewport.
   useLayoutEffect(()=>{
     const node=menuRef.current,anchor=triggers.current.share?.parentElement;
-    if(!menu||!node||!anchor||!active.has('share'))return;
+    if(!active||!menu||!node||!anchor||!presentActions.has('share'))return;
     const priorLeft=node.style.left,priorRight=node.style.right;let ownedLeft='';
     const place=()=>{
       // Mobile innerWidth can include the temporary overflow of an unshifted popup.
@@ -71,31 +82,31 @@ export function LiveActions({variant,locale,tokens,actions,previewState,fail=fal
     };
     place();window.addEventListener('resize',place);window.addEventListener('scroll',place,true);
     return()=>{window.removeEventListener('resize',place);window.removeEventListener('scroll',place,true);if(node.style.left===ownedLeft)node.style.left=priorLeft;if(node.style.right==='auto')node.style.right=priorRight;};
-  },[menu,actionKey,presentation,locale,tokens,configured]);
+  },[menu,actionKey,presentation,locale,tokens,configured,active]);
   const menuKey=(e:KeyboardEvent)=>{const items=Array.from(menuRef.current?.querySelectorAll<HTMLButtonElement>('[role=menuitem]')??[]),i=items.indexOf(document.activeElement as HTMLButtonElement);if(['ArrowDown','ArrowUp','Home','End'].includes(e.key)){e.preventDefault();items[e.key==='Home'?0:e.key==='End'?items.length-1:(i+(e.key==='ArrowDown'?1:-1)+items.length)%items.length]?.focus();}else if(e.key==='Escape'){e.preventDefault();closeMenu();}else if(e.key==='Tab'){e.preventDefault();const all=Array.from(document.querySelectorAll<HTMLElement>('button:not([disabled]),a[href],input:not([disabled]),select:not([disabled]),textarea:not([disabled]),summary,[tabindex]')).filter(el=>!menuRef.current?.contains(el)&&isSequentiallyFocusable(el)).sort((a,b)=>(a.tabIndex>0?a.tabIndex:Infinity)-(b.tabIndex>0?b.tabIndex:Infinity));const idx=all.indexOf(triggers.current.share!);closeMenu(false);const target=all[idx+(e.shiftKey?-1:1)];(target??triggers.current.share)?.focus();}};
-  const common={presentation,variant,tokens,previewState,iconMotion,motionTokens,reducedMotion};
+  const common={presentation,variant,tokens,previewState,iconMotion,motionTokens,reducedMotion:reducedMotion||!active,'aria-disabled':!active||undefined};
   const closeComposer=()=>{setMode(null);focusTrigger(mode);};
-  const pending=active.has('like')&&likeRequest.status==='pending'||active.has('share')&&shareRequest.status==='pending';
+  const pending=presentActions.has('like')&&likeRequest.status==='pending'||presentActions.has('share')&&shareRequest.status==='pending';
   const localMessage=message&&('key' in message?t[message.key]:typeof message.selected==='boolean'?(locale==='en'?`${label(message.action)}: ${message.selected?'on':'off'} (local only)`:`${label(message.action)}：${message.selected?'オン':'オフ'}（ローカルのみ）`):(locale==='en'?`${label(message.action)} previewed locally (${message.count}). Nothing was posted, sent, or generated.`:`${label(message.action)}をローカルでプレビューしました（${message.count}回）。投稿・送信・生成は行いません。`));
   return <div className={`live-actions ${compact?'compact':''}`} onFocusCapture={event=>{lastFocus.current=event.target as HTMLElement;}} onBlurCapture={event=>{if(event.relatedTarget&&!event.currentTarget.contains(event.relatedTarget as Node))lastFocus.current=null;}}>
     <ActionBar label={locale==='en'?`${variant} post actions`:`${variant} 投稿の操作`} tokens={tokens}>
-      {configured.map(({action})=>action==='share'?<div className="share-anchor" key={action}><ActionButton {...common} action={action} ref={node=>{triggers.current.share=node;}} label={label(action)} aria-haspopup="menu" pending={shareRequest.status==='pending'} error={shareRequest.status==='error'} aria-expanded={menu} aria-controls={menu?menuId:undefined} onClick={()=>{menuStart.current='first';setMenu(v=>!v);}} onKeyDown={e=>{if((e.key==='ArrowDown'||e.key==='ArrowUp')&&shareRequest.status!=='pending'){e.preventDefault();menuStart.current=e.key==='ArrowUp'?'last':'first';setMenu(true);}}}/>
-        {menu&&<div id={menuId} ref={menuRef} role="menu" aria-label={label(action)} className="share-menu" onKeyDown={menuKey}>
-          <button type="button" role="menuitem" tabIndex={-1} onClick={async()=>{closeMenu();const generation=requestGeneration.current.share;try{await navigator.clipboard.writeText(demoLink);if(alive.current&&enabled.current.has('share')&&generation===requestGeneration.current.share)setMessage({key:'copied',owner:'share'});}catch{if(alive.current&&enabled.current.has('share')&&generation===requestGeneration.current.share){setCopyFallback(true);setMessage({key:'copyError',owner:'share'});}}}}>{t.copy}</button>
+      {configured.map(({action})=>action==='share'?<div className="share-anchor" key={action}><ActionButton {...common} action={action} ref={node=>{triggers.current.share=node;}} label={label(action)} aria-haspopup="menu" pending={shareRequest.status==='pending'} error={shareRequest.status==='error'} aria-expanded={menu} aria-controls={menu?menuId:undefined} onClick={()=>{menuStart.current='first';setMenu(v=>!v);}} onKeyDown={e=>{if(active&&(e.key==='ArrowDown'||e.key==='ArrowUp')&&shareRequest.status!=='pending'){e.preventDefault();menuStart.current=e.key==='ArrowUp'?'last':'first';setMenu(true);}}}/>
+        {active&&menu&&<div id={menuId} ref={menuRef} role="menu" aria-label={label(action)} className="share-menu" onKeyDown={menuKey}>
+          <button type="button" role="menuitem" tabIndex={-1} onClick={async()=>{closeMenu();const generation=requestGeneration.current.share;try{await navigator.clipboard.writeText(demoLink);if(alive.current&&visible.current&&enabled.current.has('share')&&generation===requestGeneration.current.share)setMessage({key:'copied',owner:'share'});}catch{if(alive.current&&visible.current&&enabled.current.has('share')&&generation===requestGeneration.current.share){setCopyFallback(true);setMessage({key:'copyError',owner:'share'});}}}}>{t.copy}</button>
           <button type="button" role="menuitem" tabIndex={-1} onClick={async()=>{closeMenu();requestTrigger.current='share';setMessage(null);consumeFailure?.();await shareRequest.run(signal=>simulateRequest('shared',{signal,delay,fail}));}}>{t.prepare}</button>
         </div>}</div>:<ActionButton {...common} key={action} action={action} ref={node=>{triggers.current[action]=node;}} label={label(action)} count={action==='like'?128+Number(liked):action==='comment'?comments:undefined} selected={action==='like'?liked:!!selected[action]} aria-haspopup={action==='comment'||action==='quote'?'dialog':undefined} pending={action==='like'&&likeRequest.status==='pending'} error={action==='like'&&likeRequest.status==='error'} onClick={async()=>{
-          if(action==='like'){requestTrigger.current='like';setMessage(null);consumeFailure?.();const generation=requestGeneration.current.like,result=await likeRequest.run(signal=>simulateRequest(!liked,{signal,delay,fail}));if(typeof result==='boolean'&&alive.current&&enabled.current.has('like')&&generation===requestGeneration.current.like)setLiked(result);}
+          if(action==='like'){requestTrigger.current='like';setMessage(null);consumeFailure?.();const generation=requestGeneration.current.like,result=await likeRequest.run(signal=>simulateRequest(!liked,{signal,delay,fail}));if(typeof result==='boolean'&&alive.current&&visible.current&&enabled.current.has('like')&&generation===requestGeneration.current.like)setLiked(result);}
           else if(action==='comment'||action==='quote')setMode(action);
           else if(isToggleAction(action)){const next=!selected[action];setSelected(value=>({...value,[action]:next}));setMessage({action,selected:next});}
           else {const count=(commandCounts.current[action]??0)+1;commandCounts.current[action]=count;setMessage({action,count});}
         }}/>) }
     </ActionBar>
-    {(active.has('like')&&likeRequest.status!=='idle'||active.has('share')&&shareRequest.status!=='idle'||message||copyFallback)&&<div className="action-feedback">
-      {active.has('like')&&likeRequest.status!=='idle'&&<div className="feedback-item"><span className="feedback-label">{label('like')}</span><span role="status">{likeRequest.status==='pending'?t.pending:likeRequest.status==='error'?t.retry:liked?t.liked:t.unliked}</span></div>}
-      {active.has('share')&&shareRequest.status!=='idle'&&<div className="feedback-item"><span className="feedback-label">{label('share')}</span><span role="status">{shareRequest.status==='pending'?t.pending:shareRequest.status==='error'?t.retry:t.prepared}</span></div>}
+    {(presentActions.has('like')&&likeRequest.status!=='idle'||presentActions.has('share')&&shareRequest.status!=='idle'||message||copyFallback)&&<div className="action-feedback">
+      {presentActions.has('like')&&likeRequest.status!=='idle'&&<div className="feedback-item"><span className="feedback-label">{label('like')}</span><span role="status">{likeRequest.status==='pending'?t.pending:likeRequest.status==='error'?t.retry:liked?t.liked:t.unliked}</span></div>}
+      {presentActions.has('share')&&shareRequest.status!=='idle'&&<div className="feedback-item"><span className="feedback-label">{label('share')}</span><span role="status">{shareRequest.status==='pending'?t.pending:shareRequest.status==='error'?t.retry:t.prepared}</span></div>}
       {localMessage&&<span role="status" aria-live="polite" aria-atomic="true">{localMessage}</span>}
-      {pending&&<button type="button" className="text-button" onClick={()=>{likeRequest.cancel();shareRequest.cancel();setMessage({key:'cancelled'});focusTrigger(requestTrigger.current);}}>{t.cancel}</button>}{copyFallback&&active.has('share')&&<input aria-label={t.copy} value={demoLink} readOnly onFocus={e=>e.currentTarget.select()}/>}</div>}
+      {pending&&<button type="button" className="text-button" onClick={()=>{likeRequest.cancel();shareRequest.cancel();setMessage({key:'cancelled'});focusTrigger(requestTrigger.current);}}>{t.cancel}</button>}{copyFallback&&presentActions.has('share')&&<input aria-label={t.copy} value={demoLink} readOnly onFocus={e=>e.currentTarget.select()}/>}</div>}
     {saved.length>0&&<details className="saved-drafts"><summary>{locale==='en'?`Saved locally (${saved.length})`:`ローカルに保存済み（${saved.length}）`}</summary>{saved.map((item,i)=><p key={i}><strong>{label(item.mode)}</strong> {item.text}</p>)}</details>}
-    {mode&&active.has(mode)&&<Composer key={mode} mode={mode} label={label(mode)} locale={locale} fail={fail} delay={delay} text={drafts[mode]} onText={text=>setDrafts(value=>({...value,[mode]:text}))} onStart={consumeFailure} onClose={closeComposer} onSaved={text=>{if(!enabled.current.has(mode))return;if(mode==='comment')setComments(n=>n+1);setSaved(values=>[...values,{mode,text}]);setDrafts(value=>({...value,[mode]:''}));setMessage({key:'saved',owner:mode});closeComposer();}}/>}
+    {active&&mode&&presentActions.has(mode)&&<Composer key={mode} mode={mode} label={label(mode)} locale={locale} fail={fail} delay={delay} text={drafts[mode]} onText={text=>setDrafts(value=>({...value,[mode]:text}))} onStart={consumeFailure} onClose={closeComposer} onSaved={text=>{if(!visible.current||!enabled.current.has(mode))return;if(mode==='comment')setComments(n=>n+1);setSaved(values=>[...values,{mode,text}]);setDrafts(value=>({...value,[mode]:''}));setMessage({key:'saved',owner:mode});closeComposer();}}/>}
   </div>;
 }

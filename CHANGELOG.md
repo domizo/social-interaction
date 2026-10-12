@@ -1,5 +1,15 @@
 # Changelog / 変更履歴
 
+## 0.5.0 — 2026-10-12
+
+- Replace the long workbench page with five freely revisitable tabs: Choose icons, Appearance, Motion, In context, and Export; move explanations, full catalog, async comparison, design lens, and state specimens into a separate Guide / 長い作業ページを自由に戻れる5つのタブへ整理し、説明・全カタログ・非同期比較・デザインレンズ・状態見本を独立したガイドへ移動
+- Share the chosen actions, order, applied EN/JA labels, presentation, context, appearance, and motion across steps, language changes, and browser Back/Forward; restore validated configuration, locale, and appearance-isolation choices from a separate sessionStorage working draft on reload, with defaults for legacy drafts that omit comparison choices / 操作・順序・適用済みラベル・表示・場面・見た目・動きを共有し、再読み込みでは検証済みの設定・言語・単変数比較の選択を復元し、比較項目がない旧形式には初期値を補完
+- Keep named localStorage presets as explicit snapshots; report invalid or unavailable session storage, use defaults, and avoid automatically overwriting the stored working draft before a user edit / 名前付きプリセットの明示的な保存を維持し、セッション保存領域の不正・利用不可を通知して初期値を使用。利用者の編集前は作業中の保存データを自動上書きしない
+- Retain inactive panels as hidden/inert; stop their motion, cancel pending local work, invalidate unfinished imports, and close popups while preserving mounted drafts and confirmed toggles / 非表示パネルは hidden/inert で保持し、動き・処理中の操作・未完了の読み込みを止めてポップアップを閉じ、下書きと確定済みトグルを維持
+- Add manual keyboard tab activation, Next/Back heading focus, direct routes, and legacy-fragment routing for existing bookmarks / キーボードでのタブ選択・確定、「次へ／戻る」の見出しフォーカス、直接リンクと旧リンクの移動先を整備
+- Update bilingual workflow, use cases, accessibility guidance, and private `social-interaction-lab-react-0.5.0.tgz` installation instructions; keep fresh screenshot and test evidence separate from historical captures/results / 両言語の導線・用途・アクセシビリティ・private アーカイブの導入手順を更新し、新しい画面と検証結果は過去の記録と区別
+- Preserve the existing 12-action selection and ordering, labelled/icon-only library API, accepted motion treatments including 0.3.8 Comment/Repost, local-only simulations, private metadata, and UNLICENSED distribution / 既存の12操作・並べ替え・表示 API・確定済みの動き・ローカル動作・private・UNLICENSED を維持
+
 ## 0.4.2 — 2026-10-12
 
 - Add a prominent EN/JA picker for 1–12 existing actions, with selected count, keyboard-operable Earlier/Later controls, retained reorder focus, and announced changes/boundaries / 既存の1〜12操作を選ぶ見つけやすいピッカー、選択数、キーボード対応の並べ替え、フォーカス維持、変更・境界の通知を追加

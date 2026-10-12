@@ -1,5 +1,12 @@
 # Verification record / 検証記録
 
+## 0.5.0 Step pages / ステップ別ページ
+
+The workflow now presents one active step at a time, with a separate Guide. The configured release gate includes 302 unit/schema/lifecycle tests, 12 generated React examples and 208 native cases across Chromium, WebKit and Firefox desktop/mobile projects. The exact source build must pass before private deployment.
+
+Checks cover manual keyboard tabs, Next/Back focus, browser history, initial/legacy hashes, session-draft restoration and storage failures, retained unsaved labels/preset/composer drafts, and inactive animation/request/import cleanup. Existing accepted glyph plans and strict native motion trajectories are unchanged. Only the active page is visible and accessible; retained inactive panels are hidden and inert.
+
+
 Updated: 2026-10-12. Source checks, real-browser checks and hosted access are reported separately.
 
 ## 0.4.2 Chosen action sets / 試す操作を選ぶ
