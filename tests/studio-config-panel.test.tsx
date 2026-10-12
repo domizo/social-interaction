@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useLayoutEffect, useState} from 'react';
 import {beforeEach, afterEach, describe, expect, it, vi} from 'vitest';
 import {act, fireEvent, render, screen, waitFor} from '@testing-library/react';
 import {ConfigPanel} from '../src/app/studio/ConfigPanel.js';
@@ -105,6 +105,25 @@ describe('preset and configuration UI', () => {
     await waitFor(() => expect(screen.getByRole('alert').textContent).toContain('Could not import'));
     expect(screen.getByTestId('gap').textContent).toBe('22'); expect(onApply).toHaveBeenCalledTimes(1);
     expect(screen.getByTestId('presentation').textContent).toBe('icon-only');
+  });
+  it('keeps a new import started against a just-committed configuration current', async () => {
+    const readers: FileReader[] = [];
+    vi.spyOn(FileReader.prototype, 'readAsText').mockImplementation(function(this: FileReader) { readers.push(this); });
+    const valid = {...fresh(), tokens: {...fresh().tokens, gap: 22}};
+    const invalid = {...valid, tokens: {...valid.tokens, gap: 999}};
+    function ImmediateNextImport() {
+      const [config, setConfig] = useState(fresh());
+      useLayoutEffect(() => { if (config.tokens.gap === 22) importFile(JSON.stringify(invalid)); }, [config]);
+      return <ConfigPanel config={config} locale="en" onApply={setConfig} />;
+    }
+    render(<ImmediateNextImport />); importFile(JSON.stringify(valid));
+    Object.defineProperty(readers[0], 'result', {value: JSON.stringify(valid)});
+    await act(async () => { readers[0].dispatchEvent(new ProgressEvent('load')); });
+    expect(readers).toHaveLength(2);
+    Object.defineProperty(readers[1], 'result', {value: JSON.stringify(invalid)});
+    await act(async () => { readers[1].dispatchEvent(new ProgressEvent('load')); });
+    expect(screen.getByRole('alert').textContent).toContain('Could not import');
+    expect((screen.getByLabelText('Import JSON') as HTMLInputElement).disabled).toBe(false);
   });
   it('imports legacy JSON as labelled and rejects unsupported presentation transactionally', async () => {
     const {onApply} = harness(vi.fn(), 'en', {...fresh(), presentation: 'icon-only'});

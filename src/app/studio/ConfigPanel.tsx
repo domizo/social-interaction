@@ -1,4 +1,4 @@
-import {useEffect, useId, useMemo, useRef, useState} from 'react';
+import {useEffect, useLayoutEffect, useId, useMemo, useRef, useState} from 'react';
 import {generateReactUsage, MAX_CONFIG_BYTES, MAX_PRESETS, parsePresetCollection, parseStudioConfig, PRESET_STORAGE_KEY, serializePresets, type StudioConfig, type StudioPreset} from './config.js';
 import './config.css';
 
@@ -82,8 +82,8 @@ export function ConfigPanel({config, onApply, locale}: Props) {
     }));
     labelBase.current=config.actions;
   }, [config.actions]);
-  // A later configuration choice wins over a slow file read.
-  useEffect(() => { importVersion.current++; setImporting(false); }, [config]);
+  // Invalidate old reads at commit, before a new read can start against this config.
+  useLayoutEffect(() => { importVersion.current++; setImporting(false); }, [config]);
   useEffect(() => {
     try {
       const stored = window.localStorage.getItem(PRESET_STORAGE_KEY);
