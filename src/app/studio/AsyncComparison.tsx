@@ -3,12 +3,14 @@ import {ActionButton,type ActionPresentation} from '../../lib/ActionButton.js';
 import type {IconMotion, IconMotionTokens} from '../../lib/iconMotion.js';
 import type {SocialTokens, SocialVariant} from '../../lib/tokens.js';
 import {useToggleTransaction, type TogglePolicy} from './useToggleTransaction.js';
+import {motionForAction, type StudioConfig} from './config.js';
 import './async.css';
 
 export interface AsyncComparisonProps {
   tokens: SocialTokens;
   variant: SocialVariant;
   iconMotion: IconMotion;
+  motionOverrides?: StudioConfig['motionOverrides'];
   motionTokens: IconMotionTokens;
   locale: 'en' | 'ja';
   reducedMotion: boolean;
@@ -75,7 +77,7 @@ interface TransactionExampleProps extends AsyncComparisonProps {
   delay: number;
 }
 
-function TransactionExample({policy, action, delay, locale, active = true, ...appearance}: TransactionExampleProps) {
+function TransactionExample({policy, action, delay, locale, active = true, motionOverrides = {}, ...appearance}: TransactionExampleProps) {
   const transaction = useToggleTransaction({policy, delay});
   useLayoutEffect(() => {if (!active) transaction.cancel();}, [active, transaction.cancel]);
   const t = copy[locale];
@@ -95,6 +97,7 @@ function TransactionExample({policy, action, delay, locale, active = true, ...ap
     <div className="async-example-top">
       <ActionButton
         {...appearance}
+        iconMotion={motionForAction({iconMotion: appearance.iconMotion, motionOverrides}, action)}
         reducedMotion={appearance.reducedMotion || !active}
         aria-disabled={!active || undefined}
         action={action}

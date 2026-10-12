@@ -1,7 +1,7 @@
 import {expect, type Page} from '@playwright/test';
 
 export type WorkflowStep = 'choose' | 'appearance' | 'animation' | 'preview' | 'export' | 'guide';
-export type GuideSection = 'catalog' | 'async' | 'design' | 'states';
+export type GuideSection = 'motion' | 'catalog' | 'async' | 'design' | 'states';
 
 /** Navigate the real workflow. Tests never expose inactive panels or bypass lifecycle cleanup. */
 export async function visitStep(page: Page, step: WorkflowStep) {
@@ -24,7 +24,8 @@ export async function visitSurface(page: Page, selector: string) {
   if (/icon-catalog|data-catalog-action/.test(selector)) return visitGuide(page, 'catalog');
   if (/#states/.test(selector)) return visitGuide(page, 'states');
   if (/studio-action-picker/.test(selector)) return visitStep(page, 'choose');
-  if (/timeline|motion-row|motion-matrix|#motion/.test(selector)) return visitStep(page, 'animation');
+  if (/motion-row|motion-matrix/.test(selector)) return visitGuide(page, 'motion');
+  if (/timeline|#motion/.test(selector)) return visitStep(page, 'animation');
   if (/studio-context|context-section|\.post/.test(selector)) return visitStep(page, 'preview');
   if (/studio-config/.test(selector)) return visitStep(page, 'export');
   return visitStep(page, 'appearance');

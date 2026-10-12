@@ -1,6 +1,6 @@
 # Glyph motion / アイコンの動き
 
-Version 0.3.8 refines only Cartoon Comment: the glyph rises while its existing circle-to-canonical contour inflates through the first 75% of the selected duration, reaching the exact full bubble at the peak. The final 25% is a fall, landing squash, mild rebound, and settle. Total duration is unchanged. Cartoon Repost retains its accepted original rectangular route and motion. Every treatment shares the canonical glyph at idle, completion, cancellation and reduced motion; Comment deliberately switches to its small circle immediately on activation. The portable SVG-attribute renderer and its existing watchdog remain in use. The catalog has 12 SVG icons and five treatments: `pulse`, `spring`, `trace`, `gesture`, and `cartoon`; `none` is the opt-out. Motion changes the glyph, a glyph part, or its drawn path; it never resizes the button hit target. These are design hypotheses to compare in context, not universal rules about what feels beautiful.
+The accepted 0.3.8 Cartoon Comment motion is retained in 0.6.0: the glyph rises while its existing circle-to-canonical contour inflates through the first 75% of the selected duration, reaching the exact full bubble at the peak. The final 25% is a fall, landing squash, mild rebound, and settle. Total duration is unchanged. Cartoon Repost retains its accepted original rectangular route and motion. Every treatment shares the canonical glyph at idle, completion, cancellation and reduced motion; Comment deliberately switches to its small circle immediately on activation. The portable SVG-attribute renderer and its existing watchdog remain in use. The catalog has 12 SVG icons and five treatments: `pulse`, `spring`, `trace`, `gesture`, and `cartoon`; `none` is the opt-out. Motion changes the glyph, a glyph part, or its drawn path; it never resizes the button hit target. These are design hypotheses to compare in context, not universal rules about what feels beautiful.
 
 | Treatment | Like | Comment | Share | Quote | Intended feel and tradeoff |
 |---|---|---|---|---|---|
@@ -11,6 +11,14 @@ Version 0.3.8 refines only Cartoon Comment: the glyph rises while its existing c
 | `cartoon` | Quiver + expanding, fading outline | Inflate while rising, then fall, squash, rebound, and settle | Arrow anticipation and launch | Exaggerated sequential marks | Anime/cartoon-inspired expression; larger overshoot and decorative effects demand more attention |
 
 pulse は統一感、spring は弾力、trace は線を描く印象、gesture は操作ごとの個性、cartoon はアニメ的な誇張を比較するための仮説です。ハートの震えと拡大して消える輪郭、小さな円から吹き出しへの連続的な成長などを実際の SVG で表現します。trace は線の一部が一時的に欠け、cartoon は装飾と大きめの変形で視線を集めるため、表示の小ささや情報密度に合わせて判断してください。
+
+## Assign motion in Studio / Studio で動きを割り当てる
+
+Use **Motion** to choose a global treatment and optional per-icon overrides. **Inherit global** or **Reset to global** removes an override; explicit `none` stays still independently of the global choice. Shared duration/intensity/stagger apply to all assignments. The selected-action previews and timeline resolve `motionOverrides[action] ?? iconMotion`; the timeline’s treatment is a readout, with assignment changes made above it. Live actions, contexts, async Like/Save examples, and generated React resolve the same way. Removing/re-adding an icon retains its override.
+
+Use **Guide → Motion reference** for the five-treatment matrix, and **Guide → Icon catalog** for all 12 icons. The catalog initially shows **Assigned motions** from the working configuration. Alternative catalog treatments and reference timing controls affect only their local experiment, never the shared configuration. These changes reorganize where choices are made; all 12 × 5 existing geometry/timing plans remain unchanged in 0.6.0.
+
+「動き」で全体と個別の動きを選びます。「全体に合わせる」「全体へ戻す」は個別指定を削除し、明示的な `none` は全体と無関係に静止します。時間・強さ・パーツの時間差は共通です。各プレビュー・実操作・各場面・非同期・時間軸・生成 React は同じ規則で動きを決定し、操作を外して再追加しても個別指定を保持します。時間軸の割り当ては読み取り専用で、上の設定から変更します。「ガイド → 動きの比較」の5表現と「アイコン一覧」の全12操作は参照実験です。カタログの初期値は「設定したモーション」で、別の動きや時間を試しても共有設定は変えません。0.6.0 では全60組の形状と時間配分を維持します。
 
 ## Cartoon catalog / カートゥーンの操作一覧
 
@@ -92,13 +100,13 @@ Compatible command lists follow the [SVG path interpolation rules](https://www.w
 
 OS の `prefers-reduced-motion: reduce` は手動設定より優先されます。`motionTrigger` の変更は動きの再生だけで、いいねの状態や非同期処理を変更しません。`duration` / `intensity` が 0 の場合は静止します。不正な数値は初期値に戻し、有限な範囲外の値はクランプします。`stagger` は時間差を使うパーツ・装飾・線の間の遅延で、全体の所要時間に加算されます。
 
-`tokensToDTCG(visualTokens, motionTokens)` includes the versioned `iconMotion` duration/intensity/stagger group. Visual `duration` still controls CSS state transitions; it is deliberately separate from glyph duration. DTCG 2025.10 is a Community Group specification, not a W3C Recommendation.
+`tokensToDTCG(visualTokens, motionTokens)` includes the versioned `iconMotion` duration/intensity/stagger group. Visual `tokens.duration` controls button-surface CSS transitions and `tokens.amplitude` controls press depth; both live under Appearance → Surface hover & press feedback. They are separate from glyph duration/intensity and do not change an icon’s assigned treatment. DTCG 2025.10 is a Community Group specification, not a W3C Recommendation.
 
 ## Activation, pending, completion / 操作・処理中・完了
 
-Activation feedback runs once and does **not** claim success. When `pending` is true, the chosen glyph repeats at lower spatial intensity and a slower period (at least 1100 ms). Cartoon secondary burst effects are suppressed while pending, so the loop does not repeatedly celebrate an unfinished action. Static `···`, `aria-busy`, and contextual live status carry the pending state. Reduced motion and browsers without Web Animations still retain those static cues. There is no rotating ring.
+Activation feedback runs once and does **not** claim success. When `pending` is true, the chosen glyph repeats at lower spatial intensity and a slower period (at least 1100 ms). Cartoon secondary burst effects are suppressed while pending, so the loop does not repeatedly celebrate an unfinished action. `aria-busy`, `aria-disabled`, duplicate-activation guards, and contextual live status carry the pending state independently of animation. There is no separate pending-dot span, pending-dot pseudo-element, or rotating ring. With reduced/unsupported motion, `none`, or zero motion tokens, the glyph can stay static while the busy semantics, guards, and contextual status remain. The application owns result/error text and retry controls.
 
-開始時の動きは成功の通知ではありません。処理中はゆっくり反復し、cartoon の追加バーストを抑え、静止した点・`aria-busy`・状況説明も残します。完了や失敗の意味は、利用側の結果・エラー表示で伝えてください。`pending` を false に戻すと反復は止まり、勝手に成功アニメーションを再生しません。
+開始時の動きは成功の通知ではありません。処理中はゆっくり反復し、cartoon の追加バーストを抑え、`aria-busy`・`aria-disabled`・重複操作防止・状況説明を維持します。独立した点の要素や疑似要素はありません。動き抑制・再生非対応・`none`・時間や強さが0の場合も、静止したまま処理中の意味と操作防止を維持します。完了や失敗の意味は、利用側の結果・エラー表示で伝えてください。`pending` を false に戻すと反復は止まり、勝手に成功アニメーションを再生しません。
 
 Reactivation, trigger changes, settings changes, reduced-motion changes, cancellation and unmount cancel the prior animation set. Each replay owns its trace and decorative-effect cleanup, so an old cancelled promise cannot erase the next replay's styling. Reduced motion leaves no lingering outline burst or other secondary effect. Animation never schedules or mutates a request. Continue to use `useAsyncAction` for async cancellation and stale-result ownership.
 

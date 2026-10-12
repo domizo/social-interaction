@@ -17,7 +17,7 @@
 .studio-action-picker h4 { margin:0; font-size:12px; font-weight:650; }
 .studio-action-picker .action-picker-order-heading>span { color:#596574; font-size:10px; }
 .studio-action-picker .action-picker-order { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,270px),1fr)); gap:6px 12px; min-width:0; list-style:none; padding:0; margin:0; }
-.studio-action-picker .action-picker-order li { display:flex; align-items:center; justify-content:space-between; gap:8px; min-width:0; padding:3px 0; border-bottom:1px solid #edf0f3; }
+.studio-action-picker .action-picker-order li { display:flex; align-items:center; justify-content:space-between; gap:8px; min-width:0; padding:3px 4px 3px 0; border:1px solid transparent; border-bottom-color:#edf0f3; border-radius:6px; }
 .studio-action-picker .action-picker-ordered-name { display:flex; align-items:center; gap:8px; min-width:0; font-size:12px; line-height:1.5; }
 .studio-action-picker .action-picker-position { flex:none; width:18px; color:#596574; font:10px/1.5 'IBM Plex Mono',monospace; text-align:center; }
 .studio-action-picker .action-picker-move { display:flex; gap:4px; flex:none; }
@@ -32,3 +32,17 @@
 @media(max-width:600px) { .studio-action-picker { padding:16px; } .studio-action-picker .action-picker-ordered-name { gap:6px; } }
 @media(max-width:430px) { .studio-action-picker .action-picker-options { grid-template-columns:repeat(2,minmax(0,1fr)); } }
 @media(forced-colors:active) { .studio-action-picker .action-picker-option[data-included=true] { border-color:Highlight; } .studio-action-picker .action-picker-move button[aria-disabled=true] { color:GrayText; } }
+
+.studio-action-picker .action-picker-drag-handle { display:inline-flex; align-items:center; justify-content:center; flex:none; width:44px; height:44px; padding:0; border:1px solid #dfe4e8; border-radius:6px; color:#596574; background:#fafbfc; cursor:grab; touch-action:none; user-select:none; -webkit-user-select:none; }
+.studio-action-picker .action-picker-drag-handle:hover:not([aria-disabled=true]) { border-color:#657384; background:#f1f3f6; }
+.studio-action-picker .action-picker-drag-handle:focus-visible { outline:2px solid #285ab0; outline-offset:2px; }
+.studio-action-picker .action-picker-drag-handle[aria-disabled=true] { cursor:default; color:#697381; background:#f6f7f8; }
+.studio-action-picker .action-picker-order[data-reordering=true] { user-select:none; -webkit-user-select:none; }
+.studio-action-picker .action-picker-order li[data-dragging=true] { border-color:#b93240; background:#fff3f4; box-shadow:0 0 0 1px #b9324020; }
+.studio-action-picker .action-picker-order li[data-dragging=true] .action-picker-drag-handle { color:#812731; border-color:#c35a64; background:#fff; cursor:grabbing; }
+.studio-action-picker .action-picker-alternative { margin-top:10px; color:#596574; font-size:11px; }
+.studio-action-picker .action-picker-alternative summary { min-height:44px; align-content:center; cursor:pointer; text-decoration:underline; text-underline-offset:3px; }
+.studio-action-picker .action-picker-alternative summary:focus-visible { outline:2px solid #285ab0; outline-offset:2px; border-radius:4px; }
+.studio-action-picker .action-picker-alternative-controls { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,270px),1fr)); gap:6px 12px; }
+.studio-action-picker .action-picker-alternative-row { display:flex; align-items:center; justify-content:space-between; gap:8px; min-width:0; padding-block:3px; border-bottom:1px solid #edf0f3; }
+@media(forced-colors:active) { .studio-action-picker .action-picker-order li[data-dragging=true] { border:2px solid Highlight; } .studio-action-picker .action-picker-drag-handle[aria-disabled=true] { color:GrayText; } }

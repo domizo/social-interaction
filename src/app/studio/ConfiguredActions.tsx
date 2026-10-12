@@ -1,6 +1,6 @@
 import {useEffect, useLayoutEffect, useId, useRef, useState, type KeyboardEvent} from 'react';
 import {ActionBar, ActionButton, isToggleAction, type SocialAction} from '../../lib/index.js';
-import type {StudioConfig} from './config.js';
+import {motionForAction, type StudioConfig} from './config.js';
 
 type Locale = 'en' | 'ja';
 type ComposerMode = 'comment' | 'quote';
@@ -104,7 +104,7 @@ export function ConfiguredActions({config, locale, reducedMotion, label, active 
     <ActionBar tokens={config.tokens} label={label ?? t.actions}>
       {config.actions.map(item => {
         const action = item.action;
-        return <ActionButton key={action} action={action} label={item.label[locale]} presentation={config.presentation} variant={config.variant} tokens={config.tokens} iconMotion={config.iconMotion} motionTokens={config.motionTokens} reducedMotion={reducedMotion || !active} aria-disabled={!active || undefined}
+        return <ActionButton key={action} action={action} label={item.label[locale]} presentation={config.presentation} variant={config.variant} tokens={config.tokens} iconMotion={motionForAction(config, action)} motionTokens={config.motionTokens} reducedMotion={reducedMotion || !active} aria-disabled={!active || undefined}
           selected={!!selected[action]} ref={action === 'share' ? share : undefined}
           aria-haspopup={action === 'share' ? 'menu' : action === 'comment' || action === 'quote' ? 'dialog' : undefined}
           aria-expanded={action === 'share' ? menuOpen : undefined} aria-controls={action === 'share' && menuOpen ? menuId : undefined}

@@ -9,6 +9,7 @@ export type StudioConfig = {
   actions: Array<{action: SocialAction; label: {en: string; ja: string}}>;
   tokens: SocialTokens;
   iconMotion: IconMotion;
+  motionOverrides: Partial<Record<SocialAction, IconMotion>>;
   motionTokens: IconMotionTokens;
 };
 export const MAX_CONFIG_BYTES = 64 * 1024;
@@ -24,8 +25,16 @@ export const defaultStudioConfig: StudioConfig = {
   actions: (['like', 'comment', 'share', 'quote'] as const).map(action => ({action, label: {...actionLabels[action]}})),
   tokens: {...defaultTokens},
   iconMotion: 'cartoon',
+  motionOverrides: {},
   motionTokens: {...defaultMotionTokens},
 };
+
+/** Missing action entries inherit the global treatment; explicit `none` remains an override. */
+export function motionForAction(config: {iconMotion: IconMotion; motionOverrides?: StudioConfig['motionOverrides']}, action: SocialAction): IconMotion {
+  return config.motionOverrides?.[action] ?? config.iconMotion;
+}
+
+const supportedMotions = ['none', 'pulse', 'spring', 'trace', 'gesture', 'cartoon'] as const;
 
 export class StudioConfigError extends Error {
   constructor(message: string) { super(message); this.name = 'StudioConfigError'; }
@@ -87,7 +96,7 @@ function dataArray(input: unknown, min: number, max: number, path: string): unkn
 
 /** Strict, transactional import: returns a fresh validated object, or throws without changing the input. */
 export function parseStudioConfig(input: unknown): StudioConfig {
-  const root = object(jsonInput(input, 'config'), ['schemaVersion', 'context', 'variant', 'actions', 'tokens', 'iconMotion', 'motionTokens'], 'config', ['presentation']);
+  const root = object(jsonInput(input, 'config'), ['schemaVersion', 'context', 'variant', 'actions', 'tokens', 'iconMotion', 'motionTokens'], 'config', ['presentation', 'motionOverrides']);
   if (root.schemaVersion !== 1) fail('schemaVersion', 'only version 1 is supported');
   const seen = new Set<string>();
   const actions = dataArray(root.actions, 1, 12, 'actions').map((entry, index) => {
@@ -106,6 +115,14 @@ export function parseStudioConfig(input: unknown): StudioConfig {
   }
   if (typeof rawTokens.accent !== 'string' || !/^#[\da-f]{6}$/i.test(rawTokens.accent)) fail('tokens.accent', 'expected a six-digit hex color');
   const motion = object(root.motionTokens, ['duration', 'intensity', 'stagger'], 'motionTokens');
+  const motionOverrides: StudioConfig['motionOverrides'] = {};
+  if (Object.hasOwn(root, 'motionOverrides')) {
+    const overrides = object(root.motionOverrides, [], 'motionOverrides', socialActions);
+    // Preserve known overrides even when their actions are temporarily absent from the preview.
+    for (const action of socialActions) {
+      if (Object.hasOwn(overrides, action)) motionOverrides[action] = choice(overrides[action], supportedMotions, `motionOverrides.${action}`);
+    }
+  }
   const result: StudioConfig = {
     schemaVersion: 1,
     context: choice(root.context, ['feed', 'article', 'chat'], 'context'),
@@ -113,7 +130,8 @@ export function parseStudioConfig(input: unknown): StudioConfig {
     presentation: Object.hasOwn(root, 'presentation') ? choice(root.presentation, ['labelled', 'icon-only'], 'presentation') : 'labelled',
     actions,
     tokens: {...numericTokens, accent: rawTokens.accent},
-    iconMotion: choice(root.iconMotion, ['none', 'pulse', 'spring', 'trace', 'gesture', 'cartoon'], 'iconMotion'),
+    iconMotion: choice(root.iconMotion, supportedMotions, 'iconMotion'),
+    motionOverrides,
     motionTokens: {
       duration: number(motion.duration, 0, 1600, 'motionTokens.duration'),
       intensity: number(motion.intensity, 0, 2, 'motionTokens.intensity'),
@@ -170,13 +188,14 @@ export function generateReactUsage(input: StudioConfig, locale: 'en' | 'ja'): st
 // Configuration, presentation, and accessible labels are exported; transient selections and activity start fresh.
 // Manual reduced-motion preview is not exported; ActionButton honors the device OS preference.
 import {useEffect, useId, useRef, useState} from 'react';
-import {ActionBar, ActionButton, isToggleAction, type SocialAction} from '@social-interaction-lab/react';
+import {ActionBar, ActionButton, isToggleAction, type SocialAction, type IconMotion} from '@social-interaction-lab/react';
 import '@social-interaction-lab/react/styles.css';
 
 export const studioConfig = ${literal(config)} as const;
 const locale = ${literal(locale)} as const;
 const words = ${literal(text)};
 const configuredActions: ReadonlyArray<{action: SocialAction; label: {readonly en: string; readonly ja: string}}> = studioConfig.actions;
+const motionOverrides: Partial<Record<SocialAction, IconMotion>> = studioConfig.motionOverrides;
 export type StudioCommand = {action: SocialAction; selected?: boolean; text?: string; destination?: 'local' | 'clipboard'};
 export type SocialActionsProps = {onCommand?: (command: StudioCommand) => void};
 
@@ -238,7 +257,7 @@ export default function SocialActions({onCommand}: SocialActionsProps = {}) {
         key={item.action} action={item.action} label={item.label[locale]}
         variant={studioConfig.variant} presentation={studioConfig.presentation} tokens={studioConfig.tokens}
         style={{maxWidth: '100%', boxSizing: 'border-box', whiteSpace: 'normal', overflowWrap: 'anywhere'}}
-        iconMotion={studioConfig.iconMotion} motionTokens={studioConfig.motionTokens}
+        iconMotion={motionOverrides[item.action] ?? studioConfig.iconMotion} motionTokens={studioConfig.motionTokens}
         selected={isToggleAction(item.action) ? !!selected[item.action] : undefined}
         aria-haspopup={item.action === 'share' ? 'menu' : undefined}
         aria-expanded={item.action === 'share' ? shareOpen : ['comment', 'quote', 'send'].includes(item.action) ? composer === item.action : undefined}

@@ -28,7 +28,8 @@ describe('visible Studio action picker', () => {
     expect(checked().map(input => (input.closest('label')?.textContent))).toEqual(['Like', 'Comment', 'Share', 'Quote']);
     expect(ordered()).toEqual(['like', 'comment', 'share', 'quote']);
     expect(screen.getByText('4 / 12 selected')).toBeTruthy();
-    expect(container.querySelector('details')).toBeNull();
+    expect(container.querySelector('details')?.open).toBe(false);
+    expect(screen.getAllByRole('button', {name: /^Reorder /})).toHaveLength(4);
     expect(onChange).not.toHaveBeenCalled();
   });
 
@@ -101,6 +102,7 @@ describe('visible Studio action picker', () => {
     const initial = fresh();
     initial.actions[1].label = {en: 'Discuss', ja: '話し合う'};
     const {onChange} = harness(initial, locale);
+    await user.click(screen.getByText(locale === 'en' ? 'Reorder without dragging' : 'ドラッグせずに並べ替える'));
     const earlier = screen.getByRole('button', {name: locale === 'en' ? 'Move Comment earlier' : 'コメントを前へ'});
     earlier.focus();
     await user.keyboard('{Enter}');

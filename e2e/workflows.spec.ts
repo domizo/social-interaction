@@ -112,10 +112,10 @@ test('one configuration survives all steps locale history and a reload without a
   await page.locator('.studio-action-picker').getByRole('checkbox', {name: 'Save', exact: true}).check();
   await visitStep(page, 'appearance');
   await page.getByRole('combobox', {name: 'Studio visual style', exact: true}).selectOption('soft');
-  await setRange(page.getByRole('slider', {name: 'Studio Spacing', exact: true}), 22);
+  await setRange(page.getByRole('slider', {name: 'Spacing', exact: true}), 22);
   await page.getByRole('combobox', {name: 'Button presentation', exact: true}).selectOption('icon-only');
   await visitStep(page, 'animation');
-  await page.getByRole('radio', {name: 'Use in live actions: Trace', exact: true}).check();
+  await page.locator('#motion-settings').getByRole('combobox', {name: 'Global motion', exact: true}).selectOption('trace');
   await setRange(page.getByRole('slider', {name: 'Glyph duration', exact: true}), 1000);
   await visitStep(page, 'preview');
   await page.locator('.studio-context').getByRole('button', {name: 'AI chat', exact: true}).click();
@@ -133,32 +133,32 @@ test('one configuration survives all steps locale history and a reload without a
   await page.reload();
   await onlyActive(page, 'export');
   await expect(page.locator('html')).toHaveAttribute('lang', 'ja');
-  await expect(page.getByRole('combobox', {name: 'ボタンの表示', exact: true})).toHaveValue('icon-only');
   expect(await page.evaluate(key => JSON.parse(sessionStorage.getItem(key)!).config, draftKey)).toEqual(before);
   await visitStep(page, 'appearance');
   await expect(page.getByRole('combobox', {name: '共有設定の見た目', exact: true})).toHaveValue('soft');
+  await expect(page.getByRole('combobox', {name: 'ボタンの表示', exact: true})).toHaveValue('icon-only');
   await page.goBack();
   await onlyActive(page, 'export');
   await page.goForward();
   await onlyActive(page, 'appearance');
   await page.getByRole('button', {name: 'EN', exact: true}).click();
-  await expect(page.getByRole('slider', {name: 'Studio Spacing', exact: true})).toHaveValue('22');
+  await expect(page.getByRole('slider', {name: 'Spacing', exact: true})).toHaveValue('22');
   await visitStep(page, 'choose');
   await expect(page.locator('.studio-action-picker').getByRole('checkbox', {name: 'Save', exact: true})).toBeChecked();
   await visitStep(page, 'animation');
-  await expect(page.getByRole('radio', {name: 'Use in live actions: Trace', exact: true})).toBeChecked();
+  await expect(page.locator('#motion-settings').getByRole('combobox', {name: 'Global motion', exact: true})).toHaveValue('trace');
   await expect(page.getByRole('slider', {name: 'Glyph duration', exact: true})).toHaveValue('1000');
   await visitStep(page, 'preview');
   await expect(page.locator('.studio-context').getByRole('button', {name: 'AI chat', exact: true})).toHaveAttribute('aria-pressed', 'true');
   await visitStep(page, 'appearance');
   await page.getByRole('button', {name: 'Isolate a variable', exact: true}).click();
-  await page.locator('.inspector').getByRole('combobox').selectOption('strokeWidth');
+  await page.locator('.studio-controls').getByRole('combobox', {name: 'Only change', exact: true}).selectOption('strokeWidth');
   await setRange(page.getByRole('slider', {name: 'Stroke', exact: true}), 2.6);
   await expect.poll(() => page.evaluate(key => JSON.parse(sessionStorage.getItem(key)!).comparison, draftKey)).toEqual({isolate: true, variable: 'strokeWidth'});
   await page.reload();
   await onlyActive(page, 'appearance');
   await expect(page.getByRole('button', {name: 'Isolate a variable', exact: true})).toHaveAttribute('aria-pressed', 'true');
-  await expect(page.locator('.inspector').getByRole('combobox')).toHaveValue('strokeWidth');
+  await expect(page.locator('.studio-controls').getByRole('combobox', {name: 'Only change', exact: true})).toHaveValue('strokeWidth');
   await expect(page.getByRole('slider', {name: 'Stroke', exact: true})).toHaveValue('2.6');
   await expect(page.getByRole('slider', {name: 'Icon size', exact: true})).toBeDisabled();
 });
@@ -196,10 +196,12 @@ test('unapplied labels preset names and composer drafts survive revisiting their
 });
 
 test('inactive panels cancel requests and glyph loops while timeline inspection stays paused', async ({page}) => {
-  await page.goto('/#animation');
+  await page.goto('/#guide/motion');
   await page.getByRole('checkbox', {name: 'Loop pending preview', exact: true}).check();
   await expect(page.locator('.motion-matrix .sil-action').first()).toHaveAttribute('aria-busy', 'true');
   expect(await page.locator('.motion-matrix svg').evaluateAll(nodes => nodes.flatMap(svg => svg.getAnimations({subtree: true})).length)).toBeGreaterThan(0);
+  await visitStep(page, 'animation');
+  await expect.poll(() => page.locator('.motion-matrix svg').evaluateAll(nodes => nodes.flatMap(svg => svg.getAnimations({subtree: true})).filter(animation => animation.playState === 'running' || animation.pending).length)).toBe(0);
   const timeline = page.locator('#timeline');
   await timeline.getByRole('button', {name: 'Formed · peak', exact: false}).click();
   const position = await timeline.getByRole('slider', {name: 'Timeline position', exact: true}).inputValue();
@@ -235,7 +237,7 @@ test('legacy deep links select the owning step and Guide sections stay separate'
   test.setTimeout(90000);
   const routes: Array<[string, WorkflowStep, string]> = [
     ['studio', 'choose', '.studio-action-picker'],
-    ['compare', 'appearance', '#compare'], ['motion', 'animation', '#motion'], ['timeline', 'animation', '#timeline'],
+    ['compare', 'appearance', '#compare'], ['motion', 'animation', '#motion-settings'], ['timeline', 'animation', '#timeline'],
     ['studio-config', 'export', '#studio-config'], ['icon-catalog', 'guide', '#icon-catalog'],
     ['async-comparison', 'guide', '#async-comparison'], ['design-lens', 'guide', '#design-lens'],
     ['states', 'guide', '#states'], ['documentation', 'guide', '#documentation'],
@@ -246,11 +248,11 @@ test('legacy deep links select the owning step and Guide sections stay separate'
     await onlyActive(page, step);
     await expect(page.locator(selector)).toBeVisible();
   }
-  for (const [section, selector] of [['catalog', '#icon-catalog'], ['async', '#async-comparison'], ['design', '#design-lens'], ['states', '#states']] as const) {
+  for (const [section, selector] of [['motion', '.motion-matrix'], ['catalog', '#icon-catalog'], ['async', '#async-comparison'], ['design', '#design-lens'], ['states', '#states']] as const) {
     await visitGuide(page, section);
     await expect(page.locator(selector)).toBeVisible();
     await onlyActive(page, 'guide');
-    for (const other of ['#icon-catalog', '#async-comparison', '#design-lens', '#states']) {
+    for (const other of ['.motion-matrix', '#icon-catalog', '#async-comparison', '#design-lens', '#states']) {
       if (other !== selector) await expect(page.locator(other)).toBeHidden();
     }
   }

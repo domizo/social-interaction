@@ -1,6 +1,6 @@
 import {describe, expect, it, vi} from 'vitest';
 import {actionLabels, socialActions, tokenBounds} from '../src/lib/index.js';
-import {defaultStudioConfig, generateReactUsage, MAX_CONFIG_BYTES, parsePresetCollection, parseStudioConfig, serializePresets, type StudioConfig} from '../src/app/studio/config.js';
+import {defaultStudioConfig, generateReactUsage, MAX_CONFIG_BYTES, motionForAction, parsePresetCollection, parseStudioConfig, serializePresets, type StudioConfig} from '../src/app/studio/config.js';
 
 const fresh = (): StudioConfig => JSON.parse(JSON.stringify(defaultStudioConfig));
 
@@ -61,7 +61,7 @@ describe('strict Studio configuration', () => {
     expect(() => parseStudioConfig(Object.assign(Object.create({presentation: 'icon-only'}), legacy))).toThrow(/plain object/);
   });
   it('rejects unknown properties at every object level, including prototype pollution keys', () => {
-    const paths = ['', 'tokens', 'motionTokens', 'actions.0', 'actions.0.label'];
+    const paths = ['', 'tokens', 'motionTokens', 'motionOverrides', 'actions.0', 'actions.0.label'];
     for (const path of paths) {
       const config = fresh();
       const target = path.split('.').filter(Boolean).reduce<unknown>((value, key) => (value as Record<string, unknown>)[key], config) as object;
@@ -119,6 +119,76 @@ describe('strict Studio configuration', () => {
   });
 });
 
+describe('per-action motion configuration', () => {
+  const treatments = ['none', 'pulse', 'spring', 'trace', 'gesture', 'cartoon'] as const;
+  it('normalizes legacy objects, JSON, and presets to a fresh empty override map', () => {
+    const {motionOverrides: _overrides, presentation: _presentation, ...legacy} = fresh();
+    for (const input of [legacy, JSON.stringify(legacy)]) {
+      const config = parseStudioConfig(input);
+      expect(config).toEqual(defaultStudioConfig);
+      expect(config.motionOverrides).not.toBe(defaultStudioConfig.motionOverrides);
+    }
+    const presets = parsePresetCollection({schemaVersion: 1, presets: [{name: 'Legacy', config: legacy}]});
+    expect(presets[0].config.motionOverrides).toEqual({});
+    expect(parsePresetCollection(serializePresets(presets))).toEqual(presets);
+    expect(Object.hasOwn(legacy, 'motionOverrides')).toBe(false);
+  });
+  it.each(socialActions)('accepts every supported treatment for %s and preserves it without selecting that action', action => {
+    for (const motion of treatments) {
+      const original = {...fresh(), iconMotion: 'gesture' as const, actions: fresh().actions.filter(item => item.action !== action), motionOverrides: {[action]: motion}};
+      const result = parseStudioConfig(original);
+      expect(result.actions.some(item => item.action === action)).toBe(false);
+      expect(result.motionOverrides).toEqual({[action]: motion});
+      expect(motionForAction(result, action)).toBe(motion);
+      expect(parseStudioConfig(JSON.stringify(result))).toEqual(result);
+      expect(parsePresetCollection(serializePresets([{name: 'Mixed', config: result}]))[0].config).toEqual(result);
+      result.motionOverrides[action] = motion === 'none' ? 'cartoon' : 'none';
+      expect(original.motionOverrides[action]).toBe(motion);
+    }
+  });
+  it('inherits only absent entries and retains overrides when global motion or selected actions change', () => {
+    const config: StudioConfig = {...fresh(), iconMotion: 'spring', motionOverrides: {like: 'none', repost: 'cartoon', reaction: 'trace'}};
+    expect(motionForAction(config, 'like')).toBe('none');
+    expect(motionForAction(config, 'comment')).toBe('spring');
+    expect(motionForAction({iconMotion: 'pulse'}, 'comment')).toBe('pulse');
+    const changed = parseStudioConfig({...config, iconMotion: 'gesture', actions: [config.actions[1]]});
+    expect(changed.motionOverrides).toEqual(config.motionOverrides);
+    expect(motionForAction(changed, 'like')).toBe('none');
+    expect(motionForAction(changed, 'comment')).toBe('gesture');
+    delete changed.motionOverrides.like;
+    expect(motionForAction(changed, 'like')).toBe('gesture');
+  });
+  it('rejects invalid present maps, keys, and values rather than treating them as inheritance', () => {
+    for (const motionOverrides of [undefined, null, [], '', true, 1, Object.create(null), Object.create({like: 'pulse'})]) {
+      expect(() => parseStudioConfig({...fresh(), motionOverrides})).toThrow(/motionOverrides/);
+    }
+    for (const key of ['unknown', 'Like', 'constructor', 'prototype', '__proto__']) {
+      const motionOverrides = Object.fromEntries([[key, 'pulse']]);
+      expect(() => parseStudioConfig({...fresh(), motionOverrides})).toThrow(/motionOverrides/);
+      expect(() => parseStudioConfig(JSON.stringify({...fresh(), motionOverrides}))).toThrow(/motionOverrides/);
+    }
+    for (const value of [undefined, null, '', 'inherit', 'Pulse', 'wobble', false, 0, {}, []]) {
+      expect(() => parseStudioConfig({...fresh(), motionOverrides: {like: value}})).toThrow(/motionOverrides.like/);
+    }
+    expect(() => parseStudioConfig({...fresh(), motionOverrides: {[Symbol('like')]: 'pulse'}})).toThrow(/motionOverrides/);
+  });
+  it('rejects root/map accessors and hidden properties without executing imported code', () => {
+    const getter = vi.fn(() => 'cartoon'), setter = vi.fn(), toJSON = vi.fn();
+    for (const descriptor of [{get: getter, enumerable: true}, {set: setter, enumerable: true}, {value: 'pulse', enumerable: false}]) {
+      const config = fresh();
+      Object.defineProperty(config.motionOverrides, 'like', descriptor);
+      expect(() => parseStudioConfig(config)).toThrow(/motionOverrides.like.*data property/);
+      expect(() => generateReactUsage(config, 'en')).toThrow(/motionOverrides.like.*data property/);
+      expect(() => parsePresetCollection({schemaVersion: 1, presets: [{name: 'Unsafe', config}]})).toThrow(/motionOverrides/);
+      const root = fresh();
+      Object.defineProperty(root, 'motionOverrides', descriptor);
+      expect(() => parseStudioConfig(root)).toThrow(/motionOverrides.*data property/);
+    }
+    expect(() => parseStudioConfig({...fresh(), motionOverrides: {toJSON}})).toThrow(/motionOverrides/);
+    expect(getter).not.toHaveBeenCalled(); expect(setter).not.toHaveBeenCalled(); expect(toJSON).not.toHaveBeenCalled();
+  });
+});
+
 describe('preset schema', () => {
   it('round-trips versioned named presets with literal names', () => {
     const presets = [{name: '<b>My preset</b>', config: fresh()}];
@@ -153,6 +223,15 @@ describe('preset schema', () => {
 });
 
 describe('runnable React export', () => {
+  it.each(['en', 'ja'] as const)('retains mixed, explicit-none and inactive-action overrides in %s exports', locale => {
+    const config: StudioConfig = {...fresh(), iconMotion: 'gesture', motionOverrides: {like: 'none', comment: 'cartoon', repost: 'trace'}};
+    const generated = generateReactUsage(config, locale);
+    expect(generated).toContain('"motionOverrides": {');
+    for (const [action, motion] of Object.entries(config.motionOverrides)) expect(generated).toContain(`"${action}": "${motion}"`);
+    expect(generated).toContain('const motionOverrides: Partial<Record<SocialAction, IconMotion>> = studioConfig.motionOverrides;');
+    expect(generated).toContain('iconMotion={motionOverrides[item.action] ?? studioConfig.iconMotion}');
+    expect(generated).not.toContain('iconMotion={studioConfig.iconMotion}');
+  });
   it('includes the chosen config and controlled local command semantics', () => {
     const config = fresh(); config.context = 'article'; config.tokens.gap = 9;
     config.actions.push({action: 'bookmark', label: {en: 'Keep it', ja: 'とっておく'}});

@@ -1,5 +1,15 @@
 # Verification record / 検証記録
 
+## 0.6.0 Practical configuration / 選択と設定の整理
+
+The configured release gate includes 356 unit/schema/lifecycle tests, 20 generated EN/JA React modules and 243 discovered native cases across five engine/viewport projects. Four trusted-touch cases are intentionally skipped outside Chromium mobile; actual mouse, keyboard and remaining flows run across the applicable projects. These are gate counts, not a claim that the current candidate has passed native CI.
+
+Checks cover transactional drag/drop and keyboard alternatives, pointer cancellation and viewport edge scrolling, stale configuration protection, one authoritative Appearance panel, selected-style comparison, and inherited/per-icon motion assignments across contexts, timelines, presets and generated React. Pending actions retain their busy/name/status semantics without visible dots. The 240 accepted motion-plan samples remain exact.
+
+Trusted touch uses Chromium mobile CDP input; dispatched touch-shaped events in other harnesses are lifecycle checks rather than physical touch evidence. Native screenshots and interaction artifacts must be inspected after the exact-source run. Existing WebKit/Safari, physical-device and hosted-authentication limits below still apply.
+
+ドラッグとキーボードの並べ替え、全体設定と個別設定の継承、保存・生成コードへの引き継ぎを検証します。既存モーションの形状や時間は変更していません。上記は実行予定の検証対象であり、正確なコミットの結果を確認してから配信します。
+
 ## 0.5.0 Step pages / ステップ別ページ
 
 The workflow now presents one active step at a time, with a separate Guide. The configured release gate includes 302 unit/schema/lifecycle tests, 12 generated React examples and 208 native cases across Chromium, WebKit and Firefox desktop/mobile projects. The exact source build must pass before private deployment.

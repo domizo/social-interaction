@@ -1,5 +1,16 @@
 # Changelog / 変更履歴
 
+## 0.6.0 — 2026-10-12
+
+- Make drag handles the primary ordering control in Choose icons, with pointer/touch movement, keyboard pickup/arrows/Home/End/drop/Escape, announced positions, retained focus, safe interruption, and a collapsed Earlier/Later fallback / ハンドルによるドラッグを主操作にし、タッチ・キーボード・位置通知・フォーカス維持・中断時の復元・折りたたんだ代替操作へ対応
+- Consolidate visual style, presentation, preview options, and every visual token under Appearance → Tune the details; show the selected style with an optional one-variable comparison, and separate surface hover/press duration and depth from glyph motion / 見た目の設定を1か所に集約し、選択スタイルと任意の単変数比較を表示。表面のホバー・押下の反応とアイコンの動きを分離
+- Add practical global motion and per-icon override/inherit/reset controls, selected-action previews, and a resolved-treatment readout in the timeline / 全体と個別の動き・継承・リセット・選択操作のプレビューを追加し、時間軸は適用中の動きを読み取り表示
+- Retain schemaVersion 1 and normalize optional legacy `motionOverrides` to `{}`; validate known action/treatment pairs, preserve overrides when actions are removed/re-added, and delete entries on inherit/reset. Carry assignments through session drafts, presets, JSON, live/context/async previews, the timeline, and generated React / スキーマ1を維持し、旧入力の欠落を空マップに補完。個別指定を安全に検証・保持し、継承時は削除。保存・各プレビュー・生成 React まで同じ割り当てを反映
+- Move the comparison matrix to Guide → Motion reference and keep its exploratory controls, along with Icon catalog controls, local to each experiment; default the catalog to Assigned motions / 動きの比較をガイドへ移し、カタログとともに共有設定を書き換えない参照実験にする。カタログは設定したモーションから開始
+- Remove separate pending-dot markup and pseudo-element decoration; retain slower assigned glyph motion, busy/disabled semantics, duplicate-activation guards, and contextual status, including when reduced motion makes the glyph static / 独立した処理中の点の要素・疑似要素を除去し、割り当てたアイコンの反復・処理中の意味・重複防止・状況説明を維持。動き抑制時も意味を保つ
+- Preserve all 60 existing geometry/timing plans, including accepted Cartoon Comment/Repost behavior; retain local-only examples, explicit stylesheet installation, private archive distribution, and UNLICENSED status / 全60組の形状・時間配分、ローカルの例、CSS の明示的な導入、private アーカイブ、UNLICENSED を維持
+- Update EN/JA workflow, schema, motion, accessibility, and 0.6.0 archive instructions. Existing README screenshots remain explicitly labelled historical 0.5.0; fresh browser/CI evidence is recorded only after execution / 両言語の導線・設定・動き・アクセシビリティ・導入手順を更新。既存画像は0.5.0の記録と明記し、新しい検証結果は実行後だけ記録
+
 ## 0.5.0 — 2026-10-12
 
 - Replace the long workbench page with five freely revisitable tabs: Choose icons, Appearance, Motion, In context, and Export; move explanations, full catalog, async comparison, design lens, and state specimens into a separate Guide / 長い作業ページを自由に戻れる5つのタブへ整理し、説明・全カタログ・非同期比較・デザインレンズ・状態見本を独立したガイドへ移動
@@ -103,7 +114,7 @@
 - Add controlled Bookmark/Note/Star/Bell toggles alongside Like; keep the remaining seven actions as commands / 5トグルと7コマンドの意味を明確化
 - Add a 12-card catalog and a fifth motion-comparison row; keep previews separate from live composers/menu and external services / 12枚のカタログ・5行目の比較、プレビューと実操作を分離
 - Cancel decorative SVG effects with their replay; preserve fixed hit targets, bounded controls, and OS/manual reduced motion / 装飾も再生単位で中止し、操作領域・範囲・動きの抑制を維持
-- Suppress cartoon secondary bursts while pending; retain slower glyph repetition, static dots, and accessible status / 処理中は追加バーストを抑え、ゆっくりした反復と静止した状態表示を維持
+- Suppress cartoon secondary bursts while pending; retain slower glyph repetition and accessible status / 処理中は追加バーストを抑え、ゆっくりした反復と静止した状態表示を維持
 - Document the new API and review requirements; completed checks and limits belong in `docs/QA.md` / 新 API と確認項目を文書化、実施結果は QA に記録
 
 ## 0.2.0 — 2026-10-10
@@ -111,7 +122,7 @@
 - Four selectable glyph-motion treatments × four actions: pulse, spring, trace, gesture / 4操作 × 4種類のアイコンアニメーション
 - Dedicated EN/JA motion comparison, replay/stop, duration/intensity/stagger and live-action selection / 比較・一括再生・調整・実操作への反映
 - Reusable iconMotion/motionTokens/motionTrigger/reducedMotion API and DTCG motion tokens / 再利用 API とトークン出力
-- Pending now repeats the glyph with static dots; activation motion never implies success / 処理中はアイコンと静止した点で表現
+- Repeat the glyph while pending; activation motion never implies success / 処理中はアイコンを反復し、操作時の動きで成功を表さない
 - Cancel-owned Web Animations, stale trace cleanup protection, OS/manual reduction and fixed hit areas / 再生の所有・中止・古い後処理対策
 - Real-browser temporal SVG sampling for all 16 combinations / 全16組合せの時間経過に伴う SVG 変化を検証
 

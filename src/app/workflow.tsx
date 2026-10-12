@@ -2,11 +2,11 @@ import {useEffect,useLayoutEffect,useRef,useState,type KeyboardEvent,type ReactN
 import type {Locale} from './content.js';
 export const steps=['choose','appearance','animation','preview','export','guide'] as const;
 export type WorkflowStep=typeof steps[number];
-export const guideSections=['overview','catalog','async','design','states'] as const;
+export const guideSections=['overview','motion','catalog','async','design','states'] as const;
 export type GuideSection=typeof guideSections[number];
 export interface WorkflowRoute{step:WorkflowStep;guide:GuideSection;anchor?:string}
 export const stepLabels={en:['Choose icons','Appearance','Motion','In context','Export','Guide'],ja:['アイコンを選ぶ','見た目','動き','使用画面','エクスポート','ガイド']} as const;
-export const guideLabels={en:['Start here','Icon catalog','Async states','Design lens','State reference'],ja:['考え方','アイコン一覧','非同期の状態','デザインの見方','状態の一覧']} as const;
+export const guideLabels={en:['Start here','Motion reference','Icon catalog','Async states','Design lens','State reference'],ja:['考え方','動きの比較','アイコン一覧','非同期の状態','デザインの見方','状態の一覧']} as const;
 const legacy:Record<string,WorkflowRoute>={
  '#studio':{step:'choose',guide:'overview'},'#compare':{step:'appearance',guide:'overview',anchor:'compare'},
  '#motion':{step:'animation',guide:'overview',anchor:'motion'},'#timeline':{step:'animation',guide:'overview',anchor:'timeline'},
