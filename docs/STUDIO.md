@@ -4,18 +4,22 @@ Version 0.4.0 adds a local workflow for trying the existing library in context, 
 
 0.4.0 は既存の部品を実際の場面に近いサンプルで試し、設定を保存し、動きや状態を観察するためのローカルな作業画面です。4スタイル・12操作と、0.3.8 で確定したコメント・リポストの動きを引き継ぎます。
 
+Version 0.4.1 adds a shared labelled/icon-only presentation setting, retained in presets, JSON, and generated TSX. Labelled remains the default.
+
+0.4.1 では、ラベル付き／アイコンのみの表示設定を共有し、プリセット・JSON・生成 TSX に保持します。初期値は引き続きラベル付きです。
+
 ## 1. Context and shared settings / 場面と共有設定
 
-Switch between **Social feed**, **Article footer**, and **AI chat**. These are fixed sample content, including the scripted chat response. They share one configuration: context, variant, action list/order, both label languages, visual tokens, treatment, and motion tokens. Switching context does not replace the configuration with a separate set of defaults.
+Switch between **Social feed**, **Article footer**, and **AI chat**. These are fixed sample content, including the scripted chat response. They share one configuration: context, variant, presentation, action list/order, both label languages, visual tokens, treatment, and motion tokens. Switching context does not replace the configuration with a separate set of defaults.
 
 - Five toggle actions use local controlled state: Like, Bookmark, Note, Star, and Bell
 - Comment and Quote open local draft dialogs; saved draft text stays in the mounted preview
 - Share opens a keyboard-operated menu that shows an example link or prepares a local share
 - Other commands produce local feedback; none posts to a social network, calls an AI model, or sends a message
 
-Use the shared controls alongside the context preview. The original comparison and motion controls also edit the shared token/motion values. The original isolation mode uses its effective one-variable token set for Studio previews and exports; applying a Studio configuration exits that isolation mode. The design lens has a separate local comparison value and does not overwrite the shared configuration.
+Use the shared controls alongside the context preview. The presentation control switches between labelled and icon-only buttons across all three contexts, both design-lens specimens, async comparisons, original comparisons, and applicable motion/state specimens. Icon-only hides visible labels and counts; the stable accessible name, native title hint, and accessible count description remain. Labels are still editable and exported. The standalone timeline icon and explanatory headings are not button labels. The original comparison and motion controls also edit the shared token/motion values. The original isolation mode uses its effective one-variable token set for Studio previews and exports; applying a Studio configuration exits that isolation mode. The design lens has a separate local comparison value and does not overwrite the shared configuration.
 
-3つの場面はすべて固定のサンプルです。操作・ラベル・見た目・トークン・動きを共有し、場面を切り替えても別の初期値に置き換えません。コメントと引用の下書き、共有メニュー、ほかの操作もローカルです。従来の単変数モードでは有効なトークン値をプレビューと書き出しに使い、Studio 設定の適用でそのモードを解除します。デザインレンズ内の比較値は共有設定を変更しません。
+3つの場面はすべて固定のサンプルです。操作・ラベル・表示方法・見た目・トークン・動きを共有し、場面を切り替えても別の初期値に置き換えません。コメントと引用の下書き、共有メニュー、ほかの操作もローカルです。従来の単変数モードでは有効なトークン値をプレビューと書き出しに使い、Studio 設定の適用でそのモードを解除します。デザインレンズ内の比較値は共有設定を変更しません。表示方法は3つの場面、レンズの両側、非同期比較、従来の比較、対応する動きと状態の見本に反映します。「アイコンのみ」は見えるラベルと件数を隠し、固定のアクセシブル名・標準の title ヒント・件数の説明を保ちます。ラベルの編集と書き出しは引き続き可能です。単独の時間軸アイコンや説明用の見出しはボタンのラベルではありません。
 
 ## 2. Presets and JSON / プリセットと JSON
 
@@ -36,6 +40,7 @@ The downloadable `social-studio-config.json` is **one configuration**, not a pre
   "schemaVersion": 1,
   "context": "feed",
   "variant": "spring",
+  "presentation": "labelled",
   "actions": [
     {"action": "like", "label": {"en": "Like", "ja": "いいね"}},
     {"action": "comment", "label": {"en": "Comment", "ja": "コメント"}}
@@ -56,16 +61,17 @@ The downloadable `social-studio-config.json` is **one configuration**, not a pre
 
 - Files/text are limited to 65,536 bytes (64 KB); the saved preset collection has the same total serialized UTF-8 size limit
 - Only schema version `1` is accepted; there is no migration from unknown versions
-- Every required property must be present. Unknown properties, duplicate actions, unsupported enum values, sparse/augmented arrays, and non-plain data objects are rejected
+- `presentation` accepts only `"labelled"` or `"icon-only"`. Legacy schema-v1 JSON and saved presets may omit this field only; import normalizes it to `"labelled"`. New exports always include it
+- Every other required property must be present. Unknown properties, duplicate actions, unsupported enum values (including an invalid explicit `presentation`), sparse/augmented arrays, and non-plain data objects are rejected
 - Labels require both `en` and `ja`, each 1–80 JavaScript string units, nonblank and without U+0000–U+001F or U+007F control characters. Name lengths use the same string-length convention
 - Visual bounds: icon size 16–28 px, stroke 1–3 CSS px, gap 4–28 px, button duration 0–400 ms, amplitude 0–8%, hit target 44–64 px; accent must be `#` plus six hex digits
 - Glyph bounds: duration 0–1600 ms, intensity 0–2, stagger 0–160 ms. Treatment accepts `none`, `pulse`, `spring`, `trace`, `gesture`, or `cartoon`
-- Imported numbers must be finite and in range. Unlike the library’s tolerant runtime normalizers, imports reject bad values rather than clamp or fill defaults
+- Imported numbers must be finite and in range. Unlike the library’s tolerant runtime normalizers, imports reject bad values rather than clamp them; the missing legacy `presentation` field is the only defaulting exception
 - Validation reads plain data properties, does not execute imported getters or `toJSON`, and returns a fresh configuration. Imported strings remain text
 
 Import is transactional: the entire file must pass before anything applies. A later configuration change invalidates an older in-progress file read, so a slow import cannot replace newer edits. A file error does not reset the current configuration.
 
-JSON はプリセット一覧ではなく、ひとつの設定です。最大65,536バイト、スキーマ1のみ対応し、全項目の存在と型・範囲を検証します。不明な項目、重複した操作、不正なラベルや数値は拒否し、初期値で補完しません。全体の検証に成功した場合だけ適用し、読み込み途中に新しい設定を選んだ場合は古い読み込みを破棄します。
+JSON はプリセット一覧ではなく、ひとつの設定です。最大65,536バイト、スキーマ1のみ対応し、項目の存在と型・範囲を検証します。`presentation` は `"labelled"` または `"icon-only"` だけを受け付けます。旧 JSON と保存済みプリセットでこの項目がない場合だけ `"labelled"` に補完し、新しい書き出しには必ず含めます。それ以外の欠落、不明な項目、重複した操作、不正なラベル・数値・明示された表示値は拒否します。全体の検証に成功した場合だけ適用し、読み込み途中に新しい設定を選んだ場合は古い読み込みを破棄します。
 
 ## 3. Complete React export / React の書き出し
 
@@ -73,7 +79,7 @@ JSON はプリセット一覧ではなく、ひとつの設定です。最大65,
 
 The generated module includes:
 
-- `studioConfig` with the context, variant, ordered actions, both label languages, and all visual/motion tokens
+- `studioConfig` with the context, variant, presentation, ordered actions, both label languages, and all visual/motion tokens; each generated action uses that presentation
 - The currently selected locale, package imports, controlled toggle state, local activity/status text, and working local composers for Comment, Quote, and Send
 - A sharing menu with arrow/Home/End/Escape handling, focus restoration, a local-share option, and current-page-link clipboard copy with a selectable-link fallback
 - An optional `onCommand` callback, plus exported `StudioCommand` and `SocialActionsProps` types, as an application integration point
@@ -82,7 +88,7 @@ The context determines the generated heading and `data-context`; the editorial f
 
 Configuration labels are emitted as escaped JSON string literals, not executable expressions. If clipboard access is missing or rejected, the Studio reveals and selects the source for manual copying. If initiating a download throws, it reveals selectable TSX or JSON. These fallbacks do not prove that a browser completed a download.
 
-コピーと TSX ダウンロードは同じ完全なモジュールを生成します。設定と両言語ラベルを含み、現在の言語で表示します。トグル、コメント・引用・送信のローカル入力、共有メニュー、状態表示、任意の同期 `onCommand` 通知を含みます。場面の見出しと属性は引き継ぎますが、サンプルの本文・装飾や Studio 画面全体は含みません。実際の通信・保存・非同期方針は利用側で実装します。コピー失敗時はコードを選択できる形で表示します。
+コピーと TSX ダウンロードは同じ完全なモジュールを生成します。表示方法を含む設定と両言語ラベルを保持し、現在の言語と選んだ表示方法で各操作を描画します。トグル、コメント・引用・送信のローカル入力、共有メニュー、状態表示、任意の同期 `onCommand` 通知を含みます。場面の見出しと属性は引き継ぎますが、サンプルの本文・装飾や Studio 画面全体は含みません。実際の通信・保存・非同期方針は利用側で実装します。コピー失敗時はコードを選択できる形で表示します。
 
 ## 4. Motion timeline / 動きの時間軸
 
@@ -107,7 +113,7 @@ Each action supports **Fail next request**, **Retry**, and **Cancel**. A failure
 
 **Design lens** compares the current configuration with one altered token: gap, icon size, or stroke width. The adjusted value remains different from the baseline; all other configuration values match. Each specimen owns independent local interaction state, so reset or match those states when making a visual comparison.
 
-Hit-area outlines show rendered button bounds, while the numeric minimum is the configured hit-target token. Labels can make buttons wider. Crosshairs mark the square icon box’s geometric center, not an optical center. Spacing overlays measure horizontal gaps between adjacent buttons on the same row; they do not measure every vertical/wrapped gap. Measurements refresh after layout, resize, and font readiness.
+Hit-area outlines show rendered button bounds, while the numeric minimum is the configured hit-target token. Visible labels and counts can make labelled buttons wider; icon-only presentation retains the same configured minimum hit target. Crosshairs mark the square icon box’s geometric center, not an optical center. Spacing overlays measure horizontal gaps between adjacent buttons on the same row; they do not measure every vertical/wrapped gap. Measurements refresh after layout, resize, and font readiness.
 
 Use the lens to test a claim: more space may separate choices but increase wrapping; a larger icon may be more noticeable but compete with its label; a heavier stroke may improve prominence but crowd detail. Keep the context and task in view. Overlays are neither a visual-quality score nor an accessibility audit.
 
@@ -128,10 +134,10 @@ npm run verify:consumer
 npm run verify:generated
 ```
 
-`verify:consumer` installs the archive in a fresh external consumer. `verify:generated` compiles eight generated TSX examples against that archive with strict NodeNext types and existing dependencies. It covers EN/JA, default, full-catalog/custom-token, single-action/escaped-label, and maximum-length-label cases. It also bundles an isolated, real React consumer using the archive stylesheet in `qa/generated`, outside the deployed build. The browser suite mounts that fixture for narrow-width and keyboard checks. After committing, run `npm run verify:archive` to test committed files, and `npm run test:e2e` with the Playwright browser dependencies installed. Review `.github/workflows/quality.yml` for the CI sequence.
+`verify:consumer` installs the archive in a fresh external consumer. `verify:generated` compiles generated TSX examples against that archive with strict NodeNext types and existing dependencies. It covers EN/JA, default labelled, icon-only full-catalog, full-catalog/custom-token, single-action/escaped-label, and maximum-length-label cases. It also bundles an isolated, real React consumer using the archive stylesheet in `qa/generated`, outside the deployed build. The browser suite mounts that fixture for narrow-width and keyboard checks. After committing, run `npm run verify:archive` to test committed files, and `npm run test:e2e` with the Playwright browser dependencies installed. Review `.github/workflows/quality.yml` for the CI sequence.
 
-For browser review, exercise both languages and narrow/wide layouts; keyboard menus/dialogs; storage denial/corruption; invalid, oversized, and racing imports; clipboard rejection; timeline replay/seek/reset/unmount and OS/manual reduction; async reversal/failure/retry/cancel; and lens wrapping with long labels. Inspect real SVG geometry over time for all 12 × five treatments, including the accepted 0.3.8 Comment/Repost behavior. Keep code-generation type checks separate from runtime, accessibility, and visual QA.
+For browser review, exercise both languages, both presentations, and narrow/wide layouts; labelled/icon-only switching across shared surfaces; stable accessible names, native title hints, hidden-count descriptions, and minimum hit targets; legacy schema-v1 imports without `presentation`, rejection of invalid presentation values, and preset/JSON/TSX round trips; keyboard menus/dialogs; storage denial/corruption; invalid, oversized, and racing imports; clipboard rejection; timeline replay/seek/reset/unmount and OS/manual reduction; async reversal/failure/retry/cancel; and lens wrapping with long labels. Inspect real SVG geometry over time for all 12 × five treatments, including the accepted 0.3.8 Comment/Repost behavior. Keep code-generation type checks separate from runtime, accessibility, and visual QA.
 
 These instructions describe the verification workflow, not a claim that new browser checks have passed. Historical results remain in [QA](https://github.com/domizo/social-interaction-lab/blob/main/docs/QA.md); record fresh evidence there only when executed. Private source/demo and `UNLICENSED` distribution remain unchanged.
 
-生成 TSX の型検査と、実ブラウザーでの操作・動き・アクセシビリティ確認は別です。両言語・画面幅・中断や失敗・動き抑制を検証し、実行した範囲だけを QA に記録してください。このガイドは新しいブラウザー検証の成功を宣言するものではありません。private・UNLICENSED の配布方針は変更しません。
+生成 TSX の型検査と、実ブラウザーでの操作・動き・アクセシビリティ確認は別です。両言語・両表示方法・画面幅・共有画面への反映・固定のアクセシブル名と件数の説明・旧 JSON の互換性と保存／書き出しの往復・中断や失敗・動き抑制を検証し、実行した範囲だけを QA に記録してください。このガイドは新しいブラウザー検証の成功を宣言するものではありません。private・UNLICENSED の配布方針は変更しません。

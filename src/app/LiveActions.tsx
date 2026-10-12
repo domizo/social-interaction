@@ -1,5 +1,5 @@
 import {useEffect,useId,useRef,useState,type KeyboardEvent} from 'react';
-import {ActionBar,LikeButton,CommentButton,QuoteButton,ShareButton,simulateRequest,useAsyncAction,type SocialTokens,type SocialVariant,type PreviewState,type IconMotion,type IconMotionTokens} from '../lib/index.js';
+import {ActionBar,LikeButton,CommentButton,QuoteButton,ShareButton,simulateRequest,useAsyncAction,type ActionPresentation,type SocialTokens,type SocialVariant,type PreviewState,type IconMotion,type IconMotionTokens} from '../lib/index.js';
 import {words,type Locale} from './content.js';
 const demoLink='https://example.com/posts/small-actions';
 type Mode='comment'|'quote';
@@ -19,13 +19,13 @@ function Composer({mode,locale,fail,delay,onClose,onSaved,onStart}:{mode:Mode;lo
     </form>
   </dialog>;
 }
-export function LiveActions({variant,locale,tokens,previewState,fail=false,delay=700,consumeFailure,compact=false,iconMotion='spring',motionTokens,reducedMotion=false}:{variant:SocialVariant;locale:Locale;tokens:SocialTokens;previewState?:PreviewState;fail?:boolean;delay?:number;consumeFailure?:()=>void;compact?:boolean;iconMotion?:IconMotion;motionTokens?:Partial<IconMotionTokens>;reducedMotion?:boolean}){
+export function LiveActions({variant,locale,tokens,previewState,fail=false,delay=700,consumeFailure,compact=false,presentation='labelled',iconMotion='spring',motionTokens,reducedMotion=false}:{variant:SocialVariant;locale:Locale;tokens:SocialTokens;previewState?:PreviewState;fail?:boolean;delay?:number;consumeFailure?:()=>void;compact?:boolean;presentation?:ActionPresentation;iconMotion?:IconMotion;motionTokens?:Partial<IconMotionTokens>;reducedMotion?:boolean}){
   const t=words[locale],[liked,setLiked]=useState(false),[comments,setComments]=useState(24),[mode,setMode]=useState<Mode|null>(null),[menu,setMenu]=useState(false),[message,setMessage]=useState<MessageKey|null>(null),[copyFallback,setCopyFallback]=useState(false),[saved,setSaved]=useState<{mode:Mode;text:string}[]>([]);
   const likeRequest=useAsyncAction<boolean>(),shareRequest=useAsyncAction<string>(),trigger=useRef<HTMLButtonElement|null>(null),requestTrigger=useRef<HTMLButtonElement|null>(null),share=useRef<HTMLButtonElement>(null),menuRef=useRef<HTMLDivElement>(null),menuStart=useRef<'first'|'last'>('first'),menuId=useId();
   const closeMenu=(restore=true)=>{setMenu(false);if(restore)share.current?.focus();};
   useEffect(()=>{if(!menu)return;const items=menuRef.current?.querySelectorAll<HTMLButtonElement>('button');items?.[menuStart.current==='last'?items.length-1:0]?.focus();const outside=(e:PointerEvent)=>{if(!menuRef.current?.contains(e.target as Node)&&!share.current?.contains(e.target as Node))setMenu(false);};document.addEventListener('pointerdown',outside);return()=>document.removeEventListener('pointerdown',outside);},[menu]);
   const menuKey=(e:KeyboardEvent)=>{const items=Array.from(menuRef.current?.querySelectorAll<HTMLButtonElement>('[role=menuitem]')??[]),i=items.indexOf(document.activeElement as HTMLButtonElement);if(['ArrowDown','ArrowUp','Home','End'].includes(e.key)){e.preventDefault();items[e.key==='Home'?0:e.key==='End'?items.length-1:(i+(e.key==='ArrowDown'?1:-1)+items.length)%items.length]?.focus();}else if(e.key==='Escape'){e.preventDefault();closeMenu();}else if(e.key==='Tab'){e.preventDefault();const all=Array.from(document.querySelectorAll<HTMLElement>('button:not([disabled]),a[href],input,select,textarea')).filter(el=>!menuRef.current?.contains(el)&&el.tabIndex>=0&&el.getClientRects().length>0);const idx=all.indexOf(share.current!);closeMenu(false);const target=all[idx+(e.shiftKey?-1:1)];(target??share.current)?.focus();}};
-  const common={variant,tokens,previewState,iconMotion,motionTokens,reducedMotion};
+  const common={presentation,variant,tokens,previewState,iconMotion,motionTokens,reducedMotion};
   const closeComposer=()=>{setMode(null);trigger.current?.focus();};
   const pending=likeRequest.status==='pending'||shareRequest.status==='pending';
   return <div className={`live-actions ${compact?'compact':''}`}>

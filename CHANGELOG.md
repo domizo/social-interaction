@@ -1,5 +1,13 @@
 # Changelog / 変更履歴
 
+## 0.4.1 — 2026-10-12
+
+- Add optional `presentation` (`"labelled" | "icon-only"`) to shared action buttons, with labelled as the default; icon-only hides visible labels and counts while retaining stable accessible names, native title hints, and accessible count descriptions / 共通ボタンに表示方法を追加し、初期値はラベル付き。「アイコンのみ」は見えるラベル・件数を隠し、固定のアクセシブル名・標準の title ヒント・件数の説明を保持
+- Share the Studio presentation control across contexts, design-lens specimens, async comparisons, original comparisons, and applicable motion/state specimens / Studio の表示切り替えを各場面・レンズ・非同期比較・従来の比較・対応する動きと状態の見本に反映
+- Retain presentation in browser presets, schema-v1 JSON, and generated TSX; normalize only a missing legacy presentation field to labelled and reject invalid explicit values / プリセット・JSON・生成 TSX に表示方法を保持し、旧データの項目欠落だけをラベル付きに補完。不正な明示値は拒否
+- Preserve label-only `showLabel={false}` behavior, interaction semantics, minimum hit targets, and existing glyph motion / 既存のラベルだけを隠す動作・操作の意味・最小操作領域・アイコンの動きを維持
+- Document EN/JA integration, compatibility, and verification guidance; fresh test results belong in the QA record / EN/JA の導入・互換性・検証手順を更新し、実施結果は QA に記録
+
 ## 0.4.0 — 2026-10-11
 
 - Add a bilingual interaction Studio with local feed, article-footer, and scripted AI-chat fixtures sharing actions, labels, visual tokens, and motion / 共通設定を使うフィード・記事末尾・固定チャットのローカルな制作画面を追加

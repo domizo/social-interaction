@@ -5,6 +5,7 @@ export type StudioConfig = {
   schemaVersion: 1;
   context: 'feed' | 'article' | 'chat';
   variant: SocialVariant;
+  presentation: 'labelled' | 'icon-only';
   actions: Array<{action: SocialAction; label: {en: string; ja: string}}>;
   tokens: SocialTokens;
   iconMotion: IconMotion;
@@ -19,6 +20,7 @@ export const defaultStudioConfig: StudioConfig = {
   schemaVersion: 1,
   context: 'feed',
   variant: 'spring',
+  presentation: 'labelled',
   actions: (['like', 'comment', 'share', 'quote'] as const).map(action => ({action, label: {...actionLabels[action]}})),
   tokens: {...defaultTokens},
   iconMotion: 'cartoon',
@@ -44,13 +46,13 @@ function jsonInput(input: unknown, path: string): unknown {
   try { return JSON.parse(input); } catch { return fail(path, 'invalid JSON'); }
 }
 /** Read only plain data descriptors. Never invoke an imported getter or toJSON method. */
-function object(input: unknown, keys: readonly string[], path: string): Record<string, unknown> {
+function object(input: unknown, keys: readonly string[], path: string, optionalKeys: readonly string[] = []): Record<string, unknown> {
   if (!input || typeof input !== 'object' || Array.isArray(input) || Object.getPrototypeOf(input) !== Object.prototype) fail(path, 'expected a plain object');
   const descriptors = Object.getOwnPropertyDescriptors(input);
   const ownKeys = Reflect.ownKeys(descriptors);
-  if (ownKeys.length !== keys.length || ownKeys.some(key => typeof key !== 'string' || !keys.includes(key))) fail(path, 'missing or unknown property');
+  if (keys.some(key => !Object.hasOwn(descriptors, key)) || ownKeys.some(key => typeof key !== 'string' || !keys.includes(key) && !optionalKeys.includes(key))) fail(path, 'missing or unknown property');
   const result: Record<string, unknown> = Object.create(null);
-  for (const key of keys) {
+  for (const key of [...keys, ...optionalKeys.filter(key => Object.hasOwn(descriptors, key))]) {
     const descriptor = descriptors[key];
     if (!descriptor || !('value' in descriptor) || !descriptor.enumerable) fail(`${path}.${key}`, 'expected a data property');
     result[key] = descriptor.value;
@@ -85,7 +87,7 @@ function dataArray(input: unknown, min: number, max: number, path: string): unkn
 
 /** Strict, transactional import: returns a fresh validated object, or throws without changing the input. */
 export function parseStudioConfig(input: unknown): StudioConfig {
-  const root = object(jsonInput(input, 'config'), ['schemaVersion', 'context', 'variant', 'actions', 'tokens', 'iconMotion', 'motionTokens'], 'config');
+  const root = object(jsonInput(input, 'config'), ['schemaVersion', 'context', 'variant', 'actions', 'tokens', 'iconMotion', 'motionTokens'], 'config', ['presentation']);
   if (root.schemaVersion !== 1) fail('schemaVersion', 'only version 1 is supported');
   const seen = new Set<string>();
   const actions = dataArray(root.actions, 1, 12, 'actions').map((entry, index) => {
@@ -108,6 +110,7 @@ export function parseStudioConfig(input: unknown): StudioConfig {
     schemaVersion: 1,
     context: choice(root.context, ['feed', 'article', 'chat'], 'context'),
     variant: choice(root.variant, ['minimal', 'soft', 'solid', 'spring'], 'variant'),
+    presentation: Object.hasOwn(root, 'presentation') ? choice(root.presentation, ['labelled', 'icon-only'], 'presentation') : 'labelled',
     actions,
     tokens: {...numericTokens, accent: rawTokens.accent},
     iconMotion: choice(root.iconMotion, ['none', 'pulse', 'spring', 'trace', 'gesture', 'cartoon'], 'iconMotion'),
@@ -164,7 +167,7 @@ export function generateReactUsage(input: StudioConfig, locale: 'en' | 'ja'): st
   return `// Save as SocialActions.tsx in a React + TypeScript app.
 // Install the downloaded @social-interaction-lab/react package and React first.
 // Mount with <SocialActions />. onCommand is an optional integration callback.
-// Configuration and labels are exported; transient selections and activity start fresh.
+// Configuration, presentation, and accessible labels are exported; transient selections and activity start fresh.
 // Manual reduced-motion preview is not exported; ActionButton honors the device OS preference.
 import {useEffect, useId, useRef, useState} from 'react';
 import {ActionBar, ActionButton, isToggleAction, type SocialAction} from '@social-interaction-lab/react';
@@ -233,7 +236,7 @@ export default function SocialActions({onCommand}: SocialActionsProps = {}) {
     <ActionBar label={words.title} tokens={studioConfig.tokens}>
       {configuredActions.map(item => <ActionButton
         key={item.action} action={item.action} label={item.label[locale]}
-        variant={studioConfig.variant} tokens={studioConfig.tokens}
+        variant={studioConfig.variant} presentation={studioConfig.presentation} tokens={studioConfig.tokens}
         style={{maxWidth: '100%', boxSizing: 'border-box', whiteSpace: 'normal', overflowWrap: 'anywhere'}}
         iconMotion={studioConfig.iconMotion} motionTokens={studioConfig.motionTokens}
         selected={isToggleAction(item.action) ? !!selected[item.action] : undefined}

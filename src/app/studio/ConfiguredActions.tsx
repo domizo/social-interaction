@@ -94,7 +94,7 @@ export function ConfiguredActions({config, locale, reducedMotion, label}: {confi
     <ActionBar tokens={config.tokens} label={label ?? t.actions}>
       {config.actions.map(item => {
         const action = item.action;
-        return <ActionButton key={action} action={action} label={item.label[locale]} variant={config.variant} tokens={config.tokens} iconMotion={config.iconMotion} motionTokens={config.motionTokens} reducedMotion={reducedMotion}
+        return <ActionButton key={action} action={action} label={item.label[locale]} presentation={config.presentation} variant={config.variant} tokens={config.tokens} iconMotion={config.iconMotion} motionTokens={config.motionTokens} reducedMotion={reducedMotion}
           selected={!!selected[action]} ref={action === 'share' ? share : undefined}
           aria-haspopup={action === 'share' ? 'menu' : action === 'comment' || action === 'quote' ? 'dialog' : undefined}
           aria-expanded={action === 'share' ? menuOpen : undefined} aria-controls={action === 'share' && menuOpen ? menuId : undefined}

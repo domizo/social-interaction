@@ -36,18 +36,28 @@ Use the metadata for consistent catalog rendering, or supply your own localized 
 
 ### Button props / ボタンの props
 
-主な props: label (必須・アクセシブル名), variant, tokens, count, pending, error, previewState, showLabel, onClick, ref。通常のボタン属性にも対応します。LikeButton / BookmarkButton / NoteButton / StarButton / BellButton の selected が aria-pressed に対応。ラベルは選択前後で変えません。残りの7操作はコマンドです。
+主な props: label (必須・アクセシブル名), variant, tokens, count, pending, error, previewState, presentation, showLabel, onClick, ref。通常のボタン属性にも対応します。LikeButton / BookmarkButton / NoteButton / StarButton / BellButton の selected が aria-pressed に対応。ラベルは選択前後で変えません。残りの7操作はコマンドです。
 
 - label: required stable accessible name; defaults do not assume a locale
 - selected: Like, Bookmark, Note, Star, Bell only; controlled boolean. Commands do not expose pressed state
 - pending: aria-busy + aria-disabled; activation suppressed, focus retained
 - error: visible marker; pair with contextual live error text and a retry path
-- count: visual numeric count; label stays stable. Supply aria-describedby if counts must be announced
+- count: visual numeric count in labelled presentation; label stays stable. Icon-only presentation hides it visually and provides it through an accessible description. In labelled presentation, supply aria-describedby if counts must be announced
 - variant: minimal | soft | solid | spring
 - tokens: bounded overrides. If omitted, inherit ActionBar CSS variables; explicit button tokens apply complete defaults plus that override
 - previewState: visual simulation, independent of actual semantic state; intended for reference specimens, not app state
-- showLabel: defaults true; false hides the visible text but preserves accessible name
+- presentation: optional exported `ActionPresentation` type (`"labelled" | "icon-only"`), default `"labelled"`. Icon-only hides both visible label and count while preserving the stable `aria-label`, a native title hint, and a supplied count as an accessible description
+- showLabel: defaults true; false hides only the visible label and preserves the accessible name. With labelled presentation the count remains visible, preserving the pre-0.4.1 behavior; icon-only hides both regardless of showLabel
 - ActionBar tokens: defaults plus overrides; label defaults to “Post actions” and should be localized
+
+`presentation` is available on `ActionButton` and every named action component. In icon-only mode, `title` defaults to `label` unless you supply your own title; the hidden count description is appended to any caller-provided `aria-describedby`. It does not change toggle/command semantics, disabled/pending behavior, focus, motion, or the configured minimum hit target. Keep supplying a translated, stable `label` even when text is hidden. A native title hint is browser-dependent and is not a replacement for the accessible name or a guarantee of touch-device discovery.
+
+```tsx
+<LikeButton label="Like" presentation="icon-only" count={12} selected={liked}
+  onClick={() => setLiked(value => !value)} />
+```
+
+`presentation` は公開型 `ActionPresentation` を使い、`ActionButton` と全ての名前付き操作コンポーネントで指定できます。アイコンのみでは、独自の `title` がなければ `label` を使い、件数の説明を既存の `aria-describedby` に追加します。初期値は `"labelled"` です。`"icon-only"` では見えるラベルと件数を隠しますが、必須の `label` による固定のアクセシブル名、標準の title ヒント、指定した件数のアクセシブルな説明を保持します。トグル／コマンド、無効／処理中、フォーカス、動き、最小操作領域は変えません。既存の `showLabel={false}` はラベルだけを隠し、ラベル付き表示なら件数を表示する互換動作です。title ヒントはブラウザーに依存し、タッチ操作での発見を保証しません。
 
 `ActionIcon` accepts `action`, optional `filled` (default false), and an SVG `ref`. It draws a static decorative icon; the button owns motion through the props below. `filled` changes fillable toggle shapes, not semantic state.
 
@@ -136,6 +146,6 @@ The example’s 420 ms peak is specific to Cartoon Comment at its 560 ms duratio
 
 `StudioConfig`, presets, config parsing, `generateReactUsage`, and `useToggleTransaction` are playground source modules under `src/app/studio/`, **not package-root exports**. The generated module exports its own configuration and callback types; that does not add those types to the library API. `useAsyncAction` remains the public async primitive.
 
-Studio JSON is strict schema-v1 configuration data, not DTCG token JSON and not executable code. Imports reject unknown/missing fields and out-of-range values; this differs intentionally from tolerant public token normalization. See [Studio](STUDIO.md) for the complete schema, limits, browser-storage behavior, generated component scope, and local async comparison.
+Studio JSON is strict schema-v1 configuration data, not DTCG token JSON and not executable code. Imports reject unknown/missing fields and out-of-range values, with one compatibility exception: legacy schema-v1 data may omit `presentation`, which normalizes to `"labelled"`. This strict validation differs intentionally from tolerant public token normalization. Explicit presentation values must be `"labelled"` or `"icon-only"`, and presets, JSON, and generated TSX retain that value. See [Studio](STUDIO.md) for the complete schema, limits, browser-storage behavior, generated component scope, and local async comparison.
 
-Studio の設定・プリセット・コード生成・比較用の非同期 hook はプレイグラウンド内部で、パッケージの公開 export ではありません。公開の非同期 hook は引き続き `useAsyncAction` です。Studio JSON は DTCG トークン出力と異なり、スキーマ1の厳密な設定データとして全体を検証します。
+Studio の設定・プリセット・コード生成・比較用の非同期 hook はプレイグラウンド内部で、パッケージの公開 export ではありません。公開の非同期 hook は引き続き `useAsyncAction` です。Studio JSON は DTCG トークン出力と異なり、スキーマ1の厳密な設定データとして全体を検証します。互換性のため、旧データで `presentation` がない場合だけ `"labelled"` に補完します。明示する値は `"labelled"` と `"icon-only"` に限り、プリセット・JSON・生成 TSX に保持します。

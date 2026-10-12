@@ -5,10 +5,10 @@ import {ConfigPanel} from '../src/app/studio/ConfigPanel.js';
 import {defaultStudioConfig, parseStudioConfig, PRESET_STORAGE_KEY, type StudioConfig} from '../src/app/studio/config.js';
 
 const fresh = () => parseStudioConfig(defaultStudioConfig);
-function harness(onApply = vi.fn(), locale: 'en' | 'ja' = 'en') {
+function harness(onApply = vi.fn(), locale: 'en' | 'ja' = 'en', initialConfig = fresh()) {
   function Harness() {
-    const [config, setConfig] = useState<StudioConfig>(fresh());
-    return <><ConfigPanel config={config} locale={locale} onApply={next => { onApply(next); setConfig(next); }} /><span data-testid="gap">{config.tokens.gap}</span><button onClick={() => setConfig({...config, tokens: {...config.tokens, gap: 27}})}>Change test gap</button></>;
+    const [config, setConfig] = useState<StudioConfig>(initialConfig);
+    return <><ConfigPanel config={config} locale={locale} onApply={next => { onApply(next); setConfig(next); }} /><span data-testid="gap">{config.tokens.gap}</span><span data-testid="presentation">{config.presentation}</span><button onClick={() => setConfig({...config, tokens: {...config.tokens, gap: 27}})}>Change test gap</button><button onClick={() => setConfig({...config, presentation: 'labelled'})}>Use test labelled presentation</button></>;
   }
   return {view: render(<Harness />), onApply};
 }
@@ -24,13 +24,26 @@ afterEach(() => { vi.restoreAllMocks(); vi.unstubAllGlobals(); });
 
 describe('preset and configuration UI', () => {
   it('saves, loads, and deletes a named preset without losing its config', () => {
-    harness(); save('Editorial');
+    harness(vi.fn(), 'en', {...fresh(), presentation: 'icon-only'}); save('Editorial');
     expect(screen.getByRole('status').textContent).toContain('Preset saved');
     const stored = JSON.parse(localStorage.getItem(PRESET_STORAGE_KEY)!);
     expect(stored.schemaVersion).toBe(1); expect(stored.presets[0].config.tokens.gap).toBe(16);
+    expect(stored.presets[0].config.presentation).toBe('icon-only');
     fireEvent.click(screen.getByRole('button', {name: 'Change test gap'})); expect(screen.getByTestId('gap').textContent).toBe('27');
+    fireEvent.click(screen.getByRole('button', {name: 'Use test labelled presentation'})); expect(screen.getByTestId('presentation').textContent).toBe('labelled');
     fireEvent.click(screen.getByRole('button', {name: 'Load'})); expect(screen.getByTestId('gap').textContent).toBe('16');
+    expect(screen.getByTestId('presentation').textContent).toBe('icon-only');
     fireEvent.click(screen.getByRole('button', {name: 'Delete'})); expect(JSON.parse(localStorage.getItem(PRESET_STORAGE_KEY)!).presets).toEqual([]);
+  });
+  it('loads a legacy stored preset with labelled presentation', () => {
+    const {presentation: _presentation, ...legacy} = fresh();
+    localStorage.setItem(PRESET_STORAGE_KEY, JSON.stringify({schemaVersion: 1, presets: [{name: 'Legacy', config: legacy}]}));
+    const {onApply} = harness(vi.fn(), 'en', {...fresh(), presentation: 'icon-only'});
+    fireEvent.change(screen.getByLabelText('Choose a preset'), {target: {value: 'Legacy'}});
+    fireEvent.click(screen.getByRole('button', {name: 'Load'}));
+    expect(screen.getByTestId('presentation').textContent).toBe('labelled');
+    expect(onApply).toHaveBeenCalledWith({...fresh(), presentation: 'labelled'});
+    expect(screen.queryByRole('alert')).toBeNull();
   });
   it('rejects duplicate names without overwriting, and renders names as text', () => {
     harness(); save('<img src=x onerror=alert(1)>');
@@ -83,13 +96,26 @@ describe('preset and configuration UI', () => {
   });
   it('applies valid imports and leaves current state unchanged after invalid imports', async () => {
     const {onApply} = harness();
-    const valid = fresh(); valid.tokens.gap = 22; valid.actions[0].label.en = 'Applaud';
+    const valid = fresh(); valid.tokens.gap = 22; valid.presentation = 'icon-only'; valid.actions[0].label.en = 'Applaud';
     importFile(JSON.stringify(valid));
     await waitFor(() => expect(screen.getByTestId('gap').textContent).toBe('22'));
     expect(onApply).toHaveBeenCalledTimes(1);
+    expect(screen.getByTestId('presentation').textContent).toBe('icon-only');
     importFile(JSON.stringify({...valid, tokens: {...valid.tokens, gap: 999}}));
     await waitFor(() => expect(screen.getByRole('alert').textContent).toContain('Could not import'));
     expect(screen.getByTestId('gap').textContent).toBe('22'); expect(onApply).toHaveBeenCalledTimes(1);
+    expect(screen.getByTestId('presentation').textContent).toBe('icon-only');
+  });
+  it('imports legacy JSON as labelled and rejects unsupported presentation transactionally', async () => {
+    const {onApply} = harness(vi.fn(), 'en', {...fresh(), presentation: 'icon-only'});
+    importFile(JSON.stringify({...fresh(), presentation: null}));
+    await waitFor(() => expect(screen.getByRole('alert').textContent).toContain('presentation'));
+    expect(screen.getByTestId('presentation').textContent).toBe('icon-only'); expect(onApply).not.toHaveBeenCalled();
+    const {presentation: _presentation, ...legacy} = fresh();
+    importFile(JSON.stringify(legacy));
+    await waitFor(() => expect(screen.getByTestId('presentation').textContent).toBe('labelled'));
+    expect(onApply).toHaveBeenCalledTimes(1);
+    expect(onApply).toHaveBeenCalledWith(defaultStudioConfig);
   });
   it('ignores a slow import after a newer configuration choice', async () => {
     let reader: FileReader | undefined;
@@ -120,6 +146,24 @@ describe('preset and configuration UI', () => {
     harness(); fireEvent.click(screen.getByRole('button', {name: 'Download TSX'}));
     expect(screen.getByRole('alert').textContent).toContain('download could not start');
     expect((screen.getByLabelText('Generated React code') as HTMLTextAreaElement).readOnly).toBe(true);
+  });
+  it('retains icon-only presentation in the JSON download fallback', () => {
+    vi.spyOn(URL, 'createObjectURL').mockImplementation(() => { throw new Error('Download unavailable'); });
+    harness(vi.fn(), 'en', {...fresh(), presentation: 'icon-only'});
+    fireEvent.click(screen.getByRole('button', {name: 'Download JSON'}));
+    const json = screen.getByLabelText('Configuration JSON') as HTMLTextAreaElement;
+    expect(JSON.parse(json.value).presentation).toBe('icon-only');
+    expect(JSON.parse(json.value).schemaVersion).toBe(1);
+  });
+  it.each(['en', 'ja'] as const)('retains icon-only presentation and labels in %s React exports', locale => {
+    harness(vi.fn(), locale, {...fresh(), presentation: 'icon-only'});
+    fireEvent.click(screen.getByRole('button', {name: locale === 'en' ? 'Show code' : 'コードを表示'}));
+    const code = screen.getByLabelText(locale === 'en' ? 'Generated React code' : '生成した React コード') as HTMLTextAreaElement;
+    expect(code.value).toContain('"presentation": "icon-only"');
+    expect(code.value).toContain('presentation={studioConfig.presentation}');
+    expect(code.value).toContain('label={item.label[locale]}');
+    expect(code.value).toContain(`const locale = "${locale}"`);
+    expect(screen.getByText(locale === 'en' ? /Icon-only buttons retain their accessible labels/ : /アイコンのみでも読み上げ用のラベルを保持/)).toBeTruthy();
   });
   it('changes included actions and validates both editable labels transactionally', () => {
     const {onApply} = harness();

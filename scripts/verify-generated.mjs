@@ -27,6 +27,7 @@ try {
   const {socialActions, actionLabels} = await import(pathToFileURL(join(temp, 'package/dist/index.js')).href);
   const cases = [
     ['default', defaultStudioConfig],
+    ['icon-only', {...defaultStudioConfig, presentation: 'icon-only', actions: socialActions.map(action => ({action, label: actionLabels[action]}))}],
     ['full', {...defaultStudioConfig, context: 'article', variant: 'solid', iconMotion: 'gesture', actions: socialActions.map(action => ({action, label: actionLabels[action]})), tokens: {...defaultStudioConfig.tokens, iconSize: 28, strokeWidth: 3, gap: 4, hitTarget: 64, duration: 0, amplitude: 8, accent: '#123abc'}, motionTokens: {duration: 1600, intensity: 2, stagger: 160}}],
     ['long-labels', {...defaultStudioConfig, actions: defaultStudioConfig.actions.map(item => item.action === 'like' ? {...item, label: {en: 'W'.repeat(80), ja: '長'.repeat(80)}} : item)}],
     ['single', {...defaultStudioConfig, context: 'chat', iconMotion: 'none', actions: [{action: 'bookmark', label: {en: 'Save "quoted" <text>\\path', ja: '保存 \u2028 テスト'}}]}],
@@ -46,7 +47,19 @@ try {
   // Build a real, isolated consumer for narrow-screen and keyboard browser QA.
   // This output is intentionally outside dist and must never be deployed with the app.
   await writeFile(join(temp, 'index.html'), '<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Generated React consumer QA</title></head><body><div id="root"></div><script type="module" src="/main.tsx"></script></body></html>');
-  await writeFile(join(temp, 'main.tsx'), "import {createRoot} from 'react-dom/client';\nimport SocialActions from './long-labels-en.tsx';\ncreateRoot(document.getElementById('root')!).render(<SocialActions />);\n");
+  await writeFile(join(temp, 'main.tsx'), `import {createRoot} from 'react-dom/client';
+import LabelledEnglish from './long-labels-en.tsx';
+import LabelledJapanese from './long-labels-ja.tsx';
+import IconsEnglish from './icon-only-en.tsx';
+import IconsJapanese from './icon-only-ja.tsx';
+const query = new URLSearchParams(window.location.search);
+const locale = query.get('locale') === 'ja' ? 'ja' : 'en';
+const presentation = query.get('presentation') === 'icon-only' ? 'icon-only' : 'labelled';
+const examples = {en: {labelled: LabelledEnglish, 'icon-only': IconsEnglish}, ja: {labelled: LabelledJapanese, 'icon-only': IconsJapanese}};
+const SocialActions = examples[locale][presentation];
+document.documentElement.lang = locale;
+createRoot(document.getElementById('root')!).render(<SocialActions />);
+`);
   await build({
     root: temp,
     configFile: false,
@@ -55,6 +68,6 @@ try {
     build: {outDir: resolve(root, 'qa/generated'), emptyOutDir: true},
     logLevel: 'warn',
   });
-  console.log('QA fixture ready: qa/generated (maximum-length Like label, Comment/Share/Quote, actual archive stylesheet; excluded from deployment).');
-  console.log(`PASS: eight generated TSX consumers, EN/JA, full, single-action and maximum-length-label configurations, strict NodeNext types, archive CSS. No dependency installation.`);
+  console.log('QA fixture ready: qa/generated (default maximum-length Like label; ?presentation=icon-only&locale=en|ja selects icon-only; actual archive stylesheet; excluded from deployment).');
+  console.log(`PASS: ${cases.length * 2} generated TSX consumers, EN/JA, labelled, icon-only, full, single-action and maximum-length-label configurations, strict NodeNext types, archive CSS. No dependency installation.`);
 } finally { await rm(temp, {recursive: true, force: true}); }

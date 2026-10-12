@@ -22,3 +22,7 @@
 
 .sil-action[data-reduced-motion=true],.sil-action[data-reduced-motion=true]:hover,.sil-action[data-reduced-motion=true] .sil-content{transition:none!important;transform:none!important}
 .sil-effect{pointer-events:none;transform-origin:12px 12px!important;transform-box:view-box!important}.sil-icon [data-glyph-part=bell-body]{transform-origin:50% 15%}.sil-action[data-action=like][data-preview=selected] .sil-glyph path{fill:currentColor}
+
+/* Presentation changes the visible content, never the native hit target or name. */
+.sil-action[data-presentation="icon-only"]{padding:8px;gap:0}
+.sil-sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}

@@ -1,5 +1,5 @@
 import {useId, useState} from 'react';
-import {ActionButton} from '../../lib/ActionButton.js';
+import {ActionButton,type ActionPresentation} from '../../lib/ActionButton.js';
 import type {IconMotion, IconMotionTokens} from '../../lib/iconMotion.js';
 import type {SocialTokens, SocialVariant} from '../../lib/tokens.js';
 import {useToggleTransaction, type TogglePolicy} from './useToggleTransaction.js';
@@ -12,6 +12,7 @@ export interface AsyncComparisonProps {
   motionTokens: IconMotionTokens;
   locale: 'en' | 'ja';
   reducedMotion: boolean;
+  presentation?: ActionPresentation;
 }
 
 const copy = {

@@ -48,7 +48,7 @@ function LensSpecimen({config, locale, reducedMotion, overlays, adjusted, variab
     window.addEventListener('resize', measure);
     void document.fonts?.ready.then(measure);
     return () => {active = false; observer?.disconnect(); window.removeEventListener('resize', measure);};
-  }, [config.tokens, config.actions, config.variant, locale]);
+  }, [config.tokens, config.actions, config.variant, config.presentation, locale]);
   const tokens = normalizeTokens(config.tokens);
   return <article className="lens-specimen" aria-labelledby={`${id}-title`} data-specimen={adjusted ? 'adjusted' : 'baseline'}>
     <div className="lens-specimen-heading"><div><p>{adjusted ? t.one : t.current}</p><h3 id={`${id}-title`}>{adjusted ? t.adjusted : t.baseline}</h3></div><span>{t[variable]} <strong>{tokens[variable]} {t.units}</strong></span></div>

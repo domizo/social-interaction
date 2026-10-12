@@ -1,5 +1,5 @@
 export {ActionButton,ActionBar,LikeButton,CommentButton,ShareButton,QuoteButton,RepostButton,BookmarkButton,NoteButton,StarButton,SendButton,SparklesButton,BellButton,ReactionButton} from './ActionButton.js';
-export type {ActionButtonProps,PrimitiveProps} from './ActionButton.js';
+export type {ActionButtonProps,PrimitiveProps,ActionPresentation} from './ActionButton.js';
 export {ActionIcon} from './ActionIcon.js';
 export {useAsyncAction,simulateRequest} from './useAsyncAction.js';
 export type {AsyncActionState,AsyncStatus} from './useAsyncAction.js';

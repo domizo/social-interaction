@@ -20,11 +20,13 @@ npm run build
 
 ## Use the interaction studio
 
-1. **Try a context.** Switch between a sample social feed, article footer, and scripted AI-chat response. The same action selection, EN/JA labels, variant, tokens, and motion power all three; the chat has no AI backend. Toggle actions, local Comment/Quote drafts, and a fixture Share menu are interactive.
-2. **Keep a configuration.** Select 1–12 actions and apply edited labels. Save up to 20 named presets in this browser, or download/import schema-v1 JSON. Imports are limited to 64 KB and validated completely before applying; invalid data leaves the current configuration unchanged.
+1. **Try a context.** Switch between a sample social feed, article footer, and scripted AI-chat response. The same action selection, EN/JA labels, labelled/icon-only presentation, variant, tokens, and motion power all three; the chat has no AI backend. Toggle actions, local Comment/Quote drafts, and a fixture Share menu are interactive.
+2. **Keep a configuration.** Select 1–12 actions and apply edited labels. Save up to 20 named presets in this browser, or download/import schema-v1 JSON, including the presentation setting. Imports are limited to 64 KB and validated completely before applying; invalid data leaves the current configuration unchanged.
 3. **Take the code.** Copy or download a complete `SocialActions.tsx` component with imports, controlled toggles, local composers, a sharing menu, and an optional `onCommand` callback. It carries the configuration and both label languages, using the selected display language. It does not reproduce the entire Studio page. Clipboard failure reveals selectable source.
 4. **Inspect time and state.** Scrub any of the 12 icons × five treatments with the shared motion engine, play at 0.25×/0.5×/1×, step about 16.7 ms, and inspect phase markers. Separately compare optimistic and after-success Like/Save updates with local failure, retry, cancellation, and displayed versus confirmed values.
 5. **Compare one variable.** The design lens changes spacing, icon size, or stroke width while matching the remaining configuration. Overlays show button bounds, icon-box geometric centers, and same-row horizontal gaps. These measurements support design hypotheses, not automatic judgments of beauty or accessibility.
+
+The shared presentation control defaults to labelled buttons. Choose icon-only to hide visible labels and counts across the contexts, design lens, async comparison, original comparisons, and applicable motion/state specimens. Accessible names, count descriptions, and native title hints remain available. Older schema-v1 presets/JSON without `presentation` load as labelled.
 
 Presets and exports contain configuration, not drafts, selections, request state, or the manual reduced-motion preview switch. The generated component still honors OS reduced motion. Storage failures are reported without claiming a save; invalid stored data is left untouched until you explicitly clear it. See the [Studio guide](docs/STUDIO.md) for validation rules, export scope, and a testing workflow.
 
@@ -34,10 +36,10 @@ Presets and exports contain configuration, not drafts, selections, request state
 
 ## Install the library
 
-Download `social-interaction-lab-react-0.4.0.tgz` from the playground or build it with `npm run build:package`. In your separate React project:
+Download `social-interaction-lab-react-0.4.1.tgz` from the playground or build it with `npm run build:package`. In your separate React project:
 
 ```sh
-npm install ./social-interaction-lab-react-0.4.0.tgz
+npm install ./social-interaction-lab-react-0.4.1.tgz
 ```
 
 React 18.2 or 19 is a peer dependency. The library is ESM-only; styles are explicitly imported and are not automatically injected.
@@ -72,6 +74,17 @@ The popup callbacks above are integration placeholders for your application. Lik
 - Exported `socialActions`, `toggleActions`, `isToggleAction`, and EN/JA `actionLabels` keep catalog integrations consistent
 
 Toggle `selected` values map to `aria-pressed`; keep the accessible label stable. `NoteButton` is a sticky-note alternative for saving, labelled “Keep note” / “メモを保存” in the playground, not a text editor. Sparkles is a local visual action, not an AI service. Repost, Send, and the other catalog actions do not publish or transmit anything.
+
+### Choose icon-only presentation
+
+`presentation="icon-only"` hides both visible text and count while preserving the stable `label` as the accessible name, a native title hint, and an accessible description for a supplied count. The optional prop defaults to `"labelled"`. It changes presentation, not toggle/command behavior, focus handling, hit-target minimums, or motion.
+
+```tsx
+<LikeButton label="Like" presentation="icon-only" count={12} selected={liked}
+  onClick={() => setLiked(value => !value)} />
+```
+
+Existing `showLabel={false}` retains its original label-only behavior: in labelled presentation, the count remains visible. Native title hints are browser-dependent and do not guarantee discovery on touch devices; choose visible labels when the icon may be unfamiliar.
 
 ### Animate the icons
 
@@ -121,7 +134,7 @@ npm run verify:generated
 npm run verify:archive
 ```
 
-`verify:consumer` creates a fresh external npm project, installs the tarball, typechecks with strict NodeNext and skipLibCheck:false, imports the ESM at runtime, and checks the stylesheet. `verify:generated` compiles eight generated EN/JA TSX examples against the built archive, including full-catalog, single-action, and maximum-label configurations, using existing dependencies. It also builds a separate generated-component fixture for the browser suite; that QA page is excluded from deployment. `verify:archive` requires a Git HEAD and tests only files in that committed archive. Do not ignore `src/lib/`.
+`verify:consumer` creates a fresh external npm project, installs the tarball, typechecks with strict NodeNext and skipLibCheck:false, imports the ESM at runtime, and checks the stylesheet. `verify:generated` compiles generated EN/JA TSX examples against the built archive, including labelled/icon-only, full-catalog, single-action, and maximum-label configurations, using existing dependencies. It also builds a separate generated-component fixture for the browser suite; that QA page is excluded from deployment. `verify:archive` requires a Git HEAD and tests only files in that committed archive. Do not ignore `src/lib/`.
 
 CI is defined in `.github/workflows/quality.yml`; a configured check is not evidence of a passing run. DOM tests cover behavior but do not prove layout, native modal focus trapping, platform assistive-technology compatibility, or visual contrast on all custom surfaces. Browser checks and their status are recorded in the [QA guide](https://github.com/domizo/social-interaction-lab/blob/main/docs/QA.md). Test your real integration.
 

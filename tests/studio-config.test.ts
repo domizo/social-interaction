@@ -5,9 +5,9 @@ import {defaultStudioConfig, generateReactUsage, MAX_CONFIG_BYTES, parsePresetCo
 const fresh = (): StudioConfig => JSON.parse(JSON.stringify(defaultStudioConfig));
 
 describe('strict Studio configuration', () => {
-  it('round-trips all configuration without mutating or retaining input references', () => {
+  it.each(['labelled', 'icon-only'] as const)('round-trips %s configuration without mutating or retaining input references', presentation => {
     const original = fresh();
-    original.context = 'chat'; original.variant = 'solid'; original.iconMotion = 'none';
+    original.context = 'chat'; original.variant = 'solid'; original.presentation = presentation; original.iconMotion = 'none';
     original.actions = socialActions.map(action => ({action, label: {...actionLabels[action]}}));
     original.actions[0].label.en = 'Appreciate'; original.tokens.accent = '#123ABC';
     const result = parseStudioConfig(JSON.stringify(original));
@@ -17,16 +17,48 @@ describe('strict Studio configuration', () => {
     expect(original.actions[0].label.en).toBe('Appreciate');
     expect(original.tokens.gap).toBe(defaultStudioConfig.tokens.gap);
   });
+  it('normalizes legacy schema v1 objects and JSON to labelled presentation', () => {
+    const {presentation, ...legacy} = fresh();
+    expect(presentation).toBe('labelled');
+    for (const input of [legacy, JSON.stringify(legacy)]) {
+      expect(parseStudioConfig(input)).toEqual(defaultStudioConfig);
+    }
+    expect(Object.hasOwn(legacy, 'presentation')).toBe(false);
+    expect(parseStudioConfig({...legacy, presentation: 'icon-only'}).presentation).toBe('icon-only');
+  });
   it.each([null, [], '', '{', 12, true, JSON.stringify({schemaVersion: 2})])('rejects invalid roots: %j', input => {
     expect(() => parseStudioConfig(input)).toThrow();
   });
   it('rejects unsupported schema and all unsupported enum choices', () => {
-    for (const [key, value] of [['schemaVersion', 2], ['context', 'embed'], ['variant', 'custom'], ['iconMotion', 'wobble']]) {
+    for (const [key, value] of [['schemaVersion', 2], ['context', 'embed'], ['variant', 'custom'], ['presentation', 'icons'], ['iconMotion', 'wobble']]) {
       expect(() => parseStudioConfig({...fresh(), [key]: value})).toThrow();
     }
     const config = fresh();
     (config.actions[0] as {action: string}).action = '<script>';
     expect(() => parseStudioConfig(config)).toThrow();
+  });
+  it('defaults presentation only when absent and rejects invalid present values', () => {
+    for (const presentation of [undefined, null, '', 'Labelled', 'icon', true, 1, {}, []]) {
+      expect(() => parseStudioConfig({...fresh(), presentation})).toThrow(/presentation/);
+    }
+    const {variant: _variant, ...missingRequired} = fresh();
+    expect(() => parseStudioConfig(missingRequired)).toThrow(/missing or unknown property/);
+  });
+  it('rejects presentation accessors and hidden data without executing imported code', () => {
+    const getter = vi.fn(() => 'icon-only');
+    const setter = vi.fn();
+    for (const descriptor of [
+      {get: getter, enumerable: true},
+      {set: setter, enumerable: true},
+      {value: 'icon-only', enumerable: false},
+    ]) {
+      const config = fresh();
+      Object.defineProperty(config, 'presentation', descriptor);
+      expect(() => parseStudioConfig(config)).toThrow(/presentation.*data property/);
+    }
+    expect(getter).not.toHaveBeenCalled(); expect(setter).not.toHaveBeenCalled();
+    const {presentation: _presentation, ...legacy} = fresh();
+    expect(() => parseStudioConfig(Object.assign(Object.create({presentation: 'icon-only'}), legacy))).toThrow(/plain object/);
   });
   it('rejects unknown properties at every object level, including prototype pollution keys', () => {
     const paths = ['', 'tokens', 'motionTokens', 'actions.0', 'actions.0.label'];
@@ -92,6 +124,25 @@ describe('preset schema', () => {
     const presets = [{name: '<b>My preset</b>', config: fresh()}];
     expect(parsePresetCollection(serializePresets(presets))).toEqual(presets);
   });
+  it('retains icon-only presets and normalizes legacy schema v1 presets to labelled', () => {
+    const {presentation: _presentation, ...legacy} = fresh();
+    const input = {schemaVersion: 1, presets: [
+      {name: 'Icons', config: {...fresh(), presentation: 'icon-only'}},
+      {name: 'Legacy', config: legacy},
+    ]};
+    const parsed = parsePresetCollection(JSON.stringify(input));
+    expect(parsed.map(preset => preset.config.presentation)).toEqual(['icon-only', 'labelled']);
+    expect(parsePresetCollection(serializePresets(parsed))).toEqual(parsed);
+    expect(parsed.every(preset => preset.config.schemaVersion === 1)).toBe(true);
+  });
+  it('rejects invalid presentation in presets without invoking accessors', () => {
+    const getter = vi.fn(() => 'icon-only');
+    const config = fresh();
+    Object.defineProperty(config, 'presentation', {get: getter, enumerable: true});
+    expect(() => parsePresetCollection({schemaVersion: 1, presets: [{name: 'Unsafe', config}]})).toThrow(/presentation/);
+    expect(getter).not.toHaveBeenCalled();
+    expect(() => parsePresetCollection({schemaVersion: 1, presets: [{name: 'Invalid', config: {...fresh(), presentation: undefined}}]})).toThrow(/presentation/);
+  });
   it('rejects corrupt, unknown-schema, conflicting and oversized collections', () => {
     expect(() => parsePresetCollection('garbage')).toThrow();
     expect(() => parsePresetCollection({schemaVersion: 2, presets: []})).toThrow();
@@ -108,6 +159,17 @@ describe('runnable React export', () => {
     const generated = generateReactUsage(config, 'ja');
     for (const expected of ["import '@social-interaction-lab/react/styles.css'", '"gap": 9', '"context": "article"', 'とっておく', 'const locale = "ja"', 'selected={isToggleAction', 'onCommand?.(command)', 'role="menu"', '<form ', 'useState', 'onKeyDown', 'readOnly value={fallbackLink}']) expect(generated).toContain(expected);
     expect(generated).not.toContain('eval(');
+  });
+  it.each(['en', 'ja'] as const)('exports selected presentation and accessible labels in %s', locale => {
+    for (const presentation of ['labelled', 'icon-only'] as const) {
+      const config = fresh(); config.presentation = presentation;
+      const generated = generateReactUsage(config, locale);
+      expect(generated).toContain(`"presentation": "${presentation}"`);
+      expect(generated).toContain('presentation={studioConfig.presentation}');
+      expect(generated).toContain('label={item.label[locale]}');
+      expect(generated).toContain(`const locale = "${locale}"`);
+      for (const action of config.actions) expect(generated).toContain(action.label[locale]);
+    }
   });
   it('wraps maximum-length action labels inside a narrow standalone layout', () => {
     const config = fresh(); config.actions[0].label = {en: 'W'.repeat(80), ja: '長'.repeat(80)};
