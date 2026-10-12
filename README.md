@@ -20,7 +20,7 @@ Give the row one shared motion, keep a few icons different, and inspect the reso
 2. **Appearance.** Use **Tune the details** as the single place for visual style, labels/icon-only presentation, spacing, size, stroke, color, hit targets, and preview options. Inspect the chosen style, with an optional one-variable comparison.
 3. **Motion.** Choose a global treatment, then override individual icons or let them inherit. Tune glyph duration, intensity, and stagger; the selected-action previews and timeline show the resolved assignments.
 4. **In context.** Try the same actions in a feed, article footer, or scripted chat. Test the local toggles, composers, and sharing menu with the configuration you chose.
-5. **Export.** Edit the EN/JA names in **Actions & labels** and choose **Apply labels**, then save a named browser preset, download or import configuration JSON, and use **Copy React** or **Download TSX** to get `SocialActions.tsx`. Download the private package archive here, then install it in your application.
+5. **Export.** Edit the EN/JA names in **Actions & labels** and choose **Apply labels**, then save a named browser preset, download or import configuration JSON, and use **Copy React** or **Download TSX** to get `SocialActions.tsx`. Download the package archive here, then install it in your application.
 
 These are freely revisitable tabs, not locked milestones. Each shows its own workspace instead of adding another section to a long page. Tab changes, browser Back/Forward, and language changes keep the configuration. A validated session draft restores the configuration, language, and appearance-isolation choices after reload when browser storage is available. Leaving a panel stops its motion and pending local work, invalidates unfinished file imports, and closes its popups; its local toggles and composer drafts remain available when you return during the mounted session.
 
@@ -42,9 +42,11 @@ In **Motion**, pause, scrub, slow down, and step through a selected icon's movem
 
 ## Start locally
 
-Requires Node.js 22.12+ in the 22.x line, 24.x, or 26.x, and npm.
+Requires Git, Node.js 22.12+ in the 22.x line, 24.x, or 26.x, and npm.
 
 ```sh
+git clone https://github.com/domizo/social-interaction-lab.git
+cd social-interaction-lab
 npm ci
 npm run dev
 ```
@@ -55,17 +57,23 @@ Open the local URL printed by Vite. The workflow starts at `#choose`; `#appearan
 npm run build
 ```
 
-The build emits the playground in `dist/`, the ESM library in `package/`, and the package archive in `public/downloads/`.
+The build emits the playground in `dist/`, the ESM library in `package/`, and the package archive in `public/downloads/`. To view the production build locally, run:
+
+```sh
+npm run preview
+```
+
+Open the local URL printed by Vite. Preview requires a completed build.
 
 ## Use in React
 
-Download `social-interaction-lab-react-0.6.0.tgz` from **Export**, or create it with `npm run build:package`. Copy the archive into your separate React project, then install it there:
+Download `social-interaction-lab-react-0.6.1.tgz` from **Export**, or create it with `npm run build:package`. Copy the archive into your separate React project, then install it there:
 
 ```sh
-npm install ./social-interaction-lab-react-0.6.0.tgz
+npm install ./social-interaction-lab-react-0.6.1.tgz
 ```
 
-This is a private archive, not an npm registry release. React 18.2 or 19 is a peer dependency; the package is ESM-only. Styles must be explicitly imported.
+The package is distributed as an installable archive and is not published to the npm registry. React 18.2 or 19 is a peer dependency; the package is ESM-only. Styles must be explicitly imported.
 
 For the setup you chose in Studio, save its generated module as `SocialActions.tsx` and render it:
 
@@ -182,6 +190,10 @@ npm run verify:archive
 
 CI is defined in `.github/workflows/quality.yml`; a configured check is not evidence of a passing run. DOM tests cover behavior but do not prove layout, native modal focus trapping, platform assistive-technology compatibility, or visual contrast on all custom surfaces. Browser checks and their status are recorded in the [QA guide](https://github.com/domizo/social-interaction-lab/blob/main/docs/QA.md). Test your real integration.
 
-## Distribution
+`npm run build` also checks that MIT metadata, served notices and archived licenses agree with the installed lockfile-resolved dependencies. Run `npm run verify:distribution` to repeat this check against an existing build.
 
-Private source and private demo. `UNLICENSED` until a public license is chosen; package metadata has `private: true`. Nothing is published to npm. Third-party dependency licenses apply separately.
+## License and distribution
+
+Project-authored code is available under the [MIT License](LICENSE), including for modification, redistribution, and commercial use. Retain the copyright and license notice as required by that license. Third-party code and fonts retain their own licenses; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for the notices and license texts.
+
+The package metadata keeps `private: true` to prevent accidental npm publishing. This publishing guard does not restrict MIT-licensed reuse or installation of the `.tgz` archive. The package is not published to the npm registry.

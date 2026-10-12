@@ -6,3 +6,6 @@ dist/
 /qa/
 /test-results/
 /playwright-report/
+
+/public/LICENSE.txt
+/public/THIRD_PARTY_NOTICES.txt

@@ -1,5 +1,12 @@
 # Changelog / 変更履歴
 
+## 0.6.1 — 2026-10-12
+
+- Adopt the MIT license for project code, with copyright attributed to the repository owner handle domizo. Keep package private:true as a guard against accidental npm publication / プロジェクトを MIT ライセンスへ移行し、リポジトリ所有者のハンドル domizo を著作権表示に使用。npm の意図しない公開を防ぐ private:true は維持
+- Include complete notices for the installed React, React DOM, Scheduler, DM Sans and IBM Plex Mono distributions, plus the Vite core helper license. Verify exact lockfile versions and include notices with the served playground and component archive / 解決済みの依存バージョンと全文ライセンスを照合し、配信ファイルとアーカイブへ同梱
+- Document clone, install, development, build and preview steps in EN/JA without a hosted demo link; update the completed 0.6.0 QA record / デモサイトへのリンクを載せず、clone からの構築手順と完了済み検証記録を更新
+- No interaction, glyph geometry or motion-timing changes / 操作、アイコン形状、モーションの時間配分は変更なし
+
 ## 0.6.0 — 2026-10-12
 
 - Make drag handles the primary ordering control in Choose icons, with pointer/touch movement, keyboard pickup/arrows/Home/End/drop/Escape, announced positions, retained focus, safe interruption, and a collapsed Earlier/Later fallback / ハンドルによるドラッグを主操作にし、タッチ・キーボード・位置通知・フォーカス維持・中断時の復元・折りたたんだ代替操作へ対応
@@ -8,7 +15,7 @@
 - Retain schemaVersion 1 and normalize optional legacy `motionOverrides` to `{}`; validate known action/treatment pairs, preserve overrides when actions are removed/re-added, and delete entries on inherit/reset. Carry assignments through session drafts, presets, JSON, live/context/async previews, the timeline, and generated React / スキーマ1を維持し、旧入力の欠落を空マップに補完。個別指定を安全に検証・保持し、継承時は削除。保存・各プレビュー・生成 React まで同じ割り当てを反映
 - Move the comparison matrix to Guide → Motion reference and keep its exploratory controls, along with Icon catalog controls, local to each experiment; default the catalog to Assigned motions / 動きの比較をガイドへ移し、カタログとともに共有設定を書き換えない参照実験にする。カタログは設定したモーションから開始
 - Remove separate pending-dot markup and pseudo-element decoration; retain slower assigned glyph motion, busy/disabled semantics, duplicate-activation guards, and contextual status, including when reduced motion makes the glyph static / 独立した処理中の点の要素・疑似要素を除去し、割り当てたアイコンの反復・処理中の意味・重複防止・状況説明を維持。動き抑制時も意味を保つ
-- Preserve all 60 existing geometry/timing plans, including accepted Cartoon Comment/Repost behavior; retain local-only examples, explicit stylesheet installation, private archive distribution, and UNLICENSED status / 全60組の形状・時間配分、ローカルの例、CSS の明示的な導入、private アーカイブ、UNLICENSED を維持
+- Preserve all 60 existing geometry/timing plans, including accepted Cartoon Comment/Repost behavior; retain local-only examples, explicit stylesheet installation, private archive distribution, and the original distribution guard (superseded by the MIT license in 0.6.1) / 全60組の形状・時間配分、ローカルの例、CSS の明示的な導入、private アーカイブ、当時の配布保護を維持（0.6.1 で MIT ライセンスへ移行）
 - Update EN/JA workflow, schema, motion, accessibility, and 0.6.0 archive instructions. Add reviewed 0.6.0 browser captures for drag ordering, mixed motion assignments and mobile context / 両言語の導線・設定・動き・アクセシビリティ・導入手順を更新。実ブラウザーで撮影・確認した並べ替え、個別モーション、モバイルの使用画面を追加
 
 ## 0.5.0 — 2026-10-12
@@ -19,7 +26,7 @@
 - Retain inactive panels as hidden/inert; stop their motion, cancel pending local work, invalidate unfinished imports, and close popups while preserving mounted drafts and confirmed toggles / 非表示パネルは hidden/inert で保持し、動き・処理中の操作・未完了の読み込みを止めてポップアップを閉じ、下書きと確定済みトグルを維持
 - Add manual keyboard tab activation, Next/Back heading focus, direct routes, and legacy-fragment routing for existing bookmarks / キーボードでのタブ選択・確定、「次へ／戻る」の見出しフォーカス、直接リンクと旧リンクの移動先を整備
 - Update bilingual workflow, use cases, accessibility guidance, and private `social-interaction-lab-react-0.5.0.tgz` installation instructions; keep fresh screenshot and test evidence separate from historical captures/results / 両言語の導線・用途・アクセシビリティ・private アーカイブの導入手順を更新し、新しい画面と検証結果は過去の記録と区別
-- Preserve the existing 12-action selection and ordering, labelled/icon-only library API, accepted motion treatments including 0.3.8 Comment/Repost, local-only simulations, private metadata, and UNLICENSED distribution / 既存の12操作・並べ替え・表示 API・確定済みの動き・ローカル動作・private・UNLICENSED を維持
+- Preserve the existing 12-action selection and ordering, labelled/icon-only library API, accepted motion treatments including 0.3.8 Comment/Repost, local-only simulations, private metadata, and the original no-reuse-license distribution (superseded by MIT in 0.6.1) / 既存の12操作・並べ替え・表示 API・確定済みの動き・ローカル動作・private・当時の配布保護を維持（0.6.1 で MIT ライセンスへ移行）
 
 ## 0.4.2 — 2026-10-12
 
@@ -47,7 +54,7 @@
 - Compare independent local Like/Save optimistic and after-success transactions, including displayed/confirmed values, failure, retry, cancellation, and stale-result protection / いいね・保存の更新方針と、表示値・確定値・失敗・再試行・中止を比較
 - Add a one-variable design lens for spacing, icon size, or stroke width with rendered hit-area bounds, geometric icon-box centers, and same-row gap overlays / 余白・大きさ・線幅の単変数比較と、操作領域・幾何学的中心・横方向の間隔を表示
 - Add generated-consumer verification and Studio integration guidance; keep new verification evidence separate from historical QA / 生成コードの外部利用検証とガイドを追加し、実施結果は過去の QA と区別
-- Preserve the accepted 0.3.8 Comment/Repost motion, existing library contracts, local-only behavior, private metadata, and `UNLICENSED` distribution / 確定済みの動き・既存 API・ローカル動作・private・UNLICENSED を維持
+- Preserve the accepted 0.3.8 Comment/Repost motion, existing library contracts, local-only behavior, private metadata, and the original no-reuse-license distribution (superseded by MIT in 0.6.1) / 確定済みの動き・既存 API・ローカル動作・private・当時の配布保護を維持（0.6.1 で MIT ライセンスへ移行）
 
 ## 0.3.8 — 2026-10-11
 

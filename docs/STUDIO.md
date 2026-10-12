@@ -8,13 +8,39 @@ The four variants, 1–12-action selection, labelled/icon-only component API, an
 
 4スタイル、1〜12操作、表示方法の API、スキーマ番号1を維持し、入力では省略可能な `motionOverrides` を追加します。旧設定で省略した場合は空のマップへ補完します。コメント・リポストを含む全60組の形状と時間配分は変更しません。SNS への投稿や AI バックエンドはありません。
 
+## Start locally / ローカルで試す
+
+Requires Git, Node.js 22.12+ in the 22.x line, 24.x, or 26.x, and npm. Clone the repository and start the development server:
+
+Git、Node.js 22.12 以上の 22 系・24 系・26 系のいずれか、npm を用意し、リポジトリを取得して開発サーバーを起動します。
+
+```sh
+git clone https://github.com/domizo/social-interaction-lab.git
+cd social-interaction-lab
+npm ci
+npm run dev
+```
+
+Open the local URL printed by Vite. No account or API key is required. To build the playground, library, and installable archive, then preview the production build locally:
+
+Vite が表示するローカル URL を開いてください。アカウントや API キーは不要です。サイト・ライブラリ・インストール用アーカイブをビルドし、本番用サイトをローカルで確認するには、次を順に実行します。
+
+```sh
+npm run build
+npm run preview
+```
+
+The outputs are `dist/`, `package/`, and `public/downloads/`. Open the local URL printed by the preview server after the build succeeds.
+
+生成先は `dist/`・`package/`・`public/downloads/` です。ビルド成功後、プレビューサーバーが表示するローカル URL を開いてください。
+
 ## Five-step workflow
 
 1. **Choose icons / アイコンを選ぶ** (`#choose`): select 1–12 actions and arrange them in your order
 2. **Appearance / 見た目** (`#appearance`): choose a visual style and tune every appearance setting in one place; optionally isolate one variable
 3. **Motion / 動き** (`#animation`): set global and per-icon treatments, tune shared glyph tokens, and inspect an assigned motion
 4. **In context / 使用画面** (`#preview`): try the shared configuration in a feed, article footer, or fixed chat sample
-5. **Export / エクスポート** (`#export`): edit/apply EN/JA labels, save/load named presets, import/export JSON, generate React TSX, and download the private package
+5. **Export / エクスポート** (`#export`): edit/apply EN/JA labels, save/load named presets, import/export JSON, generate React TSX, and download the package archive
 
 Use a tab directly, or use **Next / Back** to move through the suggested order. No step is locked, and there is no completion requirement. Presentation, reduced-motion preview, and hit-target display live in **Appearance → Tune the details** and apply across the workspaces. **Guide** (`#guide`) opens the explanation area; `#guide/motion`, `#guide/catalog`, `#guide/async`, `#guide/design`, and `#guide/states` open its reference panels.
 
@@ -183,9 +209,9 @@ JSON はプリセット一覧ではなく、ひとつの設定です。最大65,
 
 ### Complete React module / React モジュール
 
-**Copy React** and **Download TSX** produce the same complete `SocialActions.tsx` module. Download the actual `social-interaction-lab-react-0.6.0.tgz` archive from **Export**, install it in a separate React + TypeScript application with `npm install ./social-interaction-lab-react-0.6.0.tgz`, keep its explicit stylesheet import, and mount the default `SocialActions` component.
+**Copy React** and **Download TSX** produce the same complete `SocialActions.tsx` module. Download the actual `social-interaction-lab-react-0.6.1.tgz` archive from **Export**, install it in a separate React + TypeScript application with `npm install ./social-interaction-lab-react-0.6.1.tgz`, keep its explicit stylesheet import, and mount the default `SocialActions` component.
 
-The package remains private and is not published to the npm registry. Its ESM build expects React 18.2 or 19 as a peer dependency.
+The package is distributed as an installable archive and is not published to the npm registry. Its ESM build expects React 18.2 or 19 as a peer dependency. See [License and distribution](#license-and-distribution--ライセンスと配布) for reuse terms.
 
 The generated module includes:
 
@@ -241,6 +267,16 @@ npm run verify:generated
 
 For browser review, exercise both languages, both presentations, and narrow/wide layouts; all five tabs and Guide panels, freely revisited steps, direct/legacy hashes, browser Back/Forward, manual keyboard tab activation, Next/Back heading focus, hidden/inert inactive panels, same-tab reload restoration of configuration, locale, and effective isolation-mode tokens, including legacy drafts without comparison choices, invalid/blocked session storage, retained local toggles and composer drafts on step changes, popup closure without hidden focus restoration, and cancellation of motion, requests, and imports when leaving a panel; picker inclusion/removal, one-action/12-action limits, pointer/touch handle ordering, keyboard pickup/arrows/Home/End/drop/Escape, interrupted-reorder rollback, the collapsed Earlier/Later fallback, focus/announcements, and custom label/order propagation across shared surfaces; labelled/icon-only switching; stable accessible names, native title hints, hidden-count descriptions, and minimum hit targets; legacy schema-v1 imports without `presentation` or `motionOverrides`, rejection of invalid values and unsafe override keys/properties, global inheritance and explicit `none`, per-icon reset and remove/re-add preservation, Guide experiment isolation and Assigned motions defaults, and preset/JSON/session/TSX assignment round trips; keyboard menus/dialogs and removal while a popup or request is active; storage denial/corruption; invalid, oversized, and racing imports; clipboard rejection; timeline selected choices, resolved-treatment readout, removal fallback, replay/seek/reset/unmount and OS/manual reduction; independent async reversal/failure/retry/cancel; and lens wrapping with long labels. Check that the independent Like/Save examples and full 12-action catalog remain available when the picker changes. Inspect real SVG geometry over time for all 12 × five treatments, including the accepted 0.3.8 Comment/Repost behavior. Keep code-generation type checks separate from runtime, accessibility, and visual QA.
 
-These instructions describe the verification workflow, not a claim that new browser checks have passed. Historical results remain in [QA](https://github.com/domizo/social-interaction-lab/blob/main/docs/QA.md); record fresh evidence there only when executed. Private source/demo and `UNLICENSED` distribution remain unchanged.
+These instructions describe the verification workflow, not a claim that new browser checks have passed. Historical results remain in [QA](https://github.com/domizo/social-interaction-lab/blob/main/docs/QA.md); record fresh evidence there only when executed.
 
-生成 TSX の型検査は両言語の10設定、計20件です。旧形式、混在する個別の動き、未選択操作の個別指定、攻撃的な文字列を含むラベルも扱い、不正なマップを拒否して getter や `toJSON` を実行しないことも確認します。任意の順序とラベルを持つ部分集合は `?set=custom&locale=en|ja`、個別指定と全体の動きを継承する Reaction の例は `?set=mixed&locale=en|ja` で選べます。どちらも指定した `presentation` より優先します。生成コードの型検査と、実ブラウザーでの操作・動き・アクセシビリティ確認は別です。両言語・両表示方法・画面幅・5つのタブとガイド・直接リンクと旧リンク・戻る／進む・キーボード操作・非表示パネルへのフォーカス防止・再読み込みでの設定復元・移動時の中止と下書き保持・選択数の上下限・ドラッグとキーボードの選択／移動／確定／中止・中断時の復元・折りたたんだ代替操作・フォーカスと通知・全体継承と個別指定・削除／再追加・ガイドの変更が共有設定に影響しないこと・共有画面への選択／順序／ラベルの反映・固定のアクセシブル名と件数の説明・旧 JSON の互換性と保存／書き出しの往復・中断や失敗・動き抑制を検証し、実行した範囲だけを QA に記録してください。このガイドは新しいブラウザー検証の成功を宣言するものではありません。private・UNLICENSED の配布方針は変更しません。
+生成 TSX の型検査は両言語の10設定、計20件です。旧形式、混在する個別の動き、未選択操作の個別指定、攻撃的な文字列を含むラベルも扱い、不正なマップを拒否して getter や `toJSON` を実行しないことも確認します。任意の順序とラベルを持つ部分集合は `?set=custom&locale=en|ja`、個別指定と全体の動きを継承する Reaction の例は `?set=mixed&locale=en|ja` で選べます。どちらも指定した `presentation` より優先します。生成コードの型検査と、実ブラウザーでの操作・動き・アクセシビリティ確認は別です。両言語・両表示方法・画面幅・5つのタブとガイド・直接リンクと旧リンク・戻る／進む・キーボード操作・非表示パネルへのフォーカス防止・再読み込みでの設定復元・移動時の中止と下書き保持・選択数の上下限・ドラッグとキーボードの選択／移動／確定／中止・中断時の復元・折りたたんだ代替操作・フォーカスと通知・全体継承と個別指定・削除／再追加・ガイドの変更が共有設定に影響しないこと・共有画面への選択／順序／ラベルの反映・固定のアクセシブル名と件数の説明・旧 JSON の互換性と保存／書き出しの往復・中断や失敗・動き抑制を検証し、実行した範囲だけを QA に記録してください。このガイドは新しいブラウザー検証の成功を宣言するものではありません。
+
+## License and distribution / ライセンスと配布
+
+Project-authored code is available under the [MIT License](../LICENSE), including for modification, redistribution, and commercial use. Retain the copyright and license notice as required by that license. Third-party code and fonts retain their own licenses; see [THIRD_PARTY_NOTICES.md](../THIRD_PARTY_NOTICES.md) for the notices and license texts.
+
+The package metadata keeps `private: true` to prevent accidental npm publishing. This publishing guard does not restrict MIT-licensed reuse or installation of the `.tgz` archive. The package is not published to the npm registry.
+
+このプロジェクトが作成したコードは [MIT License](../LICENSE) で提供し、改変・再配布・商用利用が可能です。ライセンスに従って著作権表示とライセンス表示を保持してください。第三者のコードとフォントにはそれぞれのライセンスが適用されます。権利表示とライセンス全文は [THIRD_PARTY_NOTICES.md](../THIRD_PARTY_NOTICES.md) を参照してください。
+
+`private: true` は、誤って npm に公開することを防ぐ設定です。MIT License に基づく再利用や `.tgz` アーカイブのインストールを制限するものではありません。パッケージは npm レジストリには公開していません。

@@ -371,3 +371,13 @@ test('leaving Export aborts a held import and a late reader cannot replace confi
   await expect(config.getByRole('status')).toHaveCount(0);
   await expect(config.getByRole('alert')).toHaveCount(0);
 });
+
+test('Guide exposes the exact served MIT license and complete third-party notices',async({page})=>{
+ await page.goto('/#guide');
+ const license=page.getByRole('link',{name:'MIT license',exact:true});
+ const notices=page.getByRole('link',{name:'Third-party notices',exact:true});
+ await expect(license).toHaveAttribute('href','/LICENSE.txt');await expect(notices).toHaveAttribute('href','/THIRD_PARTY_NOTICES.txt');
+ const licenseResponse=await page.request.get('/LICENSE.txt');expect(licenseResponse.ok()).toBe(true);const text=await licenseResponse.text();expect(text).toContain('MIT License');expect(text).toContain('Copyright (c) 2026 domizo');expect(text).toContain('THE SOFTWARE IS PROVIDED "AS IS"');
+ const noticeResponse=await page.request.get('/THIRD_PARTY_NOTICES.txt');expect(noticeResponse.ok()).toBe(true);const notice=await noticeResponse.text();for(const name of ['react 19.3.0','react-dom 19.3.0','scheduler 0.28.0','@fontsource-variable/dm-sans 5.3.0','@fontsource/ibm-plex-mono 5.3.0','vite 7.3.7'])expect(notice).toContain(`## ${name}`);expect(notice).toContain('SIL OPEN FONT LICENSE Version 1.1');
+ await page.getByRole('button',{name:'日本語',exact:true}).click();await expect(page.getByRole('link',{name:'MIT ライセンス',exact:true})).toBeVisible();await expect(page.getByRole('link',{name:'第三者ライセンス通知',exact:true})).toBeVisible();expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+});
