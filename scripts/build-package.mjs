@@ -5,7 +5,7 @@ import {resolve} from 'node:path';
 await prepareServedNotices();
 const root=process.cwd();await rm('package',{recursive:true,force:true});await mkdir('package',{recursive:true});
 execFileSync(process.execPath,['node_modules/typescript/bin/tsc','-p','tsconfig.package.json'],{stdio:'inherit'});
-const pkg={name:'@social-interaction-lab/react',version:JSON.parse(await readFile('package.json','utf8')).version,private:true,type:'module',license:'MIT',description:'Accessible social-action primitives, four visual styles, versioned tokens and cancellable async ownership.',main:'./dist/index.js',types:'./dist/index.d.ts',exports:{'.':{types:'./dist/index.d.ts',import:'./dist/index.js'},'./styles.css':'./dist/styles.css','./tokens.json':'./tokens.json'},files:['dist','tokens.json','README.md','README.ja.md','CHANGELOG.md','CONTRIBUTING.md','LICENSE','THIRD_PARTY_NOTICES.md','docs'],sideEffects:['**/*.css'],peerDependencies:{react:'^18.2.0 || ^19.0.0'}};
+const pkg={name:'@social-interaction/react',version:JSON.parse(await readFile('package.json','utf8')).version,private:true,type:'module',license:'MIT',description:'Accessible social-action primitives, four visual styles, versioned tokens and cancellable async ownership.',main:'./dist/index.js',types:'./dist/index.d.ts',exports:{'.':{types:'./dist/index.d.ts',import:'./dist/index.js'},'./styles.css':'./dist/styles.css','./tokens.json':'./tokens.json'},files:['dist','tokens.json','README.md','README.ja.md','CHANGELOG.md','CONTRIBUTING.md','LICENSE','THIRD_PARTY_NOTICES.md','docs'],sideEffects:['**/*.css'],peerDependencies:{react:'^18.2.0 || ^19.0.0'}};
 await writeFile('package/package.json',JSON.stringify(pkg,null,2)+'\n');await copyFile('src/lib/styles.css','package/dist/styles.css');
 for(const name of ['README.md','README.ja.md','CHANGELOG.md','CONTRIBUTING.md','LICENSE','THIRD_PARTY_NOTICES.md'])await copyFile(name,`package/${name}`);
 await mkdir('package/docs',{recursive:true});for(const name of ['API.md','DESIGN.md','ACCESSIBILITY.md','MOTION.md','STUDIO.md'])await copyFile(`docs/${name}`,`package/docs/${name}`);
@@ -14,4 +14,4 @@ const {tokensToDTCG}=await import(`${resolve('package/dist/tokens.js')}?build=${
 await rm('public/downloads',{recursive:true,force:true});await mkdir('public/downloads',{recursive:true});
 execFileSync('npm',['pack','./package','--pack-destination','public/downloads','--ignore-scripts','--cache','/tmp/social-lab-npm-cache'],{stdio:'inherit'});
 await copyFile('package/tokens.json','public/downloads/social-tokens-default.json');
-console.log('Built @social-interaction-lab/react; CSS and strict ESM declarations included.');
+console.log('Built @social-interaction/react; CSS and strict ESM declarations included.');

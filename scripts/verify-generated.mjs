@@ -10,13 +10,13 @@ import {build} from 'vite';
 
 const root = process.cwd();
 const {version} = JSON.parse(await readFile(join(root, 'package.json'), 'utf8'));
-const archive = resolve(root, `public/downloads/social-interaction-lab-react-${version}.tgz`);
+const archive = resolve(root, `public/downloads/social-interaction-react-${version}.tgz`);
 const temp = await mkdtemp(join(tmpdir(), 'social-generated-'));
 try {
   // The archive is produced by build:package. This test deliberately uses its declarations and CSS export.
   execFileSync('tar', ['-xzf', archive, '-C', temp], {stdio: 'inherit'});
-  await mkdir(join(temp, 'node_modules', '@social-interaction-lab'), {recursive: true});
-  await symlink(join(temp, 'package'), join(temp, 'node_modules', '@social-interaction-lab', 'react'), 'dir');
+  await mkdir(join(temp, 'node_modules', '@social-interaction'), {recursive: true});
+  await symlink(join(temp, 'package'), join(temp, 'node_modules', '@social-interaction', 'react'), 'dir');
   for (const name of ['react', 'react-dom', '@types', 'csstype']) {
     await symlink(join(root, 'node_modules', name), join(temp, 'node_modules', name), 'dir');
   }
@@ -48,7 +48,7 @@ try {
   for (const [name, config] of cases) {
     for (const locale of ['en', 'ja']) {
       const example = generateReactUsage(parseStudioConfig(config), locale);
-      if (!example.includes("import '@social-interaction-lab/react/styles.css'")) throw new Error('Generated example must import package CSS');
+      if (!example.includes("import '@social-interaction/react/styles.css'")) throw new Error('Generated example must import package CSS');
       if (!example.includes('iconMotion={motionOverrides[item.action] ?? studioConfig.iconMotion}')) throw new Error('Generated example must resolve motion per action');
       if (name === 'hostile-labels') assert.equal(example.includes('</script>'), false);
       await writeFile(join(temp, `${name}-${locale}.tsx`), example);

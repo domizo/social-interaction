@@ -1,4 +1,4 @@
-# Social Interaction Lab
+# Social Interaction
 
 **いいね・保存・共有の見た目と動きを選び、その設定を React の実装へ。**
 
@@ -12,7 +12,7 @@
 
 ![全体の動きとアイコンごとの動きを割り当てる画面](docs/screenshots/workflow-motion-desktop-en.png)
 
-全体をそろえつつ、必要なアイコンだけ別の動きにできます。下の時間軸で適用結果も確認できます。画像は 0.6.0 を実ブラウザーで撮影したものです。静止画はレイアウトを示し、操作や時間経過の検証は[検証記録](https://github.com/domizo/social-interaction-lab/blob/main/docs/QA.md)で区別して扱います。
+全体をそろえつつ、必要なアイコンだけ別の動きにできます。下の時間軸で適用結果も確認できます。画像は旧バージョン 0.6.0 を実ブラウザーで撮影したものです。静止画はレイアウトを示し、操作や時間経過の検証は[検証記録](https://github.com/domizo/social-interaction/blob/main/docs/QA.md)で区別して扱います。
 
 ## 5つのステップで、設定とコードを持ち帰る
 
@@ -45,8 +45,8 @@
 Git、Node.js 22.12 以上の 22 系・24 系・26 系のいずれか、npm が必要です。
 
 ```sh
-git clone https://github.com/domizo/social-interaction-lab.git
-cd social-interaction-lab
+git clone https://github.com/domizo/social-interaction.git
+cd social-interaction
 npm ci
 npm run dev
 ```
@@ -67,19 +67,21 @@ Vite が表示するローカル URL を開いてください。
 
 ## React に組み込む
 
-「エクスポート」タブから `social-interaction-lab-react-0.6.1.tgz` をダウンロードするか、`npm run build:package` で生成します。アーカイブを組み込み先の React プロジェクトへコピーし、そのプロジェクト内でインストールしてください。
+「エクスポート」タブから `social-interaction-react-0.6.2.tgz` をダウンロードするか、`npm run build:package` で生成します。アーカイブを組み込み先の React プロジェクトへコピーし、そのプロジェクト内でインストールしてください。
 
 ```sh
-npm install ./social-interaction-lab-react-0.6.1.tgz
+npm install ./social-interaction-react-0.6.2.tgz
 ```
 
 パッケージはインストール可能なアーカイブとして配布し、npm レジストリには公開していません。React 18.2 / 19 が peer dependency として必要で、ESM のみに対応します。CSS は明示的に読み込みます。
+
+新しく生成するコードは `@social-interaction/react` と `@social-interaction/react/styles.css` を読み込みます。旧 tarball のインストール済みパッケージは `@social-interaction-lab/react` として引き続き使え、以前に生成したコードの import は自動では変わりません。名称変更後の 0.6.2 パッケージで使う場合は、コードを再生成するか、パッケージと CSS の両方の import を更新してください。
 
 Studio で選んだ設定を使う場合は、生成コードを `SocialActions.tsx` として保存し、表示します。
 
 ```tsx
 import SocialActions from './SocialActions';
-import '@social-interaction-lab/react/styles.css';
+import '@social-interaction/react/styles.css';
 
 export default function App() {
   return <SocialActions />;
@@ -90,8 +92,8 @@ export default function App() {
 
 ```tsx
 import { useState } from 'react';
-import { LikeButton } from '@social-interaction-lab/react';
-import '@social-interaction-lab/react/styles.css';
+import { LikeButton } from '@social-interaction/react';
+import '@social-interaction/react/styles.css';
 
 export function PostLike() {
   const [liked, setLiked] = useState(false);
@@ -105,6 +107,8 @@ export function PostLike() {
 生成コードにはローカルのポップアップ実装を含みます。一方、個別部品の CommentButton・QuoteButton はダイアログ、ShareButton はメニューを開くことを支援技術に伝えますが、ポップアップ自体は作りません。個別部品を使う場合は、対応するポップアップ、フォーカス移動・復帰、キーボード操作、`aria-expanded` / `aria-controls` を利用側で実装してください。動くローカル実装例は `src/app/LiveActions.tsx` にあります。
 
 ## 対応範囲と保存されるもの
+
+名称変更後も、localStorage の `social-interaction-lab:studio-presets:v1` と sessionStorage の `social-interaction-lab:working-draft:v1` は意図的に変更せず、同じブラウザー・同じオリジンの保存済みデータを引き継ぎます。オリジンやポートが変わると保存領域も別になるため、設定 JSON で持ち運んでください。
 
 - **アプリへの組み込み:** 生成コードには、選んだ操作と順序、ラベル、表示方法、トークン、動きを含みます。Studio の設定画面、記事・チャットのサンプル本文、時間軸、非同期比較は出力しません。`onCommand` は同期の通知コールバックです。実際の通信・永続保存・権限・エラー処理は利用側で実装します。
 - **作業中の設定:** 操作の選択・順序・適用済みの両言語ラベル・場面・表示方法・見た目・動きは、タブ移動や言語切り替えで保持します。保存領域が使える場合は、検証済みの sessionStorage の設定から、同じタブの再読み込み後に設定・言語・見た目の単変数比較の選択を復元します。不正・利用不可の場合は通知して初期値を使い、利用者の編集までは自動上書きしません。名前付きプリセットとは別で、端末間の同期はありません。
@@ -180,7 +184,7 @@ npm run verify:archive
 
 `verify:archive` は Git HEAD が必要で、そのコミットに記録されたファイルだけを使って検証します。
 
-`verify:consumer` は新しい外部プロジェクトに tarball をインストールし、厳密な NodeNext 型検査、ESM の実行時 import、CSS を確認します。`verify:generated` はビルド済み tarball と既存の依存関係を使い、ラベル付き／アイコンのみ・全操作・単独操作・最大長ラベル・旧形式・混在する動き・未選択操作の個別指定・攻撃的な文字列を含むラベルなど、10設定の EN/JA、計20件の生成 TSX を型検査します。不正な個別指定マップを拒否し、getter や `toJSON` を実行しないことも確認します。ブラウザー検証用に独立した生成コンポーネントのページもビルドします。この QA ページは公開対象に含めません。CI の設定は `.github/workflows/quality.yml` にあります。コマンドや CI の定義が存在することと、実行済み・成功済みであることは別です。ブラウザー検証の実施範囲と結果は [QA 記録](https://github.com/domizo/social-interaction-lab/blob/main/docs/QA.md)を参照してください。
+`verify:consumer` は新しい外部プロジェクトに tarball をインストールし、厳密な NodeNext 型検査、ESM の実行時 import、CSS を確認します。`verify:generated` はビルド済み tarball と既存の依存関係を使い、ラベル付き／アイコンのみ・全操作・単独操作・最大長ラベル・旧形式・混在する動き・未選択操作の個別指定・攻撃的な文字列を含むラベルなど、10設定の EN/JA、計20件の生成 TSX を型検査します。不正な個別指定マップを拒否し、getter や `toJSON` を実行しないことも確認します。ブラウザー検証用に独立した生成コンポーネントのページもビルドします。この QA ページは公開対象に含めません。CI の設定は `.github/workflows/quality.yml` にあります。コマンドや CI の定義が存在することと、実行済み・成功済みであることは別です。ブラウザー検証の実施範囲と結果は [QA 記録](https://github.com/domizo/social-interaction/blob/main/docs/QA.md)を参照してください。
 
 DOM テストはブラウザーのレイアウトや実際の支援技術による確認を代替しません。
 

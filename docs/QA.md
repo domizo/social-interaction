@@ -1,12 +1,16 @@
 # Verification record / 検証記録
 
+## 0.6.2 Naming verification / 名称変更の確認
+
+This update aligns the project title, repository links and generated package imports with **Social Interaction**. Storage keys and schema are intentionally retained, and all accepted motion plans are unchanged. The previous exact [0.6.1 run 38280678107](https://github.com/domizo/social-interaction/actions/runs/38280678107) passed 365 unit tests and 244 native cases, with four intentional touch skips and no retries. The rename has its own exact-commit source, consumer, distribution and browser gate. Local checks on 2026-10-13 passed 368 tests, strict types, the production/package build, a fresh strict NodeNext/ESM consumer and all 20 generated modules. Three added regressions cover the current brand/imports and data retained under both legacy storage keys. The preceding native result is a baseline, not a claim about an unexecuted run.
+
 ## 0.6.1 Distribution verification / 配布物の確認
 
-This license/documentation update keeps the interaction and motion implementations from 0.6.0. `npm run build` now also runs `verify:distribution`: it checks MIT metadata, the npm publishing guard, exact license text against installed lockfile-resolved dependencies, notices served with the playground, license/notices inside the generated component archive, archive-byte equality and the absence of project-authored hosted-demo links. The [Quality workflow](https://github.com/domizo/social-interaction-lab/actions/workflows/quality.yml) reruns the clean-source, package-consumer and browser gates for each commit. Local checks on 2026-10-12 passed 365 unit/schema/lifecycle/license tests, strict types, the application/package build including distribution verification, a fresh strict external package consumer and all 20 generated modules. The completed native baseline below is distinguished from the new exact-commit browser run, which also checks that both languages expose the served license and notices.
+This license/documentation update keeps the interaction and motion implementations from 0.6.0. `npm run build` now also runs `verify:distribution`: it checks MIT metadata, the npm publishing guard, exact license text against installed lockfile-resolved dependencies, notices served with the playground, license/notices inside the generated component archive, archive-byte equality and the absence of project-authored hosted-demo links. The [Quality workflow](https://github.com/domizo/social-interaction/actions/workflows/quality.yml) reruns the clean-source, package-consumer and browser gates for each commit. Local checks on 2026-10-12 passed 365 unit/schema/lifecycle/license tests, strict types, the application/package build including distribution verification, a fresh strict external package consumer and all 20 generated modules. The final exact-commit run 38280678107 then passed all 244 native cases, including served-license links in both languages, with four intentional touch skips and no retries.
 
 ## 0.6.0 Practical configuration / 選択と設定の整理
 
-The final [exact-commit run 38270456120](https://github.com/domizo/social-interaction-lab/actions/runs/38270456120) passed **356 unit/schema/lifecycle tests and 239 native browser cases**, with **four intentional skips and no retries or flaky results**. The four skips are trusted-touch cases outside Chromium mobile; all applicable mouse, keyboard and configuration cases passed. Tested application source: `b00f2607ed40e5e25861942f0679e724ab1f8626`, matching GitHub `ed8ef5ad9035d4f34b0511a0904be0894ef62ecb`.
+The final [exact-commit run 38270456120](https://github.com/domizo/social-interaction/actions/runs/38270456120) passed **356 unit/schema/lifecycle tests and 239 native browser cases**, with **four intentional skips and no retries or flaky results**. The four skips are trusted-touch cases outside Chromium mobile; all applicable mouse, keyboard and configuration cases passed. Tested application source: `b00f2607ed40e5e25861942f0679e724ab1f8626`, matching GitHub `ed8ef5ad9035d4f34b0511a0904be0894ef62ecb`.
 
 The gate also passed strict types, a clean tracked-source install/build, 20 generated EN/JA React modules, fresh React 18/19 strict NodeNext/native ESM consumers and all 240 accepted motion-plan samples. Native checks covered transactional drag/drop, keyboard alternatives, pointer cancellation, viewport edge scrolling, stale configuration protection, one authoritative Appearance panel, selected-style comparison and inherited/per-icon motion across contexts, timelines, presets and generated React. Pending actions retained busy/name/status semantics without visible dots.
 
@@ -23,7 +27,7 @@ The workflow now presents one active step at a time, with a separate Guide. The 
 Checks cover manual keyboard tabs, Next/Back focus, browser history, initial/legacy hashes, session-draft restoration and storage failures, retained unsaved labels/preset/composer drafts, and inactive animation/request/import cleanup. Existing accepted glyph plans and strict native motion trajectories are unchanged. Only the active page is visible and accessible; retained inactive panels are hidden and inert.
 
 
-The first exact step-page candidate [passed all 208 native cases without retries](https://github.com/domizo/social-interaction-lab/actions/runs/38202730327), alongside 302 unit tests and the clean-source/package gates. Reviewed captures show the [desktop icon-selection step](screenshots/workflow-choose-desktop-en.png) and [mobile Japanese context step](screenshots/workflow-preview-mobile-ja.png). The complete artifact also contains every step in both languages on all five projects. These images come from source `fe65898d`, remote `36c5c3aa`; the following documentation-only snapshot retains the same application and must pass its own exact-commit gate before deployment. Native workflow evidence includes fresh legacy routes, visible keyboard focus, browser Back/Forward, retained drafts, and aborted hidden imports/requests. The accepted default-speed flight and canonical glyph gates also pass.
+The first exact step-page candidate [passed all 208 native cases without retries](https://github.com/domizo/social-interaction/actions/runs/38202730327), alongside 302 unit tests and the clean-source/package gates. Reviewed captures show the [desktop icon-selection step](screenshots/workflow-choose-desktop-en.png) and [mobile Japanese context step](screenshots/workflow-preview-mobile-ja.png). The complete artifact also contains every step in both languages on all five projects. These images come from source `fe65898d`, remote `36c5c3aa`; the following documentation-only snapshot retains the same application and must pass its own exact-commit gate before deployment. Native workflow evidence includes fresh legacy routes, visible keyboard focus, browser Back/Forward, retained drafts, and aborted hidden imports/requests. The accepted default-speed flight and canonical glyph gates also pass.
 
 
 Updated: 2026-10-12. Source checks, real-browser checks and hosted access are reported separately.
@@ -40,7 +44,7 @@ Browser screenshots can take longer than a finite animation. Portable playback t
 
 ## 0.4.1 Icon-only presentation / アイコンのみの表示
 
-The exact-commit release gate adds a shared labelled/icon-only setting without changing any accepted motion plan. Before deployment it must pass the [Quality workflow](https://github.com/domizo/social-interaction-lab/actions), including:
+The exact-commit release gate adds a shared labelled/icon-only setting without changing any accepted motion plan. Before deployment it must pass the [Quality workflow](https://github.com/domizo/social-interaction/actions), including:
 
 - 240 unit/schema/lifecycle tests, strict types, clean tracked-source reconstruction and fresh package consumers
 - Ten generated EN/JA TSX consumers, including full-catalog icon-only modules using the actual archive and stylesheet
@@ -53,7 +57,7 @@ The visible label and count are hidden together. Required accessible names remai
 
 ## 0.4.0 Interaction Studio / 実際の画面・設定・時間・状態をつなぐ
 
-The release gate is the exact-commit [Quality workflow](https://github.com/domizo/social-interaction-lab/actions). A configured test is not, by itself, a passing result. The Studio gate combines:
+The release gate is the exact-commit [Quality workflow](https://github.com/domizo/social-interaction/actions). A configured test is not, by itself, a passing result. The Studio gate combines:
 
 - 218 unit/lifecycle/schema/raster-metric tests and strict TypeScript; fresh committed-source reconstruction and package consumption
 - React 18 and 19 consumers, strict NodeNext imports and CSS; eight generated EN/JA TSX configurations, including maximum-length labels
@@ -82,8 +86,8 @@ WebKit on Linux is useful cross-engine evidence, not a test on the user's Mac or
 
 Evidence: application GitHub `f6d53ebf082f9f6f0734c74f7e77f8644b7fb9de`, corresponding Site source `7ee9363b499628480aa52ae74260162869a3cfe7`.
 
-- [Successful 28-case CI](https://github.com/domizo/social-interaction-lab/actions/runs/38056363811)
-- [Temporal JSON, heart phases and bilingual catalog screenshots](https://github.com/domizo/social-interaction-lab/actions/runs/38056363811/artifacts/11671121654), retained 14 days
+- [Successful 28-case CI](https://github.com/domizo/social-interaction/actions/runs/38056363811)
+- [Temporal JSON, heart phases and bilingual catalog screenshots](https://github.com/domizo/social-interaction/actions/runs/38056363811/artifacts/11671121654), retained 14 days
 - Artifact SHA-256: `86e57bc83e85aeb48bd1760ffa2eaad23a2a1914aabe66e8fa8ee30c8598cbdd`
 
 This record and the narrow capture/deep-link cleanup follow the measured application source. A later fresh-page regression exposed initial fragment scrolling before React mounted; the app now performs the initial jump after layout fonts settle, cancels stale/unmounted work, and yields to user input. Three lifecycle regressions bring the unit suite to 102. Every subsequent exact repository commit reruns the full Quality workflow. Hosted sign-in, Safari, physical devices and assistive-technology limits below still apply.
@@ -103,8 +107,8 @@ Flow: open the Motion section → activate each action in each treatment → obs
 ### Motion evidence / 根拠
 
 - Application-motion source: GitHub `1d064dc515fa368880d70030878dabf0e014458d`; Site `389a696ee9f27ea3f43ca9091688d9b67babbbef`
-- [Successful 22-case browser CI](https://github.com/domizo/social-interaction-lab/actions/runs/38053137595)
-- [Temporal JSON, motion frames and EN/JA screenshots](https://github.com/domizo/social-interaction-lab/actions/runs/38053137595/artifacts/11670911049), retained for 14 days. Open the Playwright report for the two glyph-animation-progress.json attachments
+- [Successful 22-case browser CI](https://github.com/domizo/social-interaction/actions/runs/38053137595)
+- [Temporal JSON, motion frames and EN/JA screenshots](https://github.com/domizo/social-interaction/actions/runs/38053137595/artifacts/11670911049), retained for 14 days. Open the Playwright report for the two glyph-animation-progress.json attachments
 - Artifact SHA-256: `e75a77f750f6b5bd41afb6a1a8c265108d8050d9883c3705e21ccd720360763d`
 - This record, a packaged documentation-link correction and the narrow helper-text palette cleanup follow that run. The repository Quality workflow repeats all checks for each final commit
 
@@ -129,8 +133,8 @@ The following evidence belongs to the original release; the motion gate above su
 ## Evidence / 検証の根拠
 
 - Tested application source: GitHub commit `a85764e8f98e42ac91928ccbbff98c06de677b7e`; corresponding Site source `3ec0c2daec1da2199ae580d76b04615ecf5d8d12`
-- [Successful CI run 38050726831](https://github.com/domizo/social-interaction-lab/actions/runs/38050726831)
-- [Browser report and full EN/JA screenshots](https://github.com/domizo/social-interaction-lab/actions/runs/38050726831/artifacts/11669222564) (GitHub artifact retention 14 days)
+- [Successful CI run 38050726831](https://github.com/domizo/social-interaction/actions/runs/38050726831)
+- [Browser report and full EN/JA screenshots](https://github.com/domizo/social-interaction/actions/runs/38050726831/artifacts/11669222564) (GitHub artifact retention 14 days)
 - Artifact SHA-256: `e0d62b1998a409b4e1c7dd325f26cdbb3ef5e875dca241b852096b4b9eae019b`
 - Persistent overview crops: [desktop EN](screenshots/desktop-en.png), [mobile JA](screenshots/mobile-ja.png)
 

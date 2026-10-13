@@ -236,7 +236,7 @@ describe('runnable React export', () => {
     const config = fresh(); config.context = 'article'; config.tokens.gap = 9;
     config.actions.push({action: 'bookmark', label: {en: 'Keep it', ja: 'とっておく'}});
     const generated = generateReactUsage(config, 'ja');
-    for (const expected of ["import '@social-interaction-lab/react/styles.css'", '"gap": 9', '"context": "article"', 'とっておく', 'const locale = "ja"', 'selected={isToggleAction', 'onCommand?.(command)', 'role="menu"', '<form ', 'useState', 'onKeyDown', 'readOnly value={fallbackLink}']) expect(generated).toContain(expected);
+    for (const expected of ["import '@social-interaction/react/styles.css'", '"gap": 9', '"context": "article"', 'とっておく', 'const locale = "ja"', 'selected={isToggleAction', 'onCommand?.(command)', 'role="menu"', '<form ', 'useState', 'onKeyDown', 'readOnly value={fallbackLink}']) expect(generated).toContain(expected);
     expect(generated).not.toContain('eval(');
   });
   it.each(['en', 'ja'] as const)('exports selected presentation and accessible labels in %s', locale => {

@@ -1,4 +1,4 @@
-# Social Interaction Lab
+# Social Interaction
 
 **Find the right social actions for your interface, then take the working choices into React.**
 
@@ -12,7 +12,7 @@ Choose only the actions your interface needs, then carry that setup through the 
 
 ![Assign a shared motion and individual icon treatments](docs/screenshots/workflow-motion-desktop-en.png)
 
-Give the row one shared motion, keep a few icons different, and inspect the resolved result below. These are actual 0.6.0 browser captures; still images show the layout, while interaction and elapsed-time checks are recorded in the [verification guide](https://github.com/domizo/social-interaction-lab/blob/main/docs/QA.md).
+Give the row one shared motion, keep a few icons different, and inspect the resolved result below. These are historical 0.6.0 browser captures; still images show the layout, while interaction and elapsed-time checks are recorded in the [verification guide](https://github.com/domizo/social-interaction/blob/main/docs/QA.md).
 
 ## From a design choice to a React component
 
@@ -45,8 +45,8 @@ In **Motion**, pause, scrub, slow down, and step through a selected icon's movem
 Requires Git, Node.js 22.12+ in the 22.x line, 24.x, or 26.x, and npm.
 
 ```sh
-git clone https://github.com/domizo/social-interaction-lab.git
-cd social-interaction-lab
+git clone https://github.com/domizo/social-interaction.git
+cd social-interaction
 npm ci
 npm run dev
 ```
@@ -67,19 +67,21 @@ Open the local URL printed by Vite. Preview requires a completed build.
 
 ## Use in React
 
-Download `social-interaction-lab-react-0.6.1.tgz` from **Export**, or create it with `npm run build:package`. Copy the archive into your separate React project, then install it there:
+Download `social-interaction-react-0.6.2.tgz` from **Export**, or create it with `npm run build:package`. Copy the archive into your separate React project, then install it there:
 
 ```sh
-npm install ./social-interaction-lab-react-0.6.1.tgz
+npm install ./social-interaction-react-0.6.2.tgz
 ```
 
 The package is distributed as an installable archive and is not published to the npm registry. React 18.2 or 19 is a peer dependency; the package is ESM-only. Styles must be explicitly imported.
+
+Newly generated modules import `@social-interaction/react` and `@social-interaction/react/styles.css`. Existing installations of older tarballs remain usable under `@social-interaction-lab/react`; previously generated snippets keep their old imports. To use those snippets with the renamed 0.6.2 package, regenerate them or update both package and stylesheet imports.
 
 For the setup you chose in Studio, save its generated module as `SocialActions.tsx` and render it:
 
 ```tsx
 import SocialActions from './SocialActions';
-import '@social-interaction-lab/react/styles.css';
+import '@social-interaction/react/styles.css';
 
 export default function App() {
   return <SocialActions />;
@@ -90,8 +92,8 @@ You can also compose individual primitives:
 
 ```tsx
 import { useState } from 'react';
-import { LikeButton } from '@social-interaction-lab/react';
-import '@social-interaction-lab/react/styles.css';
+import { LikeButton } from '@social-interaction/react';
+import '@social-interaction/react/styles.css';
 
 export function PostLike() {
   const [liked, setLiked] = useState(false);
@@ -105,6 +107,8 @@ export function PostLike() {
 The generated module includes local popup behavior. Individual CommentButton and QuoteButton primitives announce a dialog, and ShareButton announces a menu, but do not create those popups. When using primitives directly, provide matching accessible popups, keyboard navigation, focus handling, and `aria-expanded` / `aria-controls`. See `src/app/LiveActions.tsx` for working local examples.
 
 ## Scope and saved data
+
+The project rename deliberately retains `social-interaction-lab:studio-presets:v1` in localStorage and `social-interaction-lab:working-draft:v1` in sessionStorage so existing saved data remains available on the same browser origin. A different origin or port has separate storage; use configuration JSON to carry a setup across origins.
 
 - **Application integration:** Generated code carries the chosen actions, order, labels, presentation, tokens, and motion. It does not export the Studio panels, sample article/chat content, timeline, or async comparison. `onCommand` is a synchronous notification callback; real requests, persistence, permissions, and error policy belong to your application.
 - **Working configuration:** The shared action list/order, applied EN/JA labels, context, presentation, appearance, and motion survive navigation and language changes. A validated sessionStorage draft restores configuration, locale, and the appearance-isolation mode/variable on a same-tab reload when storage is available. Invalid or blocked storage uses defaults with a visible notice and is not automatically overwritten until a user edit. This draft is separate from named presets and does not sync across devices.
@@ -188,7 +192,7 @@ npm run verify:archive
 
 `verify:consumer` creates a fresh external npm project, installs the tarball, typechecks with strict NodeNext and skipLibCheck:false, imports the ESM at runtime, and checks the stylesheet. `verify:generated` compiles generated EN/JA TSX examples against the built archive, including labelled/icon-only, full-catalog, single-action, maximum-label, legacy, mixed-motion, inactive-override, and hostile-label configurations, using existing dependencies. Its 10 configurations produce 20 EN/JA modules; unsafe override maps must be rejected without executing imported accessors or `toJSON`. It also builds a separate generated-component fixture for the browser suite; that QA page is excluded from deployment. `verify:archive` requires a Git HEAD and tests only files in that committed archive. Do not ignore `src/lib/`.
 
-CI is defined in `.github/workflows/quality.yml`; a configured check is not evidence of a passing run. DOM tests cover behavior but do not prove layout, native modal focus trapping, platform assistive-technology compatibility, or visual contrast on all custom surfaces. Browser checks and their status are recorded in the [QA guide](https://github.com/domizo/social-interaction-lab/blob/main/docs/QA.md). Test your real integration.
+CI is defined in `.github/workflows/quality.yml`; a configured check is not evidence of a passing run. DOM tests cover behavior but do not prove layout, native modal focus trapping, platform assistive-technology compatibility, or visual contrast on all custom surfaces. Browser checks and their status are recorded in the [QA guide](https://github.com/domizo/social-interaction/blob/main/docs/QA.md). Test your real integration.
 
 `npm run build` also checks that MIT metadata, served notices and archived licenses agree with the installed lockfile-resolved dependencies. Run `npm run verify:distribution` to repeat this check against an existing build.
 

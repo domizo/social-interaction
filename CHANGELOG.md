@@ -1,5 +1,11 @@
 # Changelog / 変更履歴
 
+## 0.6.2 — 2026-10-13
+
+- Rename the project and repository to Social Interaction (`social-interaction`); align UI, clone instructions, generated React imports and the `@social-interaction/react` archive / プロジェクト名・画面・導入手順・生成コードを統一
+- Keep the existing preset and session-storage keys, JSON schema, motion plans and behavior unchanged / 保存済み設定と動きの互換性を維持
+- Existing installed archives and their imports keep working; newly generated examples use the renamed package / 既存アーカイブの import はそのまま、新しい生成例は新パッケージ名を使用
+
 ## 0.6.1 — 2026-10-12
 
 - Adopt the MIT license for project code, with copyright attributed to the repository owner handle domizo. Keep package private:true as a guard against accidental npm publication / プロジェクトを MIT ライセンスへ移行し、リポジトリ所有者のハンドル domizo を著作権表示に使用。npm の意図しない公開を防ぐ private:true は維持

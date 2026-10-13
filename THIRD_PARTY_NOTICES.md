@@ -1,6 +1,6 @@
 # Third-party notices / 第三者のライセンス通知
 
-Social Interaction Lab project code is covered by LICENSE. The following components retain their own licenses and copyright notices.
+Social Interaction project code is covered by LICENSE. The following components retain their own licenses and copyright notices.
 本プロジェクトのコードには LICENSE が適用されます。以下の構成要素には、それぞれのライセンスと著作権表示が適用されます。
 
 Scope: the built playground bundles React, React DOM, Scheduler, a Vite-generated modulepreload helper, and the listed font assets. Versions below are the exact package-lock.json resolutions, verified against the installed packages. License text is copied verbatim from each installed package; the Vite entry contains only its complete core-license section. These notices do not assert that build-time tooling dependencies are included in the playground.

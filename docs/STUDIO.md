@@ -1,8 +1,8 @@
 # Interaction Studio / インタラクション Studio
 
-Version **0.6.0** makes the five-step workflow practical for choosing an icon set: drag to order it, tune appearance in one place, assign a global motion with individual exceptions, try the result in context, and export the same configuration. **Guide** keeps exploratory comparisons separate from those working choices.
+**Social Interaction 0.6.2** is the renamed project. The five-step workflow introduced in **0.6.0** helps you choose an icon set: drag to order it, tune appearance in one place, assign a global motion with individual exceptions, try the result in context, and export the same configuration. **Guide** keeps exploratory comparisons separate from those working choices.
 
-0.6.0 では、アイコンをドラッグで並べ、見た目を1か所で調整し、全体と個別の動きを選び、使用画面で試して同じ設定を書き出せます。比較のための実験は「ガイド」に分け、作業中の設定を意図せず変えないようにします。
+**Social Interaction 0.6.2** ではプロジェクト名を変更しました。0.6.0 で導入したワークフローでは、アイコンをドラッグで並べ、見た目を1か所で調整し、全体と個別の動きを選び、使用画面で試して同じ設定を書き出せます。比較のための実験は「ガイド」に分け、作業中の設定を意図せず変えないようにします。
 
 The four variants, 1–12-action selection, labelled/icon-only component API, and schema version 1 remain. Optional `motionOverrides` adds per-action assignments to schema-v1 input; omitted legacy values normalize to an empty map. All 60 action/treatment geometry and timing plans are unchanged, including the accepted 0.3.8 Cartoon Comment/Repost behavior. Examples remain local simulations, with no social-network posting or AI backend.
 
@@ -15,8 +15,8 @@ Requires Git, Node.js 22.12+ in the 22.x line, 24.x, or 26.x, and npm. Clone the
 Git、Node.js 22.12 以上の 22 系・24 系・26 系のいずれか、npm を用意し、リポジトリを取得して開発サーバーを起動します。
 
 ```sh
-git clone https://github.com/domizo/social-interaction-lab.git
-cd social-interaction-lab
+git clone https://github.com/domizo/social-interaction.git
+cd social-interaction
 npm ci
 npm run dev
 ```
@@ -58,6 +58,10 @@ Use a tab directly, or use **Next / Back** to move through the suggested order. 
 タブ列では左右矢印・Home・End でフォーカスを移し、Enter・Space で開きます。クリックでも自由に移動できます。表示していないパネルは保持しつつ `hidden` と `inert` にし、キーボードや読み上げの対象から外します。「次へ／戻る」は移動先の見出しにフォーカスを置きます。移動時は動き・処理中の操作・未完了の読み込みを止め、メニューやダイアログを閉じますが、入力中の下書きと確定済みのトグル状態は保持します。再読み込み後は検証済みの設定・言語・見た目の単変数比較の選択を復元し、その場の操作状態はリセットします。
 
 ### Working draft and saved presets / 作業中の設定とプリセット
+
+The rename deliberately keeps the legacy keys `social-interaction-lab:working-draft:v1` and `social-interaction-lab:studio-presets:v1` to preserve saved data on the same browser origin. The keys are compatibility identifiers, not the current project name. Changing the origin or port uses different browser storage; export/import configuration JSON to carry a setup across origins.
+
+名称変更後も、保存済みデータを引き継ぐため、旧キー `social-interaction-lab:working-draft:v1` と `social-interaction-lab:studio-presets:v1` を意図的に維持します。現在のプロジェクト名ではなく、互換性のための識別子です。オリジンやポートが変わると保存領域も別になるため、設定 JSON の書き出し・読み込みで持ち運んでください。
 
 The session working draft is stored separately under `social-interaction-lab:working-draft:v1` in this origin's **sessionStorage**. New drafts use `{schemaVersion: 1, config, locale, comparison: {isolate, variable}}`. The complete configuration is checked with the same strict validator as JSON import; locale and comparison choices are also validated before restoration. `comparison.isolate` is a boolean, and `comparison.variable` is an editable token (`iconSize`, `strokeWidth`, `gap`, `duration`, `amplitude`, or `accent`). Legacy three-field drafts may omit `comparison`, which defaults to `{isolate: false, variable: "gap"}`. Configuration, locale, and the chosen isolation mode/variable return on a same-tab reload, preserving the effective token values used in previews and export. The schema version remains 1; normalized configurations and new named-preset exports also carry `motionOverrides`. This is browser-session storage, not account storage or cross-device sync.
 
@@ -209,9 +213,13 @@ JSON はプリセット一覧ではなく、ひとつの設定です。最大65,
 
 ### Complete React module / React モジュール
 
-**Copy React** and **Download TSX** produce the same complete `SocialActions.tsx` module. Download the actual `social-interaction-lab-react-0.6.1.tgz` archive from **Export**, install it in a separate React + TypeScript application with `npm install ./social-interaction-lab-react-0.6.1.tgz`, keep its explicit stylesheet import, and mount the default `SocialActions` component.
+**Copy React** and **Download TSX** produce the same complete `SocialActions.tsx` module. Download the actual `social-interaction-react-0.6.2.tgz` archive from **Export**, install it in a separate React + TypeScript application with `npm install ./social-interaction-react-0.6.2.tgz`, keep its explicit stylesheet import, and mount the default `SocialActions` component.
 
 The package is distributed as an installable archive and is not published to the npm registry. Its ESM build expects React 18.2 or 19 as a peer dependency. See [License and distribution](#license-and-distribution--ライセンスと配布) for reuse terms.
+
+Newly generated modules use `@social-interaction/react` and explicitly import `@social-interaction/react/styles.css`. Existing installations of older tarballs remain usable under `@social-interaction-lab/react`; previously generated snippets retain those old imports. To use an older snippet with the renamed 0.6.2 package, regenerate it or update both its package and stylesheet imports.
+
+新しい生成コードは `@social-interaction/react` と `@social-interaction/react/styles.css` を読み込みます。旧 tarball のインストール済みパッケージは `@social-interaction-lab/react` として引き続き使え、以前の生成コードも旧 import を保持します。名称変更後の 0.6.2 パッケージで使う場合は、コードを再生成するか、パッケージと CSS の両方の import を更新してください。
 
 The generated module includes:
 
@@ -267,7 +275,7 @@ npm run verify:generated
 
 For browser review, exercise both languages, both presentations, and narrow/wide layouts; all five tabs and Guide panels, freely revisited steps, direct/legacy hashes, browser Back/Forward, manual keyboard tab activation, Next/Back heading focus, hidden/inert inactive panels, same-tab reload restoration of configuration, locale, and effective isolation-mode tokens, including legacy drafts without comparison choices, invalid/blocked session storage, retained local toggles and composer drafts on step changes, popup closure without hidden focus restoration, and cancellation of motion, requests, and imports when leaving a panel; picker inclusion/removal, one-action/12-action limits, pointer/touch handle ordering, keyboard pickup/arrows/Home/End/drop/Escape, interrupted-reorder rollback, the collapsed Earlier/Later fallback, focus/announcements, and custom label/order propagation across shared surfaces; labelled/icon-only switching; stable accessible names, native title hints, hidden-count descriptions, and minimum hit targets; legacy schema-v1 imports without `presentation` or `motionOverrides`, rejection of invalid values and unsafe override keys/properties, global inheritance and explicit `none`, per-icon reset and remove/re-add preservation, Guide experiment isolation and Assigned motions defaults, and preset/JSON/session/TSX assignment round trips; keyboard menus/dialogs and removal while a popup or request is active; storage denial/corruption; invalid, oversized, and racing imports; clipboard rejection; timeline selected choices, resolved-treatment readout, removal fallback, replay/seek/reset/unmount and OS/manual reduction; independent async reversal/failure/retry/cancel; and lens wrapping with long labels. Check that the independent Like/Save examples and full 12-action catalog remain available when the picker changes. Inspect real SVG geometry over time for all 12 × five treatments, including the accepted 0.3.8 Comment/Repost behavior. Keep code-generation type checks separate from runtime, accessibility, and visual QA.
 
-These instructions describe the verification workflow, not a claim that new browser checks have passed. Historical results remain in [QA](https://github.com/domizo/social-interaction-lab/blob/main/docs/QA.md); record fresh evidence there only when executed.
+These instructions describe the verification workflow, not a claim that new browser checks have passed. Historical results remain in [QA](https://github.com/domizo/social-interaction/blob/main/docs/QA.md); record fresh evidence there only when executed.
 
 生成 TSX の型検査は両言語の10設定、計20件です。旧形式、混在する個別の動き、未選択操作の個別指定、攻撃的な文字列を含むラベルも扱い、不正なマップを拒否して getter や `toJSON` を実行しないことも確認します。任意の順序とラベルを持つ部分集合は `?set=custom&locale=en|ja`、個別指定と全体の動きを継承する Reaction の例は `?set=mixed&locale=en|ja` で選べます。どちらも指定した `presentation` より優先します。生成コードの型検査と、実ブラウザーでの操作・動き・アクセシビリティ確認は別です。両言語・両表示方法・画面幅・5つのタブとガイド・直接リンクと旧リンク・戻る／進む・キーボード操作・非表示パネルへのフォーカス防止・再読み込みでの設定復元・移動時の中止と下書き保持・選択数の上下限・ドラッグとキーボードの選択／移動／確定／中止・中断時の復元・折りたたんだ代替操作・フォーカスと通知・全体継承と個別指定・削除／再追加・ガイドの変更が共有設定に影響しないこと・共有画面への選択／順序／ラベルの反映・固定のアクセシブル名と件数の説明・旧 JSON の互換性と保存／書き出しの往復・中断や失敗・動き抑制を検証し、実行した範囲だけを QA に記録してください。このガイドは新しいブラウザー検証の成功を宣言するものではありません。
 

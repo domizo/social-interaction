@@ -111,8 +111,8 @@ Playback uses a finite clock with animation-frame sampling and a completion watc
 
 ```tsx
 import {useEffect, useRef} from 'react';
-import {ActionIcon, createGlyphTimeline, type GlyphTimeline} from '@social-interaction-lab/react';
-import '@social-interaction-lab/react/styles.css';
+import {ActionIcon, createGlyphTimeline, type GlyphTimeline} from '@social-interaction/react';
+import '@social-interaction/react/styles.css';
 
 export function CommentInspector() {
   const svg = useRef<SVGSVGElement>(null);

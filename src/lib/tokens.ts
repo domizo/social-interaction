@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react';
 import {normalizeMotionTokens,type IconMotionTokens} from './iconMotion.js';
-export const TOKEN_VERSION = '0.6.1';
+export const TOKEN_VERSION = '0.6.2';
 export type SocialVariant = 'minimal' | 'soft' | 'solid' | 'spring';
 export type SocialAction = 'like' | 'comment' | 'share' | 'quote' | 'repost' | 'bookmark' | 'note' | 'star' | 'send' | 'sparkles' | 'bell' | 'reaction';
 export type PreviewState = 'idle' | 'hover' | 'focus' | 'pressed' | 'selected' | 'pending' | 'error';
@@ -18,5 +18,5 @@ export function tokenStyle(input: Partial<SocialTokens> = {}): CSSProperties {
 }
 export function tokensToDTCG(input: Partial<SocialTokens> = {}, motionInput:Partial<IconMotionTokens>={}) {
   const t=normalizeTokens(input),m=normalizeMotionTokens(motionInput); const dimension=(value:number)=>({$type:'dimension',$value:{value,unit:'px'}});
-  return {iconMotion:{duration:{$type:'duration',$value:{value:m.duration,unit:'ms'}},intensity:{$type:'number',$value:m.intensity},stagger:{$type:'duration',$value:{value:m.stagger,unit:'ms'}}},$description:'Social Interaction Lab. DTCG 2025.10 format; not a W3C Recommendation. Package version '+TOKEN_VERSION, iconSize:dimension(t.iconSize),strokeWidth:dimension(t.strokeWidth),gap:dimension(t.gap),hitTarget:dimension(t.hitTarget),duration:{$type:'duration',$value:{value:t.duration,unit:'ms'}},amplitude:{$type:'number',$value:t.amplitude/100},accent:{$type:'color',$value:{colorSpace:'srgb',components:[1,3,5].map(i=>parseInt(t.accent.slice(i,i+2),16)/255),alpha:1,hex:t.accent}}};
+  return {iconMotion:{duration:{$type:'duration',$value:{value:m.duration,unit:'ms'}},intensity:{$type:'number',$value:m.intensity},stagger:{$type:'duration',$value:{value:m.stagger,unit:'ms'}}},$description:'Social Interaction. DTCG 2025.10 format; not a W3C Recommendation. Package version '+TOKEN_VERSION, iconSize:dimension(t.iconSize),strokeWidth:dimension(t.strokeWidth),gap:dimension(t.gap),hitTarget:dimension(t.hitTarget),duration:{$type:'duration',$value:{value:t.duration,unit:'ms'}},amplitude:{$type:'number',$value:t.amplitude/100},accent:{$type:'color',$value:{colorSpace:'srgb',components:[1,3,5].map(i=>parseInt(t.accent.slice(i,i+2),16)/255),alpha:1,hex:t.accent}}};
 }

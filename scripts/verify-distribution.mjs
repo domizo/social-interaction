@@ -5,7 +5,7 @@ import {verifyLicenseSources} from './licenses.mjs';
 
 const {license,notices}=await verifyLicenseSources();
 const root=JSON.parse(await readFile('package.json','utf8'));
-const archive=`public/downloads/social-interaction-lab-react-${root.version}.tgz`;
+const archive=`public/downloads/social-interaction-react-${root.version}.tgz`;
 for(const dir of ['public','dist']){
  assert.equal(await readFile(`${dir}/LICENSE.txt`,'utf8'),license,`${dir}: exact project license`);
  assert.equal(await readFile(`${dir}/THIRD_PARTY_NOTICES.txt`,'utf8'),notices,`${dir}: complete third-party notice`);
@@ -15,8 +15,9 @@ for(const file of ['LICENSE','THIRD_PARTY_NOTICES.md']){
  assert.equal(execFileSync('tar',['-xOf',archive,`package/${file}`],{encoding:'utf8'}),source,`archive: exact ${file}`);
 }
 const pkg=JSON.parse(execFileSync('tar',['-xOf',archive,'package/package.json'],{encoding:'utf8'}));
+assert.equal(root.name,'social-interaction');assert.equal(pkg.name,'@social-interaction/react');
 assert.equal(pkg.license,'MIT');assert.equal(pkg.private,true);assert.equal(pkg.version,root.version);
-assert.deepEqual(await readFile(`dist/downloads/social-interaction-lab-react-${root.version}.tgz`),await readFile(archive));
+assert.deepEqual(await readFile(`dist/downloads/social-interaction-react-${root.version}.tgz`),await readFile(archive));
 const demoLink=/https?:\/\/[^\s"'<>)]*\.chatgpt\.site(?:[\/\s"'<>)]|$)/i;
 async function scan(path){for(const entry of await readdir(path,{withFileTypes:true})){const name=`${path}/${entry.name}`;if(entry.isDirectory())await scan(name);else if(/\.(?:md|txt|json|tsx?|m?js|css|html|ya?ml)$/.test(entry.name))assert.ok(!demoLink.test(await readFile(name,'utf8')),`Remove authored demo-site link: ${name}`);}}
 for(const dir of ['src','docs','scripts','tests','e2e','.github','package','dist'])await scan(dir);

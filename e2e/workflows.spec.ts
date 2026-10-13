@@ -267,7 +267,8 @@ test('all six steps have accessible ownership unique IDs and responsive EN JA sc
   page.on('pageerror', error => errors.push(error.message));
   page.on('console', message => {if (message.type() === 'error') errors.push(message.text());});
   await page.goto('/');
-  await expect(page).toHaveTitle(/Social Interaction Lab/);
+  await expect(page).toHaveTitle('Social Interaction');
+  await expect(page.locator('.brand')).toHaveText('Social Interaction');
   for (const locale of ['en', 'ja']) {
     if (locale === 'ja') await page.getByRole('button', {name: '日本語', exact: true}).click();
     for (const step of steps) {

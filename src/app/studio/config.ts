@@ -13,6 +13,7 @@ export type StudioConfig = {
   motionTokens: IconMotionTokens;
 };
 export const MAX_CONFIG_BYTES = 64 * 1024;
+// Retain the original storage identity so existing named presets remain available.
 export const PRESET_STORAGE_KEY = 'social-interaction-lab:studio-presets:v1';
 export const MAX_PRESETS = 20;
 export type StudioPreset = {name: string; config: StudioConfig};
@@ -183,13 +184,13 @@ export function generateReactUsage(input: StudioConfig, locale: 'en' | 'ja'): st
     history: 'Local activity', saved: 'Saved in this demo', enabled: 'on', disabled: 'off', error: 'The command callback failed',
   };
   return `// Save as SocialActions.tsx in a React + TypeScript app.
-// Install the downloaded @social-interaction-lab/react package and React first.
+// Install the downloaded @social-interaction/react package and React first.
 // Mount with <SocialActions />. onCommand is an optional integration callback.
 // Configuration, presentation, and accessible labels are exported; transient selections and activity start fresh.
 // Manual reduced-motion preview is not exported; ActionButton honors the device OS preference.
 import {useEffect, useId, useRef, useState} from 'react';
-import {ActionBar, ActionButton, isToggleAction, type SocialAction, type IconMotion} from '@social-interaction-lab/react';
-import '@social-interaction-lab/react/styles.css';
+import {ActionBar, ActionButton, isToggleAction, type SocialAction, type IconMotion} from '@social-interaction/react';
+import '@social-interaction/react/styles.css';
 
 export const studioConfig = ${literal(config)} as const;
 const locale = ${literal(locale)} as const;

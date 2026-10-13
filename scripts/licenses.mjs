@@ -12,7 +12,7 @@ const dependencies=[
 export async function expectedNotices(){
  const lock=JSON.parse(await readFile('package-lock.json','utf8'));
  let output='# Third-party notices / 第三者のライセンス通知\n\n'+
- 'Social Interaction Lab project code is covered by LICENSE. The following components retain their own licenses and copyright notices.\n'+
+ 'Social Interaction project code is covered by LICENSE. The following components retain their own licenses and copyright notices.\n'+
  '本プロジェクトのコードには LICENSE が適用されます。以下の構成要素には、それぞれのライセンスと著作権表示が適用されます。\n\n'+
  'Scope: the built playground bundles React, React DOM, Scheduler, a Vite-generated modulepreload helper, and the listed font assets. Versions below are the exact package-lock.json resolutions, verified against the installed packages. License text is copied verbatim from each installed package; the Vite entry contains only its complete core-license section. These notices do not assert that build-time tooling dependencies are included in the playground.\n\n'+
  'The installable React component archive does not bundle these React runtimes or fonts: React is a peer dependency, and the consuming application chooses its runtime and typography. This notice is included with the archive as distribution context. Preserve the relevant notices when redistributing the corresponding software or font files. Other development dependencies retain the licenses provided with their packages.\n\n';

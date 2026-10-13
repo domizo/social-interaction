@@ -2,6 +2,7 @@ import {useEffect,useRef,useState} from 'react';
 import {defaultStudioConfig,parseStudioConfig,MAX_CONFIG_BYTES,type StudioConfig} from './studio/config.js';
 import type {EditableToken} from './Inspector.js';
 import type {Locale} from './content.js';
+// Retain the original storage identity across the Social Interaction rename.
 export const WORKING_DRAFT_KEY='social-interaction-lab:working-draft:v1';
 const initialComparison={isolate:false,variable:'gap' as EditableToken};
 export function readWorkingDraft(storage:Pick<Storage,'getItem'>){
